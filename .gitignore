@@ -1,7 +1,0 @@
-.parcel-cache/
-.idea/
-node_modules/
-netlify.toml
-dist
-*.css
-*.css.map
