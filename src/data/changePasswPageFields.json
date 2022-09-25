@@ -1,0 +1,17 @@
+[
+  {
+    "fieldType": "Старый пароль",
+    "fieldName": "oldPassword",
+    "fieldValue": "*******"
+  },
+  {
+    "fieldType": "Новый пароль",
+    "fieldName": "newPassword",
+    "fieldValue": "**********"
+  },
+  {
+    "fieldType": "Повторите новый пароль",
+    "fieldName": "newPassword",
+    "fieldValue": "**********"
+  }
+]
