@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../styles/profile_page.less" />
+  <title>Change Password</title>
+</head>
+<body>
+<div class="settings-container">
+  <div class="header-section">
+    {{> "profile_page/dataContainerHeader" username="User"}}
+  </div>
+  <ul class="main-section">
+    {{#each profileDataFields}}
+      <li class="data-field">
+        {{> "profile_page/dataField" this}}
+      </li>
+    {{/each}}
+  </ul>
+  <div class="footer-section">
+    <a class="change-data" href="change_data.hbs">Изменить данные</a>
+    <a class="change-password" href="change_password.hbs">Изменить пароль</a>
+    <a class="exit-link">Выйти</a>
+  </div>
+</div>
+</body>
+</html>

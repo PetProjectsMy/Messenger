@@ -1,0 +1,56 @@
+{
+  "rules": {
+    "eol-last": ["error", "always"],
+    "no-trailing-spaces": "error",
+    "no-multiple-empty-lines": ["error", { "max": 2, "maxEOF": 0 }]
+  },
+  "overrides": [
+    {
+      "files": ["*.html"],
+      "plugins": ["@html-eslint/eslint-plugin"],
+      "parser": "@html-eslint/parser",
+      "extends": ["plugin:@html-eslint/recommended"],
+      "rules": { "@html-eslint/indent": ["error", 2] }
+    },
+    {
+      "files": ["*.ts"],
+      "env": {
+        "browser": true,
+        "es2021": true
+      },
+      "plugins": ["@typescript-eslint", "prettier"],
+      "extends": [
+        "airbnb",
+        "airbnb-typescript",
+        "plugin:react/recommended",
+        "plugin:import/typescript",
+        "plugin:prettier/recommended"
+      ],
+      "parserOptions": {
+        "ecmaFeatures": {
+          "jsx": true
+        },
+        "ecmaVersion": "latest",
+        "sourceType": "module",
+        "project": ["tsconfig.json"]
+      },
+      "rules": {
+        "no-underscore-dangle": "off",
+        "no-unused-vars": ["error", { "args": "after-used" }],
+        "no-restricted-syntax": [
+          "error",
+          "ForInStatement",
+          "LabeledStatement",
+          "WithStatement"
+        ],
+        "import/no-extraneous-dependencies": [
+          "error",
+          { "devDependencies": true }
+        ],
+        "import/prefer-default-export": "off",
+        "class-methods-use-this": "warn",
+        "no-param-reassign": "warn"
+      }
+    }
+  ]
+}

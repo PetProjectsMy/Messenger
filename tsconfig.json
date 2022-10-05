@@ -1,0 +1,11 @@
+{
+  "extends": "@tsconfig/node18/tsconfig.json",
+  "include": ["src/**/*.ts", "playground/*.ts"],
+  "exclude": ["node_modules", "dist"],
+  "compilerOptions": {
+    "lib": ["es2022", "dom"],
+    "rootDir": "./",
+    "baseUrl": "./src",
+    "typeRoots": ["node_modules/@types", "src/typings/component-core.d.ts"]
+  }
+}
