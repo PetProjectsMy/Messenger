@@ -2,6 +2,7 @@
 .idea/
 node_modules/
 netlify.toml
+playground/
 dist
 *.css
 *.css.map

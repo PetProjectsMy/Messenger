@@ -6,19 +6,44 @@
     "node": "18.7.0"
   },
   "scripts": {
-    "dev": "parcel src/pages/index.hbs --no-cache",
+    "dev": "parcel src/index.html --no-cache",
     "start": "parcel build src/pages/index.hbs && node ./server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint"
+  },
+  "alias": {
+    "pages": "./src/pages",
+    "components": "./src/components",
+    "utils": "./src/utils"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@anikin/parcel-transformer-handlebars": "1.0.9",
+    "@anikin/parcel-transformer-handlebars-precompile": "1.0.1",
+    "@html-eslint/eslint-plugin": "0.15.0",
+    "@html-eslint/parser": "0.15.0",
     "@parcel/transformer-less": "2.7.0",
+    "@tsconfig/node18": "1.0.1",
+    "@tsconfig/recommended": "1.0.1",
+    "@typescript-eslint/eslint-plugin": "5.38.1",
+    "@typescript-eslint/parser": "5.38.1",
+    "eslint": "8.24.0",
+    "eslint-config-airbnb": "19.0.4",
+    "eslint-config-airbnb-typescript": "17.0.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-import": "2.26.0",
+    "eslint-plugin-jsx-a11y": "6.6.1",
+    "eslint-plugin-prettier": "4.2.1",
+    "eslint-plugin-react": "7.31.8",
+    "eslint-plugin-react-hooks": "4.6.0",
     "handlebars": "4.7.7",
     "less": "4.1.3",
-    "parcel": "2.7.0"
+    "nanoid": "4.0.0",
+    "parcel": "2.7.0",
+    "prettier": "2.7.1",
+    "typescript": "*"
   },
   "dependencies": {
     "express": "4.18.1"
