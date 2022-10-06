@@ -1,13 +1,22 @@
 declare global {
-  export type ComponentNotEventsProps = {
-    [prop: string]: string | Function | ComponentNotEventsProps;
-  };
-
   export type ComponentEventListener = (...args: any[]) => void;
 
-  export type ComponentEventsProp = {
+  type ComponentOptionalProps = {
+    name?: string;
     events?: Record<string, ComponentEventListener>;
   };
 
-  export type ComponentProps = ComponentNotEventsProps & ComponentEventsProp;
+  type ComponentPropsBase = {
+    [prop: string]: string | Function | ComponentPropsBase;
+  };
+
+  export type ComponentProps = ComponentOptionalProps & ComponentPropsBase;
+
+  type HTMLElementProps = {
+    htmlElementClass?: string;
+    htmlElementID?: string;
+  };
+  export type WithHTMLProps<PropsType> = PropsType & HTMLElementProps;
 }
+
+export {};

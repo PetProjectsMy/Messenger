@@ -1,4 +1,4 @@
-import Block from "../components/core/block";
+import Block from "./block-base";
 
 export default function renderDOM(rootSelector: string, component: Block) {
   const root = document.querySelector(rootSelector);
@@ -7,7 +7,7 @@ export default function renderDOM(rootSelector: string, component: Block) {
     throw new Error("Root not found");
   }
 
-  const element = component.getContent();
+  const element = component.getElement();
 
   if (!(element instanceof HTMLElement)) {
     throw new Error(`Wrong type ${typeof element} of element ${element}`);

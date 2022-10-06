@@ -1,3 +1,2 @@
-import Button from "./buttons/button-with-icon";
-
-export default Button;
+export { Button } from "./button/component";
+export { Link } from "./link/component";

@@ -1,20 +1,5 @@
 export default class EventBus {
-  private static instance: EventBus | null = null;
-
-  private listeners: { [event: string]: ComponentEventListener[] } = {};
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  private constructor() {}
-
-  public static getInstance(): EventBus {
-    let { instance } = EventBus;
-
-    if (!instance) {
-      instance = new EventBus();
-    }
-
-    return instance;
-  }
+  private listeners: Record<string, ComponentEventListener[]> = {};
 
   public on(event: string, callback: ComponentEventListener): void {
     if (!this.listeners[event]) {
