@@ -16,9 +16,7 @@ export default class BlockBase {
 
   protected props: ComponentProps;
 
-  protected wasRendered: Boolean = false;
-
-  protected id: string = nanoid(7);
+  readonly id: string = nanoid(7);
 
   protected componentName: string;
 
@@ -80,7 +78,6 @@ export default class BlockBase {
     Object.entries(events).forEach(
       ([event, listener]: [string, EventListener]) => {
         element!.addEventListener(event, listener);
-        console.log(`add event ${event} to ${element}`);
       }
     );
   }

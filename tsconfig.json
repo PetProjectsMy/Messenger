@@ -6,7 +6,7 @@
     "target": "ES2015",
     "rootDir": "./src",
     "baseUrl": "./src",
-    "typeRoots": ["./typings/component-core.d.ts"],
+    "typeRoots": ["src/typings"],
     "esModuleInterop": true,
     "moduleResolution": "node"
   }

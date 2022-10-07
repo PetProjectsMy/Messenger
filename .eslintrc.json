@@ -50,7 +50,8 @@
         "import/prefer-default-export": "off",
         "class-methods-use-this": "warn",
         "no-param-reassign": "warn",
-        "@typescript-eslint/no-useless-constructor": "off"
+        "@typescript-eslint/no-useless-constructor": "off",
+        "no-plusplus": "off"
       }
     }
   ]

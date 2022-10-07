@@ -1,10 +1,10 @@
 import Block from "core/block";
 import { Link, Input, HomeButton } from "components";
 import { MainPage } from "core/renderDOM";
-import { SignUpPage } from "pages";
+import { LoginPage } from "pages";
 import template from "./template";
 
-export class LoginPage extends Block {
+export class SignUpPage extends Block {
   constructor() {
     const children: ComponentChildren = {};
 
@@ -16,15 +16,15 @@ export class LoginPage extends Block {
       },
     });
 
-    children.signUpLink = new Link({
+    children.signInLink = new Link({
       props: {
-        label: "Register Account",
-        htmlName: "Sign up",
-        htmlClass: "sign-up-link",
+        label: "Sign In",
+        htmlName: "Sign in",
+        htmlClass: "sign-in-link",
         events: {
           click: () => {
-            console.log("click on sign up link");
-            MainPage.component = new SignUpPage();
+            console.log(`Click on sign in link`);
+            MainPage.component = new LoginPage();
           },
         },
       },
@@ -33,8 +33,13 @@ export class LoginPage extends Block {
     children.homeButton = new HomeButton();
 
     children.formFields = [
+      ["email", "Your Email"],
       ["login", "Your Login"],
-      ["password", "Your Password"],
+      ["first_name", "First Name"],
+      ["second_name", "Second Name"],
+      ["phone", "Phone Number"],
+      ["password", "Password"],
+      ["login", "Password (Repeat)"],
     ].map(([name, placeholder]) => {
       return new Input({
         props: {

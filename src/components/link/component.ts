@@ -1,20 +1,25 @@
 import Block from "core/block";
 import template from "./template";
 
-type LinkProps = WithHTMLProps<{
+type LinkProps = {
   label: string;
   href?: string;
-  events?: {
-    click: EventListener;
-  };
-}>;
+} & ComponentCommonProps;
 
 export class Link extends Block {
-  constructor(props: LinkProps) {
-    super(props);
+  protected props: LinkProps;
+
+  constructor({
+    props,
+    refs = {},
+  }: {
+    props: LinkProps;
+    refs?: ComponentRefs;
+  }) {
+    super({ props, refs });
   }
 
-  render(): string {
+  protected render(): string {
     return template;
   }
 }

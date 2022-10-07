@@ -1,34 +1,48 @@
 import Block from "core/block";
-import { Link, Button } from "components";
+import { Link } from "components";
+import { LoginPage, SignUpPage, ChatsPage } from "pages";
+
+import { MainPage } from "core/renderDOM";
 import template from "./template";
 
 export class NavigationPage extends Block {
+  static readonly linkIDToPageMap = {
+    login: LoginPage,
+    register_account: SignUpPage,
+    chats: ChatsPage,
+  };
+
   constructor() {
     const linkNames = [
       "login",
-      "register account",
+      "register_account",
       "chats",
       "profile",
-      "change profile data",
-      "change password",
-      "error 404",
-      "error 500",
+      "change_profile_data",
+      "change_password",
+      "error_404",
+      "error_500",
     ];
     const linkElements = linkNames.reduce((acc, linkName) => {
       acc.push(
-        new Button({
-          label: linkName,
-          htmlElementID: `${linkName}__link`,
-          events: {
-            click: () => console.log(`click on ${linkName} link`),
+        new Link({
+          props: {
+            label: linkName,
+            htmlId: `${linkName}_link`,
+            events: {
+              click: () => {
+                console.log(`click on ${linkName} link`);
+                const Component = NavigationPage.linkIDToPageMap[linkName];
+                MainPage.component = new Component();
+              },
+            },
           },
         })
       );
       return acc;
     }, []);
 
-    super({ links: linkElements });
-    // super({ links: new Button({ label: "click" }) });
+    super({ children: { links: linkElements } });
   }
 
   render(): string {

@@ -1,5 +1,5 @@
 export default `
-  <div class="navigation__panel">
+  <nav class="navigation__panel">
     {{{ links }}}
-  </div>
+  </nav>
 `;

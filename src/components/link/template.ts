@@ -1,19 +1,13 @@
-export default `
-<a 
-  {{#if linkHREF}} 
-    href="{{linkHREF}}" 
+import getTemplate from "utils/component-template-generator";
+
+const tag = "a";
+const attributes = `
+  {{#if href}} 
+    href="{{ href }}" 
   {{else}} 
     href="#app" 
   {{/if}}
-  
-  {{#if htmlElementClass}} 
-    class="{{htmlElementClass}}" 
-  {{/if}}
-
-  {{#if htmlElementid}} 
-    id="{{htmlElementid}}" 
-  {{/if}}
->
-  {{ label }}
-</a>
 `;
+const content = "{{ label }}";
+
+export default getTemplate({ tag, attributes, content });

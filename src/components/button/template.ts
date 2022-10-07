@@ -1,19 +1,19 @@
-export default `
-<button 
-  {{#if buttonElementType}} 
-    type="{{buttonElementType}}" 
+import getTemplate from "utils/component-template-generator";
+
+const tag = "button";
+const attributes = `
+  {{#if type}} 
+    type="{{ type }}" 
   {{else}} 
     type="button" 
   {{/if}}
-  
-  {{#if htmlElementClass}} 
-    class="{{htmlElementClass}}" 
-  {{/if}}
-
-  {{#if htmlElementid}} 
-    id="{{htmlElementid}}" 
-  {{/if}}
->
-  {{ label }}
-</button>
 `;
+const content = `
+{{#if label}}
+  {{ label }}
+{{else}}
+  ""
+{{/if}}
+`;
+
+export default getTemplate({ tag, attributes, content });

@@ -1,19 +1,19 @@
 import Block from "core/block";
 import template from "./template";
 
-export type ButtonProps = {
-  label?: string;
-  type?: string;
+type ImageProps = {
+  src: string;
+  alt: string;
 } & ComponentCommonProps;
 
-export class Button extends Block {
-  protected props: ButtonProps;
+export class ImageElement extends Block {
+  protected props: ImageProps;
 
   constructor({
-    props = {},
+    props,
     refs = {},
   }: {
-    props?: ButtonProps;
+    props: ImageProps;
     refs?: ComponentRefs;
   }) {
     super({ props, refs });

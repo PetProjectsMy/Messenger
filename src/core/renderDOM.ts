@@ -1,6 +1,6 @@
 import Block from "./block-base";
 
-export default function renderDOM(rootSelector: string, component: Block) {
+export function renderDOM(rootSelector: string, component: Block) {
   const root = document.querySelector(rootSelector);
 
   if (!root) {
@@ -16,3 +16,16 @@ export default function renderDOM(rootSelector: string, component: Block) {
   if (component) root.innerHTML = "";
   root.append(element);
 }
+
+export const MainPage: PageProxy = new Proxy(
+  { component: null },
+  {
+    set(target, prop, block: Block) {
+      if (prop === "component") {
+        target[prop] = block;
+        renderDOM("#app", block);
+      }
+      return true;
+    },
+  }
+);

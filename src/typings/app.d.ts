@@ -1,5 +1,5 @@
 declare global {
-  export type Nullable<T> = T | null;
+  export type Nullable<T> = T | null | undefined;
 
   export type Keys<T extends Record<string, unknown>> = keyof T;
 

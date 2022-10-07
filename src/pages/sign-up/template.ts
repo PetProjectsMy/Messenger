@@ -1,8 +1,8 @@
 export default `
-  <main class="login-page">
-    <form class="login-form">
+  <main class="sign-up-page">
+    <form class="sign-up-form">
       <legend>
-        <h1>Login</h1>
+        <h1>Sign Up</h1>
       </legend>
       <fieldset class="form-fields">
         {{{ formFields }}}
@@ -12,13 +12,12 @@ export default `
       </fieldset>
     </form>
   <nav class="form-links">
-    <div class="sign-up-link-section">
-      {{{ signUpLink }}}
+    <div class="sign-in-link-section">
+      {{{ signInLink }}}
     </div>
     <div class="index-page-link-section">
       {{{ homeButton }}}
     </div>
   </nav>
 </main>
-
 `;

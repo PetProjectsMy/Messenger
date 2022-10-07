@@ -2,14 +2,31 @@ import Handlebars from "handlebars";
 import BlockBase from "./block-base";
 
 export default class Block extends BlockBase {
-  protected children: ComponentChildren;
+  private wasRendered: Boolean = false;
 
-  constructor(propsAndChildren: ComponentPropsAndChildren = {}) {
+  private children: ComponentChildren;
+
+  private refs: ComponentRefs = {};
+
+  private htmlWrapper: Nullable<ComponentWrapper>;
+
+  private mainPageRef: Nullable<PageProxy>;
+
+  constructor({
+    props = {},
+    children = {},
+    refs = {},
+  }: {
+    props?: ComponentProps;
+    children?: ComponentChildren;
+    refs?: ComponentRefs;
+  } = {}) {
     super();
-
-    const { props, children } = Block._getPropsAndChildren(propsAndChildren);
-    this.children = children;
     this.props = this._makePropsProxy(props);
+    this.children = children;
+
+    this.htmlWrapper = props.htmlWrapper;
+    this.refs.mainPage = refs.mainPage;
 
     this.componentName = props.name ?? "Not Named Block";
 
@@ -28,29 +45,6 @@ export default class Block extends BlockBase {
     eventBus.on(BlockBase.EVENTS.FLOW_CDM, this._componentDidMount.bind(this));
     eventBus.on(BlockBase.EVENTS.FLOW_CDU, this._componentDidUpdate.bind(this));
     eventBus.on(BlockBase.EVENTS.FLOW_RENDER, this._render.bind(this));
-  }
-
-  private static _getPropsAndChildren(
-    propsAndChildren: ComponentPropsAndChildren
-  ): {
-    props: ComponentProps;
-    children: ComponentChildren;
-  } {
-    const children: ComponentChildren = {};
-    const props: ComponentProps = {};
-
-    Object.entries(propsAndChildren).forEach(([key, value]) => {
-      if (value instanceof Block) {
-        children[key] = value;
-      } else if (Array.isArray(value)) {
-        Block._assertChildrenArray(value);
-        children[key] = value;
-      } else {
-        props[key] = value as ComponentPropsBase;
-      }
-    });
-
-    return { children, props };
   }
 
   private static _assertChildrenArray(arr: unknown[]) {
@@ -74,7 +68,6 @@ export default class Block extends BlockBase {
       }
     });
 
-    console.log(stubs);
     return stubs;
   }
 
@@ -128,12 +121,20 @@ export default class Block extends BlockBase {
       "template"
     ) as HTMLTemplateElement;
 
-    const templateString = this.render();
     const stubs = this._makeStubs();
     const context = { ...this.props, ...stubs };
+
+    let templateString = this.render();
+    if (this.htmlWrapper) {
+      const htmlWrapper = this.htmlWrapper as ComponentWrapper;
+      templateString = Handlebars.compile(htmlWrapper.htmlWrapperTemplate)({
+        [`${htmlWrapper.componentAlias}`]: templateString,
+      });
+    }
+
     const htmlString = Handlebars.compile(templateString)(context);
-    console.log(htmlString);
     fragment.innerHTML = htmlString;
+
     this._replaceStubs(fragment);
 
     return fragment.content;
