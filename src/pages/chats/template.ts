@@ -24,7 +24,7 @@ export const chatsPageTemplate = `
       {{{ chats }}}
     </ul>
   </nav>
-  <main class="main-section">
+  <main class="chats-page-main-section">
     <header class="main-section-header">
       <div class="avatar-section">
         {{{ avatarImage }}}

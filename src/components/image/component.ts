@@ -16,6 +16,7 @@ export class ImageElement extends Block {
     props: ImageProps;
     refs?: ComponentRefs;
   }) {
+    props.componentName = props.componentName ?? "Image";
     super({ props, refs });
   }
 

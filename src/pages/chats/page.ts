@@ -19,10 +19,11 @@ export class ChatsPage extends Block {
       props: {
         src: avatarImagePlaceholder,
         alt: "avatar placeholder",
+        componentName: "Avatar Image",
       },
     });
 
-    super({ children });
+    super({ children, props: { componentName: "Chats Page" } });
   }
 
   protected render(): string {

@@ -16,6 +16,7 @@ export class Link extends Block {
     props: LinkProps;
     refs?: ComponentRefs;
   }) {
+    props.componentName = props.componentName ?? "Link";
     super({ props, refs });
   }
 

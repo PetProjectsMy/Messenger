@@ -1,15 +1,16 @@
 import Block from "core/block";
 import { Link } from "components";
-import { LoginPage, SignUpPage, ChatsPage } from "pages";
+import { LoginPage, SignUpPage, ChatsPage, ProfilePage } from "pages";
 
 import { MainPage } from "core/renderDOM";
 import template from "./template";
 
 export class NavigationPage extends Block {
-  static readonly linkIDToPageMap = {
+  static readonly linkIDToPageMap: Record<string, typeof Block> = {
     login: LoginPage,
     register_account: SignUpPage,
     chats: ChatsPage,
+    profile: ProfilePage,
   };
 
   constructor() {
@@ -18,23 +19,28 @@ export class NavigationPage extends Block {
       "register_account",
       "chats",
       "profile",
-      "change_profile_data",
       "change_password",
       "error_404",
       "error_500",
     ];
-    const linkElements = linkNames.reduce((acc, linkName) => {
+    const linkElements = linkNames.reduce((acc: Link[], linkName) => {
       acc.push(
         new Link({
           props: {
             label: linkName,
             htmlId: `${linkName}_link`,
             events: {
-              click: () => {
-                console.log(`click on ${linkName} link`);
-                const Component = NavigationPage.linkIDToPageMap[linkName];
-                MainPage.component = new Component();
-              },
+              click: [
+                () => {
+                  const Component = NavigationPage.linkIDToPageMap[linkName];
+
+                  if (Component) {
+                    MainPage.component = new Component({
+                      props: { componentName: linkName },
+                    });
+                  }
+                },
+              ],
             },
           },
         })
@@ -42,7 +48,10 @@ export class NavigationPage extends Block {
       return acc;
     }, []);
 
-    super({ children: { links: linkElements } });
+    super({
+      children: { links: linkElements },
+      props: { componentName: "Navigation Page" },
+    });
   }
 
   render(): string {

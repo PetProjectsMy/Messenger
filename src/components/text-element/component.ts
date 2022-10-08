@@ -21,6 +21,6 @@ export class TextElement extends Block {
   }
 
   protected render(): string {
-    return templator(this.props.htmlTag);
+    return templator(this.props.htmlTag as string);
   }
 }

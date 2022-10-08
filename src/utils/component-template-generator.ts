@@ -20,6 +20,10 @@ export default function getTemplate({
       {{#if htmlId}} 
         id="{{htmlId}}" 
       {{/if}}
+
+      {{#if wrappedId}} 
+        wrapped-id="{{wrappedId}}" 
+      {{/if}}
         
       {{#if htmlName}}
         name="{{htmlName}}" 

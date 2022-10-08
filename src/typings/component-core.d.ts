@@ -1,7 +1,8 @@
+import { InputValidator } from "components";
 import Block from "core/block";
 
 declare global {
-  export type ComponentEventListener = (...args: any[]) => void;
+  export type ComponentEventListener = EventListener | InputValidator;
 
   export type ComponentWrapper = {
     componentAlias: string;
@@ -9,9 +10,12 @@ declare global {
   };
 
   export type ComponentOptionalProps = {
-    name?: string;
+    componentName?: string;
     htmlWrapper?: ComponentWrapper;
-    events?: Record<string, ComponentEventListener>;
+    hmtlWrapped?: boolean;
+    events?: Record<string, ComponentEventListener[]>;
+    refs?: ComponentRefs;
+    state?: ComponentState;
   };
 
   type HTMLElementProps = {
@@ -23,17 +27,21 @@ declare global {
 
   export type ComponentCommonProps = WithHTMLProps<ComponentOptionalProps>;
 
-  type ComponentPropsBase = {
-    [prop: string]: string | Function | ComponentPropsBase;
+  export type ComponentProps = {
+    [prop: string]:
+      | string
+      | boolean
+      | Record<string, Function[] | Function>
+      | ComponentRefs
+      | ComponentState
+      | ComponentProps;
   };
-
-  export type ComponentProps = ComponentPropsBase & ComponentCommonProps;
 
   export type ComponentChildren = Record<string, Block | Block[]>;
 
-  export type ComponentRefs =
-    | Record<string, Block>
-    | { mainPage?: Nullable<PageProxy> };
+  export type ComponentRefs = Record<string, Block>;
+
+  export type ComponentState = Record<string, unknown>;
 
   export type PageProxy = { component: Nullable<Block> };
 }

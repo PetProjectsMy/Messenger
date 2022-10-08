@@ -1,0 +1,99 @@
+@import "../helpers/common";
+@import "../helpers/mixins-common";
+
+@profile-form-height: 90vh;
+// --------------------------
+@header-section-flex: 25%;
+@profile-header-height: @profile-form-height * (@header-section-flex / 100%);
+
+@image-section-flex: 75%;
+@image-max-height: @profile-header-height * (@image-section-flex / 100%);
+
+@name-section-flex: 100% - @image-section-flex;
+// --------------------------
+@footer-nav-section-flex: 20%;
+@footer-section-background-color: slategrey;
+
+@main-section-flex: 100% - @header-section-flex - @footer-nav-section-flex;
+@main-section-background-color: azure;
+
+main.profile-data-form {
+  &:extend(.centered-container);
+  &:extend(.vertical-block);
+  .mixin-width-by-device(0.9, 0.6, 600px);
+  height: @profile-form-height;
+
+  & > * {
+    &:extend(.vertical-block);
+    width: 100%;
+  }
+
+  .profile-form-header {
+    flex: @profile-header-height;
+    background-color: @footer-section-background-color;
+
+    .image-section {
+      &:extend(.vertical-block);
+      flex: @image-section-flex;
+
+      img {
+        border-radius: 50%;
+        @h: ~"min(90%, calc(0.9 * @{image-max-height}))";
+        max-height: @h;
+        max-width: @h;
+        padding: calc(0.05 * @h);
+        font-size: 1.5em;
+      }
+    }
+
+    .name-section {
+      &:extend(.vertical-block);
+      flex: @name-section-flex;
+
+      .user-name {
+        height: 80%;
+        font-size: 2em;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .profile-data-fields {
+    background-color: @main-section-background-color;
+    flex: @main-section-flex;
+    &:extend(.vertical-block);
+    height: 100%;
+    width: 100%;
+
+    .data-field {
+      &:extend(.horizontal-block);
+      width: 100%;
+
+      & > * {
+        height: 100%;
+        width: 100%;
+        flex: 1;
+        &:extend(.vertical-block);
+        font-size: 1.2em;
+      }
+
+      .data-type-section {
+        .data-type {
+          font-weight: 550;
+        }
+      }
+
+      .data-input-section {
+        .data-input {
+          font-style: italic;
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  .profile-nav-section {
+    background-color: beige;
+    flex: @footer-nav-section-flex;
+  }
+}

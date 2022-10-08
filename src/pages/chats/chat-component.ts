@@ -11,12 +11,14 @@ export default class ChatComponent extends Block {
       props: {
         src: avatarImagePlaceholder,
         alt: "avatar placeholder",
+        componentName: "Chat Component Avatar Image",
       },
     });
 
     children.message = new TextElement({
       props: {
         text: Array(3).fill("Last received message.").join(" "),
+        componentName: "Chat Component Message",
       },
     });
 

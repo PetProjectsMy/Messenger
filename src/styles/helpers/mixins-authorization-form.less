@@ -23,28 +23,36 @@
       flex: 100% - @flex-fieldset;
     }
 
-    @margin: calc(@fields-total-margin / (@fields-num + 1));
+    @margin: calc(@fields-total-margin / (2 * @fields-num + 1));
     fieldset {
       flex: @flex-fieldset;
+      justify-content: space-evenly;
 
       & > * {
         width: 100%;
         &:extend(.vertical-block);
         flex: 1;
+        margin-top: @margin;
       }
 
       .form-field {
-        margin-top: @margin;
-
-        input {
-          height: 100%;
+        & > * {
           width: 95%;
           text-align: center;
+        }
+
+        input {
+          height: 80%;
+        }
+
+        span {
+          height: auto;
+          display: block;
         }
       }
 
       .submit-button-section {
-        margin: @margin 0;
+        margin-bottom: @margin;
 
         .submit-button {
           height: 100%;
@@ -74,46 +82,3 @@
     }
   }
 }
-
-// .mixin-form-field(@flex-field) {
-//   .form-fields {
-//     .form-field {
-//       flex: @flex-field;
-//       width: 100%;
-
-//       input {
-//         height: 80%;
-//         width: 100%;
-//         border: 2px solid #e9f2ff;
-//         border-radius: 5%;
-//         font-size: 1.1em;
-//         text-align: center;
-//       }
-//     }
-//   }
-// }
-
-// .mixin-form-buttons(@bw, @bf, @lf) {
-//   .form-buttons {
-//     .confirm-button {
-//       &:extend(.confirm-button);
-//       flex: 50%;
-//       font-size: @bf;
-//     }
-
-//     a {
-//       margin-bottom: 5%;
-//       margin-top: 5%;
-//       vertical-align: middle;
-//       font-size: @lf;
-//       flex: auto;
-//     }
-//   }
-// }
-
-// .sign-up-form {
-//   .mixin-auth-container(70%, 20%);
-//   .mixin-height-by-device(0.9, 0.9, 0.75, 750px);
-//   .mixin-form-field(15%);
-//   .mixin-form-buttons(90%, 1.1em, 1.25em);
-// }

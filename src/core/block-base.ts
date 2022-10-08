@@ -10,11 +10,11 @@ export default class BlockBase {
     FLOW_RENDER: "flow:render",
   };
 
-  protected _element: HTMLElement | null = null;
+  protected _element: Nullable<HTMLElement> = null;
 
   protected eventBus: EventBus = new EventBus();
 
-  protected props: ComponentProps;
+  protected props: ComponentProps = {};
 
   readonly id: string = nanoid(7);
 
@@ -47,7 +47,8 @@ export default class BlockBase {
     oldProps: ComponentProps,
     newProps: ComponentProps
   ): boolean {
-    return !propsAreEqual(oldProps, newProps);
+    const result = !propsAreEqual(oldProps, newProps);
+    return result;
   }
 
   protected setProps(nextProps: ComponentProps): void {
@@ -62,64 +63,53 @@ export default class BlockBase {
     return this._element;
   }
 
-  protected _addEvents(): void {
-    const { events } = this.props;
-    const element = this.getElement();
-
-    if (!BlockBase.isHTMLElement(element)) {
-      throw new Error(
-        `Wrong element ${element} of type ${typeof element} to add event listeners`
-      );
-    }
+  protected _bindEventListeners() {
+    const events = this.props.events as Record<string, EventListener[]>;
     if (!events) {
       return;
     }
 
-    Object.entries(events).forEach(
-      ([event, listener]: [string, EventListener]) => {
+    Object.keys(events).forEach((event) => {
+      const listeners = events[event];
+      events[event] = listeners.map((listener) => listener.bind(this));
+    });
+  }
+
+  protected _addEvents(targetElement: Nullable<HTMLElement> = null): void {
+    const element = targetElement ?? this.getElement();
+    if (!BlockBase.isHTMLElement(element)) {
+      throw new Error(
+        `${
+          this.componentName
+        }: wrong element ${element} of type ${typeof element} to add event listeners`
+      );
+    }
+
+    const events = this.props.events as Record<string, EventListener[]>;
+
+    Object.entries(events).forEach(([event, listeners]) => {
+      listeners.forEach((listener) => {
         element!.addEventListener(event, listener);
-      }
-    );
+      });
+    });
   }
 
-  protected _removeEvents(): void {
-    const { events } = this.props;
-    const element = this._element;
-
+  protected _removeEvents(targetElement: Nullable<HTMLElement> = null): void {
+    const element = targetElement ?? this.getElement();
     if (!BlockBase.isHTMLElement(element)) {
       throw new Error(
-        `Wrong element ${element} of type ${typeof element} to remove event listeners`
+        `${
+          this.componentName
+        }: wrong element ${element} of type ${typeof element} to remove event listeners`
       );
     }
-    if (!events) {
-      return;
-    }
 
-    Object.entries(events).forEach(
-      ([event, listener]: [string, EventListener]) => {
+    const events = this.props.events as Record<string, EventListener[]>;
+
+    Object.entries(events).forEach(([event, listeners]) => {
+      listeners.forEach((listener) => {
         element!.removeEventListener(event, listener);
-      }
-    );
-  }
-
-  protected _makePropsProxy(props: ComponentProps) {
-    const self = this;
-
-    return new Proxy(props, {
-      get(target, prop: string) {
-        const value = target[prop];
-        return typeof value === "function" ? value.bind(target) : value;
-      },
-      set(target, prop: string, value) {
-        const oldValue = target[prop];
-
-        target[prop] = value;
-        self.eventBus.emit(BlockBase.EVENTS.FLOW_CDU, oldValue, value);
-        return true;
-      },
-      deleteProperty() {
-        throw new Error("Нет доступа");
-      },
+      });
     });
   }
 

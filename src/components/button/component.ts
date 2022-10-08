@@ -10,13 +10,15 @@ export class Button extends Block {
   protected props: ButtonProps;
 
   constructor({
-    props = {},
+    props = { componentName: "Button" },
     refs = {},
+    state = {},
   }: {
     props?: ButtonProps;
     refs?: ComponentRefs;
+    state?: ComponentState;
   }) {
-    super({ props, refs });
+    super({ props, refs, state });
   }
 
   protected render(): string {

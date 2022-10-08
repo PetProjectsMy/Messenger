@@ -1,5 +1,6 @@
+type EventBusEventListener = (...args: unknown[]) => void;
 export default class EventBus {
-  private listeners: Record<string, ComponentEventListener[]> = {};
+  private listeners: Record<string, EventBusEventListener[]> = {};
 
   public on(event: string, callback: ComponentEventListener): void {
     if (!this.listeners[event]) {

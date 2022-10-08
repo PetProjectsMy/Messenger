@@ -1,7 +1,6 @@
-// import { ChatsPage, NavigationPage } from "pages";
 import { MainPage } from "core/renderDOM";
-import { ChatsPage, NavigationPage } from "pages";
+import { NavigationPage } from "pages";
 
 document.addEventListener("DOMContentLoaded", () => {
-  MainPage.component = new ChatsPage();
+  MainPage.component = new NavigationPage();
 });

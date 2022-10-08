@@ -5,7 +5,10 @@ export default `
         <h1>Login</h1>
       </legend>
       <fieldset class="form-fields">
-        {{{ formFields }}}
+        {{{ loginField }}}
+        {{{ loginError }}}
+        {{{ passwordField }}}
+        {{{ passwordError }}}
         <div class="submit-button-section">
           {{{ submitButton }}}
         </div>

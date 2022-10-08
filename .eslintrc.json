@@ -48,10 +48,11 @@
           { "devDependencies": true }
         ],
         "import/prefer-default-export": "off",
-        "class-methods-use-this": "warn",
-        "no-param-reassign": "warn",
+        "class-methods-use-this": "off",
+        "no-param-reassign": "off",
         "@typescript-eslint/no-useless-constructor": "off",
-        "no-plusplus": "off"
+        "no-plusplus": "off",
+        "max-classes-per-file": "off"
       }
     }
   ]
