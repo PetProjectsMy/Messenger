@@ -1,2 +1,0 @@
-*{margin:0;padding:0;font-size:2vmin}.vertical-block,.error-container{flex-direction:column;justify-content:space-evenly;align-items:center;display:flex}.horizontal-block{flex-direction:row;justify-content:space-evenly;align-items:center;display:flex}.centered-container,.error-container{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%)}.error-container{height:40%;top:44%}.error-container .error-code{flex:40%;font-size:4em}.error-container .error-description,.error-container .return-link{flex:20%;font-size:1.5em}
-/*# sourceMappingURL=error404.62345c15.css.map */
