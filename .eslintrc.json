@@ -4,6 +4,9 @@
     "no-trailing-spaces": "error",
     "no-multiple-empty-lines": ["error", { "max": 2, "maxEOF": 0 }]
   },
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
   "overrides": [
     {
       "files": ["*.html"],
