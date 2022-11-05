@@ -1,8 +1,7 @@
-import Block from "core/block";
+import { Block } from "core/dom";
 import { Link, Input, HomeButton, Button, InputValidator } from "components";
 import { InputValidators } from "utils/input-validators";
-import { MainPage } from "core/renderDOM";
-import { LoginPage } from "pages";
+import { withRouter } from "components/hocs";
 import template from "./template";
 
 export class SignUpPage extends Block {
@@ -10,20 +9,20 @@ export class SignUpPage extends Block {
     const children: ComponentChildren = {};
     const refs: ComponentRefs = {};
 
-    children.signInLink = new Link({
-      props: {
-        label: "Sign In",
-        htmlName: "Sign in",
-        htmlClass: "sign-in-link",
-        events: {
-          click: [
-            () => {
-              MainPage.component = new LoginPage();
-            },
-          ],
-        },
-      },
-    });
+    // children.signInLink = new (withRouter(Link))({
+    //   props: {
+    //     label: "Sign In",
+    //     htmlName: "Sign in",
+    //     htmlClass: "sign-in-link",
+    //     events: {
+    //       click: [
+    //         function goToLogin() {
+    //           // this.router.go("/login");
+    //         },
+    //       ],
+    //     },
+    //   },
+    // });
 
     children.homeButton = new HomeButton();
 
@@ -90,7 +89,9 @@ export class SignUpPage extends Block {
             function submitForm() {
               const formRefs = this.refs as ComponentRefs;
               Object.values(formRefs).forEach((inputField: Input) => {
-                Object.values(inputField.validators).forEach(
+                const validators = inputField.getValidators();
+
+                Object.values(validators).forEach(
                   (validator: InputValidator) => {
                     validator();
                   }

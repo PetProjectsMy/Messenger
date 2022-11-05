@@ -1,4 +1,4 @@
-import Block from "core/block";
+import { Block } from "core/dom";
 import template from "./template";
 
 type ImageProps = {

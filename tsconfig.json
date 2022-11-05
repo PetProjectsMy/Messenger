@@ -1,11 +1,12 @@
 {
-  "include": ["./**/*.ts", "playground/playground.ts"],
+  "include": ["./**/*.ts", "playground/playground.ts", "src/index.ts.old"],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "lib": ["es2022", "dom"],
     "target": "ES2015",
     "rootDir": "./src",
     "baseUrl": "./src",
+    "types": ["node"],
     "typeRoots": ["src/typings"],
     "esModuleInterop": true,
     "moduleResolution": "node",

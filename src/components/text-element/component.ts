@@ -1,4 +1,4 @@
-import Block from "core/block";
+import { Block } from "core/dom";
 import templator from "./template";
 
 type TetxElementProps = {

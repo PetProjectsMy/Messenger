@@ -1,12 +1,10 @@
-import Block from "core/block";
+import { Block, MainPage } from "core/dom";
 import { Link } from "components";
 import { LoginPage, SignUpPage, ChatsPage, ProfilePage } from "pages";
-
-import { MainPage } from "core/renderDOM";
 import template from "./template";
 
 export class NavigationPage extends Block {
-  static readonly linkIDToPageMap: Record<string, typeof Block> = {
+  static readonly linkIDToPageMap: Record<string, AppPageClass> = {
     login: LoginPage,
     register_account: SignUpPage,
     chats: ChatsPage,
@@ -16,12 +14,12 @@ export class NavigationPage extends Block {
   constructor() {
     const linkNames = [
       "login",
-      "register_account",
-      "chats",
-      "profile",
-      "change_password",
-      "error_404",
-      "error_500",
+      // "register_account",
+      // "chats",
+      // "profile",
+      // "change_password",
+      // "error_404",
+      // "error_500",
     ];
     const linkElements = linkNames.reduce((acc: Link[], linkName) => {
       acc.push(
@@ -32,10 +30,10 @@ export class NavigationPage extends Block {
             events: {
               click: [
                 () => {
-                  const Component = NavigationPage.linkIDToPageMap[linkName];
+                  const Page = NavigationPage.linkIDToPageMap[linkName];
 
-                  if (Component) {
-                    MainPage.component = new Component({
+                  if (Page) {
+                    MainPage.component = new Page({
                       props: { componentName: linkName },
                     });
                   }

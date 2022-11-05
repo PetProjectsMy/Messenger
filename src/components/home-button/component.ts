@@ -1,4 +1,4 @@
-import { MainPage } from "core/renderDOM";
+import { MainPage } from "core/dom";
 import { NavigationPage } from "pages";
 import { Button, ButtonProps } from "components/button/component";
 

@@ -1,8 +1,8 @@
-import { InputValidator } from "components";
-import Block from "core/block";
+import { Block } from "core/dom";
+import type { EventHandler } from "core/event-bus";
 
 declare global {
-  export type ComponentEventListener = EventListener | InputValidator;
+  export type ComponentEventHandler = EventHandler;
 
   export type ComponentWrapper = {
     componentAlias: string;
@@ -11,14 +11,12 @@ declare global {
 
   export type ComponentOptionalProps = {
     componentName?: string;
-    htmlWrapper?: ComponentWrapper;
-    hmtlWrapped?: boolean;
-    events?: Record<string, ComponentEventListener[]>;
-    refs?: ComponentRefs;
-    state?: ComponentState;
+    events?: Record<string, ComponentEventHandler[]>;
   };
 
   type HTMLElementProps = {
+    htmlWrapper?: ComponentWrapper;
+    hmtlWrapped?: boolean;
     htmlClass?: string;
     htmlId?: string;
     htmlName?: string;
@@ -26,6 +24,8 @@ declare global {
   type WithHTMLProps<PropsType> = PropsType & HTMLElementProps;
 
   export type ComponentCommonProps = WithHTMLProps<ComponentOptionalProps>;
+
+  export type WithCommonProps<Tprops> = Tprops & ComponentCommonProps;
 
   export type ComponentProps = {
     [prop: string]:

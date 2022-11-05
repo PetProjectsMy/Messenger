@@ -6,18 +6,22 @@
   "license": "MIT",
   "scripts": {
     "dev": "parcel ./src/index.html --no-cache",
-    "start": "parcel build src/index.html && node ./server.js"
+    "start": "parcel build src/index.html && node ./server.js",
+    "compile-check": "tsc --noEmit"
   },
   "alias": {
+    "api": "./src/api",
+    "components": "./src/components",
     "core": "./src/core",
     "pages": "./src/pages",
-    "components": "./src/components",
-    "utils": "./src/utils",
-    "static": "./src/static"
+    "services": "./src/services",
+    "static": "./src/static",
+    "utils": "./src/utils"
   },
   "devDependencies": {
     "@html-eslint/eslint-plugin": "0.15.0",
     "@html-eslint/parser": "0.15.0",
+    "@types/node": "18.11.9",
     "@typescript-eslint/eslint-plugin": "5.38.1",
     "@typescript-eslint/parser": "5.38.1",
     "eslint": "8.24.0",

@@ -1,4 +1,4 @@
-import Block from "core/block";
+import { Block } from "core/dom";
 import { HomeButton, ImageElement } from "components";
 import avatarImagePlaceholder from "static/avatar-placeholder-chats.svg";
 import { chatsPageTemplate } from "./template";

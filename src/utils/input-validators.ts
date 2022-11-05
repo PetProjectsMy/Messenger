@@ -109,15 +109,21 @@ function validateEmailRegex(value: string): string {
 }
 
 export const InputValidators: Record<string, InputValidator> = [
-  ["login", [validateLoginRegex]],
-  ["password", [validatePasswordRegex]],
-  ["passwordRepeat", [validatePasswordRegex]],
-  ["firstName", [validateNameRegex]],
-  ["secondName", [validateNameRegex]],
-  ["phone", [validatePhoneRegex]],
-  ["email", [validateEmailRegex]],
+  { fieldName: "login", validatorsList: [validateLoginRegex] },
+  { fieldName: "password", validatorsList: [validatePasswordRegex] },
+  { fieldName: "passwordRepeat", validatorsList: [validatePasswordRegex] },
+  { fieldName: "firstName", validatorsList: [validateNameRegex] },
+  { fieldName: "secondName", validatorsList: [validateNameRegex] },
+  { fieldName: "phone", validatorsList: [validatePhoneRegex] },
+  { fieldName: "email", validatorsList: [validateEmailRegex] },
 ].reduce(
-  (acc, [fieldName, validatorsList]: [string, SingleInputValidator[]]) => {
+  (
+    acc,
+    {
+      fieldName,
+      validatorsList,
+    }: { fieldName: string; validatorsList: SingleInputValidator[] }
+  ) => {
     acc[fieldName] = makeValidator({
       validatorsList,
       errorStateRef: `${fieldName}Error`,

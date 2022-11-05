@@ -1,57 +1,43 @@
-import Block from "core/block";
+import { Block } from "core/dom";
 import template from "./template";
 
 export type InputValidator = (isErrorRenderNeeded?: boolean) => boolean;
 
-export type InputInitProps = {
+export type InputProps = WithCommonProps<{
   placeholder?: string;
   type?: string;
   value?: string;
   validators?: Record<string, InputValidator>;
   disabledAttr?: boolean;
-} & ComponentCommonProps;
+}>;
 
-export type InputProps = Omit<InputInitProps, "validators"> &
-  ComponentCommonProps;
-
-export class Input extends Block {
-  protected props: InputProps;
-
-  protected validators: Record<string, InputValidator>;
-
-  constructor({
-    props = { componentName: "Input" },
-    refs = {},
-  }: {
-    props?: InputInitProps;
-    refs?: ComponentRefs;
-  }) {
-    super({
-      props: { ...props, error: "" },
-      refs,
-    });
-  }
-
+type InputState = {
+  previousValue: string;
+  error: string;
+};
+export class Input extends Block<InputProps, InputState> {
   protected render(): string {
     return template;
   }
 
   protected _preInitHook() {
-    this._bindValidators();
-    this.state = { previousValue: "" };
+    this.state = { previousValue: "", error: "" };
   }
 
   protected _preProxyHook() {
-    const props = this.props as InputInitProps;
-    this.validators = props.validators ?? {};
-    delete props.validators;
+    this.props.validators = this.props.validators ?? {};
+    this._bindValidators();
   }
 
   protected _bindValidators() {
-    Object.entries(this.validators).forEach(([event, validator]) => {
+    if (this.props.validators === undefined) {
+      throw new Error("validators prop is undefined");
+    }
+
+    Object.entries(this.props.validators).forEach(([event, validator]) => {
       const events = this.props.events as Record<
         string,
-        ComponentEventListener[]
+        ComponentEventHandler[]
       >;
 
       if (!events[event]) {
@@ -59,8 +45,16 @@ export class Input extends Block {
       }
 
       const bindedValidator = validator.bind(this);
-      this.validators[event] = bindedValidator;
+      this.props.validators![event] = bindedValidator;
       events[event].push(bindedValidator);
     });
+  }
+
+  public getValidators() {
+    return this.props.validators as Record<string, InputValidator>;
+  }
+
+  public toggleDisableState() {
+    this.props.disabledAttr = !this.props.disabledAttr;
   }
 }

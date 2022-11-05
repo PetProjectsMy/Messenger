@@ -1,32 +1,8 @@
-import Block from "core/block";
+import { Block } from "core/dom";
 import avatarImagePlaceholder from "static/avatar-placeholder-profile.png";
-import { Button, HomeButton, ImageElement, Input } from "components";
-import { dataFieldTemplate, pageTemplate } from "./template";
-
-type DataFieldProps = {
-  dataType: string;
-  inputPlaceholder: string;
-} & ComponentCommonProps;
-
-class DataField extends Block {
-  constructor(props: DataFieldProps) {
-    const children: ComponentChildren = {};
-    const { dataType, inputPlaceholder } = props;
-    children.dataInput = new Input({
-      props: {
-        value: inputPlaceholder,
-        htmlClass: "data-input",
-        disabledAttr: true,
-      },
-    });
-
-    super({ props: { dataType }, children });
-  }
-
-  protected render(): string {
-    return dataFieldTemplate;
-  }
-}
+import { Button, HomeButton, ImageElement } from "components";
+import { DataField } from "./data-field-component/component";
+import template from "./template";
 
 export class ProfilePage extends Block {
   constructor() {
@@ -83,9 +59,8 @@ export class ProfilePage extends Block {
                 this.state.mode = "save";
               }
 
-              Object.values(this.refs).forEach((inputField: Input) => {
-                const inputProps = inputField.children.dataInput.props;
-                inputProps.disabledAttr = !inputProps.disabledAttr;
+              Object.values(this.refs).forEach((dataField: DataField) => {
+                dataField.toggleDisableState();
               });
             },
           ],
@@ -97,6 +72,6 @@ export class ProfilePage extends Block {
   }
 
   protected render(): string {
-    return pageTemplate;
+    return template;
   }
 }
