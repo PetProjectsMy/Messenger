@@ -2,6 +2,7 @@ import { Block } from "core/dom";
 import { Link, Input, InputValidator, HomeButton, Button } from "components";
 import { InputValidators } from "utils/input-validators";
 import { withRouter } from "components/hocs";
+import { EnumAppRoutes } from "core/router";
 import template from "./template";
 
 export class LoginPage extends Block {
@@ -9,21 +10,21 @@ export class LoginPage extends Block {
     const children: ComponentChildren = {};
     const refs: ComponentRefs = {};
 
-    // const LinkWithRouter = withRouter(Link);
-    // children.signUpLink = new Link({
-    //   props: {
-    //     label: "Register Account",
-    //     htmlName: "Sign up",
-    //     htmlClass: "sign-up-link",
-    //     events: {
-    //       click: [
-    //         function goToSignup() {
-    //           this.router.go("/signup");
-    //         },
-    //       ],
-    //     },
-    //   },
-    // });
+    const LinkWithRouter = withRouter(Link);
+    children.signUpLink = new LinkWithRouter({
+      props: {
+        label: "Register Account",
+        htmlName: "Sign up",
+        htmlClass: "sign-up-link",
+        events: {
+          click: [
+            function goToSignup() {
+              this.router.go(EnumAppRoutes.SignUp);
+            },
+          ],
+        },
+      },
+    });
 
     children.homeButton = new HomeButton();
 

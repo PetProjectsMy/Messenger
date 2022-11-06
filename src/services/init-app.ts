@@ -1,24 +1,27 @@
-import { authAPI } from "api/auth";
+// import { authAPI } from "api/auth";
+
+import { Store } from "core/store";
+import { Router } from "core/router";
 import { UserDTO } from "api/types";
-import type { Dispatch } from "core/store";
-import { Pages } from "pages/pages-list";
 import { transformUserData, APIResponseHasError } from "utils/api";
 
-export async function initApp(dispatch: Dispatch<AppState>) {
+export async function initApp() {
   try {
+    const store = new Store<TAppState>();
+    const router = new Router();
+    window.router = router;
+    window.store = store;
+    router.init();
+    store.init();
     // const { response } = (await authAPI.me()) as any;
     const response = { reason: "error" };
-
     if (APIResponseHasError(response)) {
-      dispatch({ page: Pages.Login });
-      window.history.replaceState({}, "", "/login");
       return;
     }
-
-    dispatch({ user: transformUserData(response as UserDTO) });
+    store.dispatch({ user: transformUserData(response as UserDTO) });
   } catch (err) {
     console.error(err);
   } finally {
-    dispatch({ appIsInited: true });
+    window.store.dispatch({ appIsInited: true });
   }
 }

@@ -1,1 +1,7 @@
-export { defaultState, Dispatch, Action, Store, StoreEvent } from "./store";
+export {
+  defaultState,
+  Dispatch,
+  Action,
+  Store,
+  EnumStoreEvents,
+} from "./store";

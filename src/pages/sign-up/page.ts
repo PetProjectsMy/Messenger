@@ -2,6 +2,7 @@ import { Block } from "core/dom";
 import { Link, Input, HomeButton, Button, InputValidator } from "components";
 import { InputValidators } from "utils/input-validators";
 import { withRouter } from "components/hocs";
+import { EnumAppRoutes } from "core/router";
 import template from "./template";
 
 export class SignUpPage extends Block {
@@ -9,32 +10,44 @@ export class SignUpPage extends Block {
     const children: ComponentChildren = {};
     const refs: ComponentRefs = {};
 
-    // children.signInLink = new (withRouter(Link))({
-    //   props: {
-    //     label: "Sign In",
-    //     htmlName: "Sign in",
-    //     htmlClass: "sign-in-link",
-    //     events: {
-    //       click: [
-    //         function goToLogin() {
-    //           // this.router.go("/login");
-    //         },
-    //       ],
-    //     },
-    //   },
-    // });
+    children.signInLink = new (withRouter(Link))({
+      props: {
+        label: "Sign In",
+        htmlName: "Sign in",
+        htmlClass: "sign-in-link",
+        events: {
+          click: [
+            function goToLogin() {
+              this.router.go(EnumAppRoutes.Login);
+            },
+          ],
+        },
+      },
+    });
 
     children.homeButton = new HomeButton();
 
     [
-      ["email", "email", "Your Email"],
-      ["login", "login", "Your Login"],
-      ["firstName", "first_name", "First Name"],
-      ["secondName", "second_name", "Second Name"],
-      ["phone", "phone", "Phone Number"],
-      ["password", "password", "Password"],
-      ["passwordRepeat", "password", "Password (Repeat)"],
-    ].forEach(([fieldName, htmlName, placeholder]) => {
+      { fieldName: "email", htmlName: "email", placeholder: "Your Email" },
+      { fieldName: "login", htmlName: "login", placeholder: "Your Login" },
+      {
+        fieldName: "firstName",
+        htmlName: "first_name",
+        placeholder: "First Name",
+      },
+      {
+        fieldName: "secondName",
+        htmlName: "second_name",
+        placeholder: "Second Name",
+      },
+      { fieldName: "phone", htmlName: "phone", placeholder: "Phone Number" },
+      { fieldName: "password", htmlName: "password", placeholder: "Password" },
+      {
+        fieldName: "passwordRepeat",
+        htmlName: "password",
+        placeholder: "Password (Repeat)",
+      },
+    ].forEach(({ fieldName, htmlName, placeholder }) => {
       const inputField = new Input({
         props: {
           placeholder,

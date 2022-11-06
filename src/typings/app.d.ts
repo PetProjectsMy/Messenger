@@ -1,45 +1,16 @@
-import * as PagesClasses from "pages";
-import * as Components from "components";
-import { Pages as PagesList } from "pages/pages-list";
-import { Block } from "core/dom";
+import { EnumAppPages } from "utils/enums";
+import { Store } from "core/store";
+import { CoreRouter, EnumAppRoutes } from "core/router";
 
 declare global {
-  export type BlockClass<
-    P extends ComponentCommonProps,
-    S extends ComponentState
-  > = typeof Block<P, S>;
+  interface Window {
+    store: Store<TAppState>;
+    router: CoreRouter<EnumAppRoutes>;
+  }
 
-  export type PageComponent =
-    | Components.Button
-    | Components.ImageElement
-    | Components.Input
-    | Components.Link
-    | Components.TextElement;
-
-  export type PageComponentClass =
-    | typeof Components.Button
-    | typeof Components.ImageElement
-    | typeof Components.Input
-    | typeof Components.Link
-    | typeof Components.TextElement;
-
-  export type AppPage =
-    | PagesClasses.ChatsPage
-    | PagesClasses.LoginPage
-    | PagesClasses.ProfilePage
-    | PagesClasses.SignUpPage
-    | PagesClasses.Error404Page;
-
-  export type AppPageClass =
-    | typeof PagesClasses.ChatsPage
-    | typeof PagesClasses.LoginPage
-    | typeof PagesClasses.ProfilePage
-    | typeof PagesClasses.SignUpPage
-    | typeof PagesClasses.Error404Page;
-
-  export type AppState = {
+  export type TAppState = {
     appIsInited: boolean;
-    page: PagesList | null;
+    page: EnumAppPages | null;
     isLoading: boolean;
     loginFormError: string | null;
     user: User | null;

@@ -1,11 +1,18 @@
-export interface CoreRouter {
-  start(startURL: string): void;
+export interface CoreRouter<EnumAppRoutes> {
+  init(...args: unknown[]): void;
 
-  use(path: string, callback: () => void): CoreRouter;
+  start(...args: unknown[]): void;
 
-  go(path: string): void;
+  use(
+    route: EnumAppRoutes,
+    renderFunction: Function
+  ): CoreRouter<EnumAppRoutes>;
+
+  go(route: EnumAppRoutes): void;
 
   back(): void;
 
   forward(): void;
+
+  matchRoute(pathname: string): { route: EnumAppRoutes; path: string };
 }

@@ -1,5 +1,6 @@
 import { authAPI } from "api/auth";
 import { UserDTO } from "api/types";
+import { EnumAppRoutes } from "core/router";
 import type { Dispatch } from "core/store";
 import { transformUserData, APIResponseHasError } from "utils/api";
 
@@ -8,19 +9,19 @@ type LoginPayload = {
   password: string;
 };
 
-export const logout = async (dispatch: Dispatch<AppState>) => {
+export const logout = async (dispatch: Dispatch<TAppState>) => {
   dispatch({ isLoading: true });
 
   await authAPI.logout();
 
   dispatch({ isLoading: false, user: null });
 
-  window.router.go("/login");
+  window.router.go(EnumAppRoutes.Login);
 };
 
 export const login = async (
-  dispatch: Dispatch<AppState>,
-  state: AppState,
+  dispatch: Dispatch<TAppState>,
+  state: TAppState,
   action: LoginPayload
 ) => {
   dispatch({ isLoading: true });
@@ -43,5 +44,5 @@ export const login = async (
 
   dispatch({ user: transformUserData(responseUser as UserDTO) });
 
-  window.router.go("/profile");
+  window.router.go(EnumAppRoutes.Profile);
 };

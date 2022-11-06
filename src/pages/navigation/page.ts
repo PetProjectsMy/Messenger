@@ -4,7 +4,7 @@ import { LoginPage, SignUpPage, ChatsPage, ProfilePage } from "pages";
 import template from "./template";
 
 export class NavigationPage extends Block {
-  static readonly linkIDToPageMap: Record<string, AppPageClass> = {
+  static readonly linkIDToPageMap: Record<string, TAppPageClass> = {
     login: LoginPage,
     register_account: SignUpPage,
     chats: ChatsPage,
@@ -14,12 +14,12 @@ export class NavigationPage extends Block {
   constructor() {
     const linkNames = [
       "login",
-      // "register_account",
-      // "chats",
-      // "profile",
-      // "change_password",
-      // "error_404",
-      // "error_500",
+      "register_account",
+      "chats",
+      "profile",
+      "change_password",
+      "error_404",
+      "error_500",
     ];
     const linkElements = linkNames.reduce((acc: Link[], linkName) => {
       acc.push(
