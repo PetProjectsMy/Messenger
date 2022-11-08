@@ -2,14 +2,14 @@ import { Block } from "core/dom";
 import { Input } from "components";
 import template from "./template";
 
-type DataFieldProps = WithCommonProps<{
+type DataFieldProps = WithComponentCommonProps<{
   dataType: string;
   inputPlaceholder: string;
 }>;
 
 export class DataField extends Block<DataFieldProps> {
   constructor(props: DataFieldProps) {
-    const children: ComponentChildren = {};
+    const children: TComponentChildren = {};
 
     const { inputPlaceholder } = props;
     children.dataInput = new Input({

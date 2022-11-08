@@ -1,4 +1,4 @@
-import getTemplate from "utils/component-template-generator";
+import getComponentTemplate from "utils/component-template-generator";
 
 const tag = "button";
 const attributes = `
@@ -16,4 +16,4 @@ const content = `
 {{/if}}
 `;
 
-export default getTemplate({ tag, attributes, content });
+export default getComponentTemplate({ tag, attributes, content });

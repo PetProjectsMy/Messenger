@@ -11,7 +11,6 @@ declare global {
   export type TAppState = {
     appIsInited: boolean;
     page: EnumAppPages | null;
-    isLoading: boolean;
     loginFormError: string | null;
     user: User | null;
   };

@@ -4,7 +4,7 @@ import template from "./template";
 type ImageProps = {
   src: string;
   alt: string;
-} & ComponentCommonProps;
+} & TComponentCommonProps;
 
 export class ImageElement extends Block {
   protected props: ImageProps;
@@ -14,7 +14,7 @@ export class ImageElement extends Block {
     refs = {},
   }: {
     props: ImageProps;
-    refs?: ComponentRefs;
+    refs?: TComponentRefs;
   }) {
     props.componentName = props.componentName ?? "Image";
     super({ props, refs });

@@ -1,6 +1,6 @@
-import { UserDTO } from "api/types";
+import { EnumInputFields as EnumSignUpFormFields } from "pages/sign-up/input-fields";
 
-export const transformUserData = (data: UserDTO): User => {
+export const transformUserData = (data: TUserDTO): User => {
   return {
     id: data.id,
     login: data.login,
@@ -12,3 +12,16 @@ export const transformUserData = (data: UserDTO): User => {
     email: data.email,
   };
 };
+
+export function transformSignUpFormDatatoAPI(
+  data: Record<EnumSignUpFormFields, string>
+): SignUpFormDTO {
+  return {
+    first_name: data[EnumSignUpFormFields.FirstName],
+    second_name: data[EnumSignUpFormFields.SecondName],
+    login: data[EnumSignUpFormFields.Login],
+    email: data[EnumSignUpFormFields.Email],
+    password: data[EnumSignUpFormFields.Password],
+    phone: data[EnumSignUpFormFields.Phone],
+  };
+}

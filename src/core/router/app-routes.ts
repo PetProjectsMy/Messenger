@@ -6,6 +6,7 @@ export const enum EnumAppRoutes {
   Chats = "chats_route",
   Profile = "profile_route",
   NotFound = "not_found_route",
+  NotAuthorized = "not_authorized_route",
 }
 
 export const AppRoutesData = {
@@ -32,6 +33,11 @@ export const AppRoutesData = {
   [EnumAppRoutes.NotFound]: {
     path: "/not-found",
     block: EnumAppPages.NotFound,
+    needAuthorization: false,
+  },
+  [EnumAppRoutes.NotAuthorized]: {
+    path: "/not-authorized",
+    block: EnumAppPages.Forbidden,
     needAuthorization: false,
   },
 };

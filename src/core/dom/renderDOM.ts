@@ -42,7 +42,7 @@ class MainPageSingleton {
   }
 }
 
-export const MainPage: PageProxy = new Proxy(
+export const MainPage: TPageProxy = new Proxy(
   (MainPageSingleton.getInstance() as MainPageSingleton).page,
   {
     set(target, prop, block: Block) {

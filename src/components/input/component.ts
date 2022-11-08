@@ -1,30 +1,31 @@
 import { Block } from "core/dom";
 import template from "./template";
 
-export type InputValidator = (isErrorRenderNeeded?: boolean) => boolean;
+export type TInputValidator = (isErrorRenderNeeded?: boolean) => boolean;
 
-export type InputProps = WithCommonProps<{
+export type TInputProps = WithComponentCommonProps<{
   placeholder?: string;
   type?: string;
-  value?: string;
-  validators?: Record<string, InputValidator>;
+  validators?: Record<string, TInputValidator[]>;
   disabledAttr?: boolean;
 }>;
 
 type InputState = {
   previousValue: string;
-  error: string;
+  inputError: string;
 };
-export class Input extends Block<InputProps, InputState> {
+export class Input extends Block<TInputProps, InputState> {
   protected render(): string {
     return template;
   }
 
   protected _preInitHook() {
-    this.state = { previousValue: "", error: "" };
+    this.state = { previousValue: "", inputError: "" };
   }
 
   protected _preProxyHook() {
+    super._preProxyHook();
+
     this.props.validators = this.props.validators ?? {};
     this._bindValidators();
   }
@@ -34,7 +35,8 @@ export class Input extends Block<InputProps, InputState> {
       throw new Error("validators prop is undefined");
     }
 
-    Object.entries(this.props.validators).forEach(([event, validator]) => {
+    const bindedValidators = {} as Record<string, TInputValidator[]>;
+    Object.entries(this.props.validators).forEach(([event, validators]) => {
       const events = this.props.events as Record<
         string,
         ComponentEventHandler[]
@@ -43,15 +45,39 @@ export class Input extends Block<InputProps, InputState> {
       if (!events[event]) {
         events[event] = [];
       }
+      bindedValidators[event] = [];
 
-      const bindedValidator = validator.bind(this);
-      this.props.validators![event] = bindedValidator;
-      events[event].push(bindedValidator);
+      validators.forEach((validator) => {
+        const bindedValidator = validator.bind(this);
+        bindedValidators[event].push(bindedValidator);
+        events[event].push(bindedValidator);
+      });
     });
+
+    this.props.validators = bindedValidators;
   }
 
   public getValidators() {
-    return this.props.validators as Record<string, InputValidator>;
+    return this.props.validators as Record<string, TInputValidator[]>;
+  }
+
+  public getValue() {
+    let element = this._element;
+    if (this.htmlWrapped) {
+      try {
+        element = (element as HTMLElement).querySelector("input");
+      } catch {
+        if (!(element instanceof HTMLElement)) {
+          throw new Error(
+            `${
+              this.componentName
+            }: wrong element ${element} of type ${typeof element} to validate input`
+          );
+        }
+      }
+    }
+
+    return (element as HTMLInputElement).value;
   }
 
   public toggleDisableState() {

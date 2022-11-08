@@ -25,6 +25,10 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
           }
           if (isAuthorized || !routeData.needAuthorization) {
             store.dispatch({ page: routeData.block });
+          } else {
+            store.dispatch({
+              page: this.routesData[EnumAppRoutes.NotAuthorized].block,
+            });
           }
         });
       }
@@ -36,10 +40,6 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
       return;
     }
 
-    window.onpopstate = () => {
-      this.onRouteChange.call(this);
-    };
-
     if (startRoute !== EnumAppRoutes.NotFound) {
       console.log(`Start: replace state to '${startPathname}'`);
       window.history.replaceState({}, "", startPathname);
@@ -49,31 +49,10 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
   }
 
   private onRouteChange(route: EnumAppRoutes) {
-    console.log(`onRouteChange`);
-    // const found = Object.entries(this.routes).some(
-    //   ([routeName, renderFunction]) => {
-    //     if (routeName === EnumAppRoutes.NotFound) {
-    //       return false;
-    //     }
-    //     if (route === routeName) {
-    //       console.log(`${route} = ${routeName}`);
-    //       renderFunction();
-    //       return true;
-    //     }
-
-    //     console.log(`${route} != ${routeName}`);
-    //     return false;
-    //   }
-    // );
+    console.log(`onRouteChange ('${route}' route)`);
     const renderFunction =
       this.routes[route] ?? this.routes[EnumAppRoutes.NotFound];
     renderFunction();
-
-    // if (!found) {
-    //   const notFoundRender = this.routes[EnumAppRoutes.NotFound];
-    //   console.log(`Not found render: ${typeof notFoundRender}`);
-    //   notFoundRender();
-    // }
   }
 
   use(route: EnumAppRoutes, renderFunction: Function) {
@@ -82,7 +61,10 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
   }
 
   go(route: EnumAppRoutes) {
-    window.history.pushState({}, "", AppRoutesData[route].path);
+    console.log(`Go to route '${route}'`);
+    const { path } = AppRoutesData[route];
+    window.history.pushState({}, "", path);
+    console.log(`Go: state pushed to ${path}'`);
     this.onRouteChange(route);
   }
 
@@ -108,11 +90,19 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
 
     for (const route of Object.keys(this.routes)) {
       const { path } = this.routesData[route as EnumAppRoutes];
-      if (path === pathname) {
+      if (path === pathname || `${path}#` === pathname) {
         console.log(
           `Route matching: '${pathname}' == '${path}' of route '${route}'`
         );
-        return { route, path };
+
+        if (
+          route === EnumAppRoutes.NotAuthorized ||
+          route === EnumAppRoutes.NotFound
+        ) {
+          return { route: EnumAppRoutes.NotFound, path: pathname };
+        }
+
+        return { route: route as EnumAppRoutes, path };
       }
       console.log(
         `Route matching: '${pathname}' != '${path}' of route '${route}'`

@@ -1,14 +1,22 @@
 import { Block } from "core/dom";
-import { Link, Input, InputValidator, HomeButton, Button } from "components";
-import { InputValidators } from "utils/input-validators";
+import { Link, InputForm, HomeButton } from "components";
 import { withRouter } from "components/hocs";
 import { EnumAppRoutes } from "core/router";
 import template from "./template";
+import { EnumInputFields, MapInputFieldsProps } from "./input-fields";
+import { LoginFormValidators } from "./input-validators";
 
 export class LoginPage extends Block {
   constructor() {
-    const children: ComponentChildren = {};
-    const refs: ComponentRefs = {};
+    const children: TComponentChildren = {};
+    const refs: TComponentRefs = {};
+
+    children.loginForm = new InputForm(
+      "Login",
+      EnumInputFields,
+      MapInputFieldsProps,
+      LoginFormValidators
+    );
 
     const LinkWithRouter = withRouter(Link);
     children.signUpLink = new LinkWithRouter({
@@ -28,33 +36,6 @@ export class LoginPage extends Block {
 
     children.homeButton = new HomeButton();
 
-    [
-      ["login", "Your Login"],
-      ["password", "Your Password"],
-    ].forEach(([name, placeholder]: [string, string]) => {
-      const inputField = new Input({
-        props: {
-          placeholder,
-          htmlName: name,
-          componentName: `${name} input with validation`,
-          htmlWrapper: {
-            componentAlias: "wrapped",
-            htmlWrapperTemplate: `
-              <div class="form-field">
-                {{{ wrapped }}}
-              </div>
-              `,
-          },
-          validators: {
-            blur: InputValidators[name],
-          },
-        },
-      });
-
-      children[`${name}Field`] = inputField;
-      refs[`${name}Field`] = inputField;
-    });
-
     super({
       children,
       props: { componentName: "Login Page" },
@@ -64,38 +45,5 @@ export class LoginPage extends Block {
 
   render() {
     return template;
-  }
-
-  protected _preInitHook(): void {
-    Object.values(this.refs).forEach((inputField: Input) => {
-      inputField.refs.Form = this;
-    });
-
-    ["errorLogin", "errorPassword"].forEach((stateErrorName) => {
-      this.state[stateErrorName] = "";
-    });
-
-    this.children.submitButton = new Button({
-      props: {
-        type: "button",
-        label: "submit",
-        htmlClass: "submit-button",
-        events: {
-          click: [
-            function submitForm() {
-              const formRefs = this.refs as ComponentRefs;
-              Object.values(formRefs).forEach((inputField: Input) => {
-                const validators = inputField.getValidators();
-                Object.values(validators).forEach(
-                  (validator: InputValidator) => {
-                    validator();
-                  }
-                );
-              });
-            }.bind(this),
-          ],
-        },
-      },
-    });
   }
 }

@@ -23,27 +23,27 @@ declare global {
   };
   type WithHTMLProps<PropsType> = PropsType & HTMLElementProps;
 
-  export type ComponentCommonProps = WithHTMLProps<ComponentOptionalProps>;
+  export type TComponentCommonProps = WithHTMLProps<ComponentOptionalProps>;
 
-  export type WithCommonProps<Tprops> = Tprops & ComponentCommonProps;
+  export type WithComponentCommonProps<Tprops> = Tprops & TComponentCommonProps;
 
-  export type ComponentProps = {
+  export type TComponentProps = {
     [prop: string]:
       | string
       | boolean
       | Record<string, Function[] | Function>
-      | ComponentRefs
-      | ComponentState
-      | ComponentProps;
+      | TComponentRefs
+      | TComponentState
+      | TComponentProps;
   };
 
-  export type ComponentChildren = Record<string, Block | Block[]>;
+  export type TComponentChildren = Record<string, Block | Block[]>;
 
-  export type ComponentRefs = Record<string, Block>;
+  export type TComponentRefs = Record<string, Block>;
 
-  export type ComponentState = Record<string, unknown>;
+  export type TComponentState = Record<string, unknown>;
 
-  export type PageProxy = { component: Nullable<Block> };
+  export type TPageProxy = { component: Nullable<Block> };
 }
 
 export {};

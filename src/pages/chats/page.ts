@@ -6,7 +6,7 @@ import ChatComponent from "./chat-component";
 
 export class ChatsPage extends Block {
   constructor() {
-    const children: { chats: ChatComponent[] } & ComponentChildren = {
+    const children: { chats: ChatComponent[] } & TComponentChildren = {
       chats: [],
     };
 

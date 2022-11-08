@@ -2,7 +2,7 @@
 
 import { Store } from "core/store";
 import { Router } from "core/router";
-import { UserDTO } from "api/types";
+import { TUserDTO } from "api/types";
 import { transformUserData, APIResponseHasError } from "utils/api";
 
 export async function initApp() {
@@ -18,7 +18,7 @@ export async function initApp() {
     if (APIResponseHasError(response)) {
       return;
     }
-    store.dispatch({ user: transformUserData(response as UserDTO) });
+    store.dispatch({ user: transformUserData(response as TUserDTO) });
   } catch (err) {
     console.error(err);
   } finally {

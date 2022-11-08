@@ -1,4 +1,4 @@
-export default function getTemplate({
+export default function getComponentTemplate({
   tag,
   attributes = null,
   content = null,

@@ -4,4 +4,5 @@ export const enum EnumAppPages {
   Chats = "chats_page",
   Profile = "profile_page",
   NotFound = "not_found_page",
+  Forbidden = "access_denied_error_page",
 }

@@ -1,12 +1,12 @@
 import { Block } from "core/dom";
 import templator from "./template";
 
-type TetxElementProps = {
+type TetxElementProps = WithComponentCommonProps<{
   text?: string;
   htmlTag?: string;
-} & ComponentCommonProps;
+}>;
 
-export class TextElement extends Block {
+export class TextElement extends Block<TetxElementProps> {
   protected props: TetxElementProps;
 
   constructor({
@@ -14,7 +14,7 @@ export class TextElement extends Block {
     refs = {},
   }: {
     props?: TetxElementProps;
-    refs?: ComponentRefs;
+    refs?: TComponentRefs;
   }) {
     props.htmlTag = props.htmlTag ?? "span";
     super({ props, refs });

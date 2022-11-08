@@ -24,7 +24,7 @@ export type Action<State> = (
 ) => void;
 
 export const enum EnumStoreEvents {
-  PageChanged = "changed",
+  PageChanged = "page changed",
   AppInit = "appInit",
 }
 
@@ -134,6 +134,7 @@ export class Store<State extends Record<string, any>> {
       EnumStoreEvents.AppInit,
       (startRoute: EnumAppRoutes, startPathname) => {
         window.router.start(startRoute, startPathname);
+        console.log(`Store event '${EnumStoreEvents.AppInit}' emitted`);
       }
     );
 
@@ -142,6 +143,7 @@ export class Store<State extends Record<string, any>> {
       const page = new PageComponent();
       renderDOM({ component: page });
       document.title = `App / ${page.componentName}`;
+      console.log(`Store event '${EnumStoreEvents.PageChanged}' emitted`);
     });
   }
 }

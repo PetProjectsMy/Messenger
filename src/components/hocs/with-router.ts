@@ -1,8 +1,8 @@
 import { CoreRouter, EnumAppRoutes } from "core/router";
 
 export function withRouter<
-  P extends ComponentCommonProps,
-  S extends ComponentState
+  P extends TComponentCommonProps,
+  S extends TComponentState
 >(ComponentClass: BlockClass<P, S>) {
   return class WrappedComponent extends ComponentClass {
     // @ts-ignore: 'router' is declared but its value is never read.

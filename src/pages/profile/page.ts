@@ -6,7 +6,7 @@ import template from "./template";
 
 export class ProfilePage extends Block {
   constructor() {
-    const children: ComponentChildren = {};
+    const children: TComponentChildren = {};
 
     children.avatarImage = new ImageElement({
       props: {
@@ -16,7 +16,7 @@ export class ProfilePage extends Block {
       },
     });
 
-    const changeButtonRefs: ComponentRefs = {};
+    const changeButtonRefs: TComponentRefs = {};
     children.profileDataFields = [];
     [
       ["email", "email", "email@example.com"],

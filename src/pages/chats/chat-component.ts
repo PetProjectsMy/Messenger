@@ -5,7 +5,7 @@ import { chatElementTemplate } from "./template";
 
 export default class ChatComponent extends Block {
   constructor() {
-    const children: ComponentChildren = {};
+    const children: TComponentChildren = {};
 
     children.avatarImage = new ImageElement({
       props: {

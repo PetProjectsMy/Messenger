@@ -1,14 +1,14 @@
 import { Block, MainPage } from "core/dom";
 import { Link } from "components";
-import { LoginPage, SignUpPage, ChatsPage, ProfilePage } from "pages";
+import * as PagesClasses from "pages";
 import template from "./template";
 
 export class NavigationPage extends Block {
   static readonly linkIDToPageMap: Record<string, TAppPageClass> = {
-    login: LoginPage,
-    register_account: SignUpPage,
-    chats: ChatsPage,
-    profile: ProfilePage,
+    login: PagesClasses.LoginPage,
+    register_account: PagesClasses.SignUpPage,
+    chats: PagesClasses.ChatsPage,
+    profile: PagesClasses.ProfilePage,
   };
 
   constructor() {

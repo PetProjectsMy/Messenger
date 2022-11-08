@@ -6,14 +6,14 @@ declare global {
     | PagesClasses.LoginPage
     | PagesClasses.ProfilePage
     | PagesClasses.SignUpPage
-    | PagesClasses.Error404Page;
+    | PagesClasses.TErrorPage;
 
   export type TAppPageClass =
     | typeof PagesClasses.ChatsPage
     | typeof PagesClasses.LoginPage
     | typeof PagesClasses.ProfilePage
     | typeof PagesClasses.SignUpPage
-    | typeof PagesClasses.Error404Page;
+    | PagesClasses.TErrorPageClass;
 }
 
 export {};

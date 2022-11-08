@@ -1,4 +1,4 @@
-import getTemplate from "utils/component-template-generator";
+import getComponentTemplate from "utils/component-template-generator";
 
 const tag = "img";
 const attributes = `
@@ -6,4 +6,8 @@ const attributes = `
   alt="{{ alt }}"
 `;
 
-export default getTemplate({ tag, attributes, isSelfClosingTag: true });
+export default getComponentTemplate({
+  tag,
+  attributes,
+  isSelfClosingTag: true,
+});

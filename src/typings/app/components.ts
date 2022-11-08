@@ -3,8 +3,8 @@ import { Block } from "core/dom";
 
 declare global {
   export type BlockClass<
-    P extends ComponentCommonProps,
-    S extends ComponentState
+    P extends TComponentCommonProps,
+    S extends TComponentState
   > = typeof Block<P, S>;
 
   export type PageComponent =

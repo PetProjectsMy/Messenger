@@ -12,7 +12,7 @@ export const enum BlockEvents {
 type EventHanlderArgs = {
   [BlockEvents.FLOW_CDM]: [];
   [BlockEvents.INIT]: [];
-  [BlockEvents.FLOW_CDU]: [Values<ComponentProps>, Values<ComponentProps>];
+  [BlockEvents.FLOW_CDU]: [Values<TComponentProps>, Values<TComponentProps>];
   [BlockEvents.FLOW_RENDER]: [];
 };
 
@@ -28,7 +28,9 @@ export default class BlockBase {
 
   protected eventBus = new EventBus<typeof BlockEvents, EventHanlderArgs>();
 
-  protected props: ComponentProps = {};
+  protected props: TComponentProps = {};
+
+  protected helpers: Record<string, unknown>;
 
   readonly id: string = nanoid(7);
 
@@ -45,8 +47,8 @@ export default class BlockBase {
   }
 
   protected _componentDidUpdate(
-    oldProps: ComponentProps,
-    newProps: ComponentProps
+    oldProps: TComponentProps,
+    newProps: TComponentProps
   ): void {
     const response = this.componentDidUpdate(oldProps, newProps);
     if (!response) {
@@ -58,14 +60,14 @@ export default class BlockBase {
   }
 
   protected componentDidUpdate(
-    oldProps: ComponentProps,
-    newProps: ComponentProps
+    oldProps: TComponentProps,
+    newProps: TComponentProps
   ): boolean {
     const result = !propsAreEqual(oldProps, newProps);
     return result;
   }
 
-  protected setProps(nextProps: ComponentProps): void {
+  protected setProps(nextProps: TComponentProps): void {
     if (!nextProps) {
       return;
     }

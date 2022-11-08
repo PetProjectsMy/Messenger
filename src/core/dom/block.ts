@@ -3,20 +3,20 @@ import { nanoid } from "nanoid";
 import BlockBase, { BlockEvents } from "./block-base";
 
 export class Block<
-  TProps extends ComponentCommonProps = ComponentCommonProps,
-  TState extends ComponentState = ComponentState
+  TProps extends TComponentCommonProps = TComponentCommonProps,
+  TState extends TComponentState = TComponentState
 > extends BlockBase {
-  protected children: ComponentChildren;
+  protected children: TComponentChildren;
 
   public componentName: string = "Unnamed Block";
 
-  private htmlWrapped: boolean;
+  protected htmlWrapped: boolean;
 
-  private htmlWrapper: Nullable<ComponentWrapper>;
+  protected htmlWrapper: Nullable<ComponentWrapper>;
 
   protected props: TProps;
 
-  public refs: ComponentRefs;
+  public refs: TComponentRefs;
 
   protected state: TState;
 
@@ -29,11 +29,13 @@ export class Block<
     children = {},
     refs = {},
     state = {},
+    helpers = {},
   }: {
     props?: TProps;
-    children?: ComponentChildren;
-    refs?: ComponentRefs;
-    state?: ComponentState;
+    children?: TComponentChildren;
+    refs?: TComponentRefs;
+    state?: TComponentState;
+    helpers?: Record<string, unknown>;
   } = {}) {
     super();
 
@@ -43,6 +45,7 @@ export class Block<
     this.children = children;
     this.refs = refs;
     this.state = state as TState;
+    this.helpers = helpers;
 
     this.htmlWrapper = props.htmlWrapper as ComponentWrapper;
     this.htmlWrapped = !!this.htmlWrapper;
@@ -65,7 +68,7 @@ export class Block<
     this.wasRendered = true;
   }
 
-  protected _makePropsProxy(props: ComponentProps) {
+  protected _makePropsProxy(props: TComponentProps) {
     const self = this;
 
     return new Proxy(props, {

@@ -1,7 +1,7 @@
 import { Block } from "core/dom";
 import template from "./template";
 
-type LinkProps = WithCommonProps<{
+type LinkProps = WithComponentCommonProps<{
   label: string;
   href?: string;
 }>;

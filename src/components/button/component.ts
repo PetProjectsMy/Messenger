@@ -1,7 +1,7 @@
 import { Block } from "core/dom";
 import template from "./template";
 
-export type ButtonProps = WithCommonProps<{
+export type ButtonProps = WithComponentCommonProps<{
   label?: string;
   type?: string;
 }>;
