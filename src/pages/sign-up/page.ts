@@ -2,9 +2,9 @@ import { Block } from "core/dom";
 import { Link, HomeButton, InputForm } from "components";
 import { withRouter } from "components/hocs";
 import { EnumAppRoutes } from "core/router";
-import { EnumInputFields, MapInputFieldsProps } from "./input-fields";
-import { SignupFormValidators } from "./input-validators";
+import { EnumInputFields, MapInputFieldsProps } from "./form-component";
 import template from "./template";
+import { afterValidationCallback } from "./api-service";
 
 export class SignUpPage extends Block {
   constructor() {
@@ -30,7 +30,7 @@ export class SignUpPage extends Block {
       "Sign Up",
       EnumInputFields,
       MapInputFieldsProps,
-      SignupFormValidators
+      afterValidationCallback
     );
     children.homeButton = new HomeButton();
 

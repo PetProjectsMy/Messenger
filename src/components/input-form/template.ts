@@ -15,11 +15,18 @@ export default function getInputFormTemplate(
     content = `
       ${content}
       {{{ ${fieldName}_child }}}
-      {{{ ${fieldName}_error }}}
+      {{ ${fieldName}_error }}
     `;
   });
   content = `
       ${content}
+      {{#if apiResponseSuccess }} 
+        <span style="color:green"> {{ api_response_success }} </span>
+      {{else}}
+        {{#if apiResponseError }} 
+          <span style="color:red"> {{ apiResponseError }} </span>
+        {{/if}}
+      {{/if}}
       <div class="submit-button-section">
         {{{ submitButton }}}
       </div>

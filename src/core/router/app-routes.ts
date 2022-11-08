@@ -1,4 +1,4 @@
-import { EnumAppPages } from "utils/enums";
+import { EnumAppPages } from "utils/pages";
 
 export const enum EnumAppRoutes {
   SignUp = "signup_route",

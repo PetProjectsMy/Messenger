@@ -4,9 +4,9 @@ import {
   validatePasswordRegex,
 } from "utils/form-input-validator";
 import { TInputValidator } from "components";
-import { EnumInputFields } from "./input-fields";
+import { EnumInputFields } from "./enum-input-fields";
 
-export const LoginFormValidators: Record<
+export const FormValidators: Record<
   EnumInputFields,
   Record<string, TInputValidator[]>
 > = [

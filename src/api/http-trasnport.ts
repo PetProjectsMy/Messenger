@@ -1,9 +1,25 @@
-const METHODS = {
-  GET: "GET",
-  POST: "POST",
-  PUT: "PUT",
-  DELETE: "DELETE",
+const enum METHODS {
+  GET = "GET",
+  POST = "POST",
+  PUT = "PUT",
+  DELETE = "DELETE",
+}
+
+const DefualtHeaders = {
+  GET: { accept: "application/json" },
+  POST: { "Content-Type": "application/json", accept: "application/json" },
+  PUT: { "Content-Type": "application/json", accept: "application/json" },
+  DELETE: { accept: "application/json" },
 };
+
+type TRequestOptions = {
+  method: METHODS;
+  headers?: Record<string, string>;
+  data?: Record<string, string>;
+  timeout?: number;
+};
+
+type TRequestOptionsWithoutMethod = Omit<TRequestOptions, "method">;
 
 // Самая простая версия. Реализовать штучку со всеми проверками им предстоит в конце спринта
 // Необязательный метод
@@ -26,40 +42,25 @@ class HTTPTransport {
     this.baseURL = baseURL;
   }
 
-  get = (url: string, options: any = {}) => {
-    return this.request(
-      url,
-      { ...options, method: METHODS.GET },
-      options.timeout
-    );
+  get = (url: string, options: TRequestOptionsWithoutMethod = {}) => {
+    return this.request(url, { ...options, method: METHODS.GET });
   };
 
-  post = (url: string, options: any = {}) => {
-    return this.request(
-      url,
-      { ...options, method: METHODS.POST },
-      options.timeout
-    );
+  post = (url: string, options: TRequestOptionsWithoutMethod = {}) => {
+    return this.request(url, { ...options, method: METHODS.POST });
   };
 
-  put = (url: string, options: any = {}) => {
-    return this.request(
-      url,
-      { ...options, method: METHODS.PUT },
-      options.timeout
-    );
+  put = (url: string, options: TRequestOptionsWithoutMethod = {}) => {
+    return this.request(url, { ...options, method: METHODS.PUT });
   };
 
-  delete = (url: string, options: any = {}) => {
-    return this.request(
-      url,
-      { ...options, method: METHODS.DELETE },
-      options.timeout
-    );
+  delete = (url: string, options: TRequestOptionsWithoutMethod = {}) => {
+    return this.request(url, { ...options, method: METHODS.DELETE });
   };
 
-  request = (apiURL: string, options: any = {}, timeout = 5000) => {
-    const { headers = {}, method, data } = options;
+  request = (apiURL: string, options: TRequestOptions) => {
+    const { method, data, timeout = 5000 } = options;
+    const headers = options.headers ?? DefualtHeaders[method];
 
     return new Promise((resolve, reject) => {
       if (!method) {

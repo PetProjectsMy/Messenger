@@ -1,4 +1,4 @@
-import { EnumAppPages } from "utils/enums";
+import { EnumAppPages } from "utils/pages";
 import { Store } from "core/store";
 import { CoreRouter, EnumAppRoutes } from "core/router";
 
@@ -11,7 +11,6 @@ declare global {
   export type TAppState = {
     appIsInited: boolean;
     page: EnumAppPages | null;
-    loginFormError: string | null;
     user: User | null;
   };
 

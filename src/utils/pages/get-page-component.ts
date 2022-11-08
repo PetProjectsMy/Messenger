@@ -1,5 +1,5 @@
 import * as Pages from "pages";
-import { EnumAppPages } from "./enums";
+import { EnumAppPages } from "./enum-app-pages";
 
 const map = {
   [EnumAppPages.SignUp]: Pages.SignUpPage,

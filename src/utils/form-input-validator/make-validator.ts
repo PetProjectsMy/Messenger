@@ -15,12 +15,10 @@ export function makeValidator({
     const form = this.refs.Form;
 
     for (const validator of validatorsList) {
-      error = validator(value);
+      error = validator.call(this, value);
+      this.state.inputError = error;
 
-      const oldState = JSON.stringify(form.state);
       form.state[errorStateRef] = error;
-      const newState = JSON.stringify(form.state);
-      console.log(`Form State: ${oldState} -> ${newState}`);
 
       if (error !== "") {
         break;
@@ -33,6 +31,6 @@ export function makeValidator({
 
     this.state.previousValue = value;
 
-    return !!error;
+    return !error;
   };
 }

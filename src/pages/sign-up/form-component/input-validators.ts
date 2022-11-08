@@ -1,8 +1,23 @@
 import * as InputValidators from "utils/form-input-validator";
 import { TInputValidator } from "components";
-import { EnumInputFields } from "./input-fields";
+import { EnumInputFields } from "./enum-input-fields";
 
-export const SignupFormValidators: Record<
+function validatePasswordRepeatedMatchesPassword(): string {
+  const form = this.refs.Form;
+  const passwordRepeated = this.getValue();
+  const password = form.refs[EnumInputFields.Password].getValue();
+
+  const passwordsMatching = passwordRepeated === password;
+  if (!passwordsMatching) {
+    const error = "Passwords don't match";
+    form.state[`${EnumInputFields.PasswordRepeat}_error`] = error;
+    return error;
+  }
+
+  return "";
+}
+
+export const FormValidators: Record<
   EnumInputFields,
   Record<string, TInputValidator[]>
 > = [
@@ -24,7 +39,10 @@ export const SignupFormValidators: Record<
   },
   {
     field: EnumInputFields.PasswordRepeat,
-    validatorsList: [InputValidators.validatePasswordRegex],
+    validatorsList: [
+      InputValidators.validatePasswordRegex,
+      validatePasswordRepeatedMatchesPassword,
+    ],
   },
   {
     field: EnumInputFields.Email,
@@ -42,20 +60,3 @@ export const SignupFormValidators: Record<
   acc[field] = { blur: [validator] };
   return acc;
 }, {} as any);
-
-// function validatePasswordRepeatedMatchesPassword(): string {
-//   const form = this.refs.Form;
-//   const passwordRepeated = this.getValue();
-//   const password = form.refs[EnumInputFields.Password].getValue();
-//   console.log(`password: ${password}; repeated: ${passwordRepeated}`);
-
-//   const passwordsMatching = passwordRepeated === password;
-//   if (!passwordsMatching) {
-//     form.state[`${EnumInputFields.PasswordRepeat}_error`] =
-//   }
-//   return  ? "" : "Passwords don't match";
-// }
-
-// SignupFormValidators[EnumInputFields.PasswordRepeat].blur.push(
-//   validatePasswordRepeatedMatchesPassword
-// );

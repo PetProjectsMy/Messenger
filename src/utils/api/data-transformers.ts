@@ -1,4 +1,4 @@
-import { EnumInputFields as EnumSignUpFormFields } from "pages/sign-up/input-fields";
+import { EnumInputFields as EnumSignUpFormFields } from "pages/sign-up/form-component";
 
 export const transformUserData = (data: TUserDTO): User => {
   return {

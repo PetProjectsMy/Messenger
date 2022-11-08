@@ -1,14 +1,11 @@
-import { getPageComponent } from "utils/get-page-component";
-import { EnumAppPages } from "utils/enums";
+import { getPageComponent, EnumAppPages } from "utils/pages";
 import { renderDOM } from "core/dom";
 import { EnumAppRoutes } from "core/router";
 import EventBus from "../event-bus";
 
 export const defaultState: TAppState = {
   appIsInited: false,
-  isLoading: false,
   page: null,
-  loginFormError: null,
   user: null,
 };
 

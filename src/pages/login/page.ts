@@ -3,8 +3,7 @@ import { Link, InputForm, HomeButton } from "components";
 import { withRouter } from "components/hocs";
 import { EnumAppRoutes } from "core/router";
 import template from "./template";
-import { EnumInputFields, MapInputFieldsProps } from "./input-fields";
-import { LoginFormValidators } from "./input-validators";
+import { EnumInputFields, MapInputFieldsProps } from "./form-component";
 
 export class LoginPage extends Block {
   constructor() {
@@ -14,8 +13,7 @@ export class LoginPage extends Block {
     children.loginForm = new InputForm(
       "Login",
       EnumInputFields,
-      MapInputFieldsProps,
-      LoginFormValidators
+      MapInputFieldsProps
     );
 
     const LinkWithRouter = withRouter(Link);

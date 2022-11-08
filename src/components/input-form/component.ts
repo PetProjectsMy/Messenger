@@ -1,15 +1,23 @@
 import { Block } from "core/dom";
 import { Input, Button } from "components";
-import { TInputProps, TInputValidator } from "components/input/component";
+import { TInputProps } from "components/input/component";
 import template from "./template";
 
 type TInputFormProps = WithComponentCommonProps<{
   formTitle: string;
+  afterValidationCallback: () => void;
 }>;
 
 export class InputForm<
   TEnumInputFiledsNames extends Record<string, string>
-> extends Block<TInputFormProps, TAppState & { formHasInputErrors: boolean }> {
+> extends Block<
+  TInputFormProps,
+  TAppState & {
+    formHasInputErrors: boolean;
+    apiResponseSuccess: string;
+    apiResponseError: string;
+  }
+> {
   protected helpers: {
     enumInputFiledsNames: TEnumInputFiledsNames;
   };
@@ -18,10 +26,7 @@ export class InputForm<
     formTitle: string,
     enumInputFiledsNames: TEnumInputFiledsNames,
     mapInputToProps?: Record<string, TInputProps>,
-    validators?: Record<
-      string, // fieldName
-      Record<string, TInputValidator[]> // { event: validatorsList}
-    >
+    afterValidationCallback?: () => void
   ) {
     console.log(`CREATE INPUT FORM`);
 
@@ -42,7 +47,6 @@ export class InputForm<
               </div>
               `,
           },
-          validators: (validators ?? {})[fieldName],
         },
       });
 
@@ -57,7 +61,11 @@ export class InputForm<
       },
       {} as any
     );
-    state.formHasInputErrors = true;
+    Object.assign(state, {
+      formHasInputErrors: true,
+      apiResponseError: "",
+      apiResponseSuccess: "",
+    });
     console.log(`Input Form State${JSON.stringify(state)}`);
 
     super({
@@ -65,6 +73,7 @@ export class InputForm<
       props: {
         componentName: "Login Page",
         formTitle,
+        afterValidationCallback: afterValidationCallback ?? (() => {}),
       },
       refs,
       state,
@@ -83,7 +92,7 @@ export class InputForm<
       inputField.refs.Form = this;
     });
 
-    this._createSubmitButton();
+    this._createSubmitButton(this.props.afterValidationCallback);
 
     super._preInitHook();
   }
@@ -91,7 +100,12 @@ export class InputForm<
   private _createSubmitButton(
     afterValidationCallback: () => void = () => {}
   ): void {
+    const clearAPIResponseState = () => {
+      this.state.apiResponseSuccess = "";
+      this.state.apiResponseError = "";
+    };
     const validateform = this._validateForm.bind(this);
+
     this.children.submitButton = new Button({
       props: {
         type: "button",
@@ -99,9 +113,10 @@ export class InputForm<
         htmlClass: "submit-button",
         events: {
           click: [
-            function () {
+            () => {
+              clearAPIResponseState.call(this);
               validateform();
-              afterValidationCallback();
+              afterValidationCallback.call(this);
             },
           ],
         },
@@ -110,6 +125,8 @@ export class InputForm<
   }
 
   private _validateForm(): void {
+    let formHasInputErrors = false;
+
     Object.values(this.refs).forEach((inputField: Input) => {
       const validators = inputField.getValidators();
       const validatorsByEvent = Object.values(validators);
@@ -118,12 +135,14 @@ export class InputForm<
         for (const validator of eventValidators) {
           const validationResult = validator();
           if (!validationResult) {
-            this.state.formHasInputErrors = true;
+            formHasInputErrors = true;
             return;
           }
         }
       }
     });
+
+    this.state.formHasInputErrors = formHasInputErrors;
   }
 
   public collectFormData(): Record<string, string> {
