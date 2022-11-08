@@ -1,4 +1,5 @@
 export const enum EnumAppPages {
+  Navigation = "navigation_page",
   SignUp = "signup_page",
   Login = "login_page",
   Chats = "chats_page",

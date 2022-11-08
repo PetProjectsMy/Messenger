@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import propsAreEqual from "utils/object-compare";
+import { deepEqual } from "utils/objects-handle";
 import EventBus from "core/event-bus";
 
 export const enum BlockEvents {
@@ -47,10 +47,10 @@ export default class BlockBase {
   }
 
   protected _componentDidUpdate(
-    oldProps: TComponentProps,
-    newProps: TComponentProps
+    oldPropsOrState: TComponentProps | TComponentState,
+    newPropsOrState: TComponentProps | TComponentState
   ): void {
-    const response = this.componentDidUpdate(oldProps, newProps);
+    const response = this.componentDidUpdate(oldPropsOrState, newPropsOrState);
     if (!response) {
       return;
     }
@@ -60,10 +60,10 @@ export default class BlockBase {
   }
 
   protected componentDidUpdate(
-    oldProps: TComponentProps,
-    newProps: TComponentProps
+    oldPropsOrState: TComponentProps | TComponentState,
+    newPropsOrState: TComponentProps | TComponentState
   ): boolean {
-    const result = !propsAreEqual(oldProps, newProps);
+    const result = !deepEqual(oldPropsOrState, newPropsOrState);
     return result;
   }
 

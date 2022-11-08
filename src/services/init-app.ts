@@ -2,7 +2,6 @@
 
 import { Store } from "core/store";
 import { Router } from "core/router";
-import { TUserDTO } from "api/types";
 import { transformUserData, APIResponseHasError } from "utils/api";
 
 export async function initApp() {

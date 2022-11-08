@@ -1,12 +1,12 @@
 import { Block } from "core/dom";
 import template from "./template";
 
-export type ButtonProps = WithComponentCommonProps<{
+export type TButtonProps = WithComponentCommonProps<{
   label?: string;
   type?: string;
 }>;
 
-export class Button extends Block<ButtonProps> {
+export class Button extends Block<TButtonProps> {
   protected render(): string {
     return template;
   }

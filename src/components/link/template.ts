@@ -5,7 +5,7 @@ const attributes = `
   {{#if href}} 
     href="{{ href }}" 
   {{else}} 
-    href="#" 
+    href="javascript:void(0);" 
   {{/if}}
 `;
 const content = "{{ label }}";

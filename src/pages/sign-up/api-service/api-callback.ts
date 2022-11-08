@@ -15,22 +15,14 @@ async function makeAPIRequest() {
   //   email: "Rtu42@mail.net",
   //   phone: "87778888777",
   // };
-  if (this.state.formHasInputErrors) {
-    console.log(`Form has input errors: ${JSON.stringify(this.state)}`);
-    return Promise.resolve({
-      status: "Form wasn't sent",
-      response: { reason: "Form has input errors" },
-    });
-  }
 
-  console.log(`Form filled correctly: ${JSON.stringify(formData)}`);
   const apiData = transformFormDatatoAPI(formData);
   console.log(`API data: ${JSON.stringify(apiData)}`);
   return SignUpService.signup(apiData);
 }
 
 function handleAPIResponse(apiResponse: any) {
-  apiResponse.then((r) => {
+  apiResponse.then((r: any) => {
     const { status, response } = r;
     console.log(`status: ${status}; response: ${JSON.stringify(response)}`);
 

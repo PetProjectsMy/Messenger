@@ -57,7 +57,7 @@ export class Store<State extends Record<string, any>> {
           if (!oldValue && newValue) {
             let startPathname = window.location.pathname;
             console.log(`Router starts on window path '${startPathname}'`);
-            const matchingRoute = window.router.matchRoute(startPathname);
+            const matchingRoute = window.router.matchRouteByPath(startPathname);
             const startRoute = matchingRoute.route;
             startPathname = matchingRoute.path;
             console.log(

@@ -1,12 +1,12 @@
 import { Block } from "core/dom";
 import template from "./template";
 
-type LinkProps = WithComponentCommonProps<{
+export type TLinkProps = WithComponentCommonProps<{
   label: string;
   href?: string;
 }>;
 
-export class Link extends Block<LinkProps> {
+export class Link extends Block<TLinkProps> {
   protected render(): string {
     return template;
   }

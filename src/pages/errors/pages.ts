@@ -1,3 +1,4 @@
+import { HomeButton } from "components";
 import { Block } from "core/dom";
 import template from "./template";
 
@@ -11,7 +12,9 @@ export type TErrorPageClass = typeof Block<ErrorPageProps>;
 function getErrorPageClass(initProps: ErrorPageProps): TErrorPageClass {
   class ErrorPage extends Block<ErrorPageProps> {
     constructor() {
-      super({ props: initProps });
+      const children: TComponentChildren = {};
+      children.homeButton = new HomeButton({ htmlClass: "return-link" });
+      super({ props: initProps, children });
     }
 
     protected render(): string {

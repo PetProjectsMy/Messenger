@@ -1,5 +1,5 @@
 import { Block } from "core/dom";
-import { ImageElement, TextElement } from "components";
+import { ImageComponent, TextComponent } from "components";
 import avatarImagePlaceholder from "static/avatar-placeholder-chats.svg";
 import { chatElementTemplate } from "./template";
 
@@ -7,7 +7,7 @@ export default class ChatComponent extends Block {
   constructor() {
     const children: TComponentChildren = {};
 
-    children.avatarImage = new ImageElement({
+    children.avatarImage = new ImageComponent({
       props: {
         src: avatarImagePlaceholder,
         alt: "avatar placeholder",
@@ -15,7 +15,7 @@ export default class ChatComponent extends Block {
       },
     });
 
-    children.message = new TextElement({
+    children.message = new TextComponent({
       props: {
         text: Array(3).fill("Last received message.").join(" "),
         componentName: "Chat Component Message",

@@ -1,5 +1,5 @@
 import { Block } from "core/dom";
-import { HomeButton, ImageElement } from "components";
+import { HomeButton, ImageComponent } from "components";
 import avatarImagePlaceholder from "static/avatar-placeholder-chats.svg";
 import { chatsPageTemplate } from "./template";
 import ChatComponent from "./chat-component";
@@ -15,7 +15,7 @@ export class ChatsPage extends Block {
     }
 
     children.homeButton = new HomeButton();
-    children.avatarImage = new ImageElement({
+    children.avatarImage = new ImageComponent({
       props: {
         src: avatarImagePlaceholder,
         alt: "avatar placeholder",

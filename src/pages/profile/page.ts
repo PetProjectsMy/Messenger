@@ -1,6 +1,6 @@
 import { Block } from "core/dom";
 import avatarImagePlaceholder from "static/avatar-placeholder-profile.png";
-import { Button, HomeButton, ImageElement } from "components";
+import { Button, HomeButton, ImageComponent } from "components";
 import { DataField } from "./data-field-component/component";
 import template from "./template";
 
@@ -8,7 +8,7 @@ export class ProfilePage extends Block {
   constructor() {
     const children: TComponentChildren = {};
 
-    children.avatarImage = new ImageElement({
+    children.avatarImage = new ImageComponent({
       props: {
         src: avatarImagePlaceholder,
         alt: "avatar placeholder",

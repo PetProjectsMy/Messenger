@@ -9,17 +9,17 @@ declare global {
 
   export type PageComponent =
     | Components.Button
-    | Components.ImageElement
+    | Components.ImageComponent
     | Components.Input
     | Components.Link
-    | Components.TextElement;
+    | Components.TextComponent;
 
   export type PageComponentClass =
     | typeof Components.Button
-    | typeof Components.ImageElement
+    | typeof Components.ImageComponent
     | typeof Components.Input
     | typeof Components.Link
-    | typeof Components.TextElement;
+    | typeof Components.TextComponent;
 }
 
 export {};

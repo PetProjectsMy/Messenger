@@ -1,6 +1,6 @@
 import { Block } from "core/dom";
 import { Link, InputForm, HomeButton } from "components";
-import { withRouter } from "components/hocs";
+import { WithRouter } from "components/hocs";
 import { EnumAppRoutes } from "core/router";
 import template from "./template";
 import { EnumInputFields, MapInputFieldsProps } from "./form-component";
@@ -16,7 +16,7 @@ export class LoginPage extends Block {
       MapInputFieldsProps
     );
 
-    const LinkWithRouter = withRouter(Link);
+    const LinkWithRouter = WithRouter(Link);
     children.signUpLink = new LinkWithRouter({
       props: {
         label: "Register Account",
@@ -24,7 +24,7 @@ export class LoginPage extends Block {
         htmlClass: "sign-up-link",
         events: {
           click: [
-            function goToSignup() {
+            function goToLogin() {
               this.router.go(EnumAppRoutes.SignUp);
             },
           ],

@@ -1,6 +1,7 @@
 import { EnumAppPages } from "utils/pages";
 
 export const enum EnumAppRoutes {
+  NavigationPage = "navigation_page_route",
   SignUp = "signup_route",
   Login = "login_route",
   Chats = "chats_route",
@@ -10,6 +11,11 @@ export const enum EnumAppRoutes {
 }
 
 export const AppRoutesData = {
+  [EnumAppRoutes.NavigationPage]: {
+    path: "/naviagtion",
+    block: EnumAppPages.Navigation,
+    needAuthorization: false,
+  },
   [EnumAppRoutes.SignUp]: {
     path: "/signup",
     block: EnumAppPages.SignUp,

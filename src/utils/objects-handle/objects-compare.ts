@@ -2,7 +2,7 @@ function isObject(object: any) {
   return object != null && typeof object === "object";
 }
 
-export default function deepEqual(object1: any, object2: any) {
+export function deepEqual(object1: any, object2: any) {
   if (!isObject(object1) || !isObject(object2)) {
     return object1 === object2;
   }

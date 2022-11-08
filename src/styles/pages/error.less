@@ -1,18 +1,23 @@
 @import "../helpers/common.less";
 
-.error-container {
+main.error-page {
   &:extend(.centered-container);
   &:extend(.vertical-block);
   top: 44%;
-  height: 40%;
+  height: 30%;
 
   .error-code {
-    flex: 40%;
-    font-size: 4em;
+    flex: 1;
+    font-size: 2em;
   }
 
   .error-description {
-    flex: 20%;
-    font-size: 1.5em;
+    flex: 1;
+    font-size: 1.2em;
+  }
+
+  .return-link {
+    flex: 1;
+    font-size: 1.2em;
   }
 }

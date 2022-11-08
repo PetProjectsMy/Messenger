@@ -2,6 +2,7 @@ import * as Pages from "pages";
 import { EnumAppPages } from "./enum-app-pages";
 
 const map = {
+  [EnumAppPages.Navigation]: Pages.NavigationPage,
   [EnumAppPages.SignUp]: Pages.SignUpPage,
   [EnumAppPages.Login]: Pages.LoginPage,
   [EnumAppPages.Chats]: Pages.ChatsPage,

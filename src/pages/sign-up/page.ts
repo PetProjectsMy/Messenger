@@ -1,6 +1,6 @@
 import { Block } from "core/dom";
 import { Link, HomeButton, InputForm } from "components";
-import { withRouter } from "components/hocs";
+import { WithRouter } from "components/hocs";
 import { EnumAppRoutes } from "core/router";
 import { EnumInputFields, MapInputFieldsProps } from "./form-component";
 import template from "./template";
@@ -11,7 +11,7 @@ export class SignUpPage extends Block {
     const children: TComponentChildren = {};
     const refs: TComponentRefs = {};
 
-    children.signInLink = new (withRouter(Link))({
+    children.signInLink = new (WithRouter(Link))({
       props: {
         label: "Sign In",
         htmlName: "Sign in",

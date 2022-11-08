@@ -1,23 +1,21 @@
-import { MainPage } from "core/dom";
-import { NavigationPage } from "pages";
-import { Button, ButtonProps } from "components/button/component";
+import { EnumAppRoutes } from "core/router";
+import { Button, TButtonProps } from "components/button";
+import { WithRouter } from "components/hocs";
 
-export class HomeButton extends Button {
-  constructor({
-    props = { componentName: "Home Button" },
-  }: { props?: ButtonProps } = {}) {
+export class HomeButton extends WithRouter(Button) {
+  constructor(props?: TButtonProps) {
     super({
       props: {
-        ...props,
-        label: props.label ?? "Home",
+        label: "Home",
         htmlClass: "home-button",
         events: {
           click: [
             () => {
-              MainPage.component = new NavigationPage();
+              this.router.go(EnumAppRoutes.NavigationPage);
             },
           ],
         },
+        ...props,
       },
     });
   }

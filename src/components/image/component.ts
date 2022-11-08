@@ -1,19 +1,19 @@
 import { Block } from "core/dom";
 import template from "./template";
 
-type ImageProps = {
+export type TImageProps = {
   src: string;
   alt: string;
 } & TComponentCommonProps;
 
-export class ImageElement extends Block {
-  protected props: ImageProps;
+export class ImageComponent extends Block {
+  protected props: TImageProps;
 
   constructor({
     props,
     refs = {},
   }: {
-    props: ImageProps;
+    props: TImageProps;
     refs?: TComponentRefs;
   }) {
     props.componentName = props.componentName ?? "Image";

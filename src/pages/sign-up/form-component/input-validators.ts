@@ -1,5 +1,5 @@
 import * as InputValidators from "utils/form-input-validator";
-import { TInputValidator } from "components";
+import { TInputValidator } from "components/input";
 import { EnumInputFields } from "./enum-input-fields";
 
 function validatePasswordRepeatedMatchesPassword(): string {

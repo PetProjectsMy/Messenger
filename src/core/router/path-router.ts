@@ -40,11 +40,19 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
       return;
     }
 
+    console.log(`Start: replace state to '${startPathname}'`);
     if (startRoute !== EnumAppRoutes.NotFound) {
-      console.log(`Start: replace state to '${startPathname}'`);
       window.history.replaceState({}, "", startPathname);
     }
     this.onRouteChange(startRoute);
+
+    window.onpopstate = function () {
+      const currentPath = this.getCurrentPath();
+      console.log(`ONPOPSTATE: ${currentPath}`);
+      const { route } = this.matchRouteByPath(currentPath);
+      this.onRouteChange.call(this, route);
+    }.bind(this);
+
     this.isStarted = true;
   }
 
@@ -62,7 +70,7 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
 
   go(route: EnumAppRoutes) {
     console.log(`Go to route '${route}'`);
-    const { path } = AppRoutesData[route];
+    const { path } = this.routesData[route];
     window.history.pushState({}, "", path);
     console.log(`Go: state pushed to ${path}'`);
     this.onRouteChange(route);
@@ -76,7 +84,7 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
     window.history.forward();
   }
 
-  matchRoute(pathname: string): { route: EnumAppRoutes; path: string } {
+  matchRouteByPath(pathname: string): { route: EnumAppRoutes; path: string } {
     if (pathname === "/") {
       let route;
       if (window.store.isUserAthorized()) {
@@ -90,7 +98,7 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
 
     for (const route of Object.keys(this.routes)) {
       const { path } = this.routesData[route as EnumAppRoutes];
-      if (path === pathname || `${path}#` === pathname) {
+      if (path === pathname) {
         console.log(
           `Route matching: '${pathname}' == '${path}' of route '${route}'`
         );
@@ -110,5 +118,13 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
     }
 
     return { route: EnumAppRoutes.NotFound, path: pathname };
+  }
+
+  getPathByRoute(route: EnumAppRoutes) {
+    return this.routesData[route].path;
+  }
+
+  getCurrentPath() {
+    return window.location.pathname;
   }
 }

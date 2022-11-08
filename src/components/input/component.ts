@@ -1,7 +1,7 @@
 import { Block } from "core/dom";
 import template from "./template";
 
-export type TInputValidator = (isErrorRenderNeeded?: boolean) => boolean;
+export type TInputValidator = (isFormRerenderNeeded?: boolean) => boolean;
 
 export type TInputProps = WithComponentCommonProps<{
   placeholder?: string;
@@ -10,17 +10,16 @@ export type TInputProps = WithComponentCommonProps<{
   disabledAttr?: boolean;
 }>;
 
-type InputState = {
-  previousValue: string;
+type TInputState = {
   inputError: string;
 };
-export class Input extends Block<TInputProps, InputState> {
+export class Input extends Block<TInputProps, TInputState> {
   protected render(): string {
     return template;
   }
 
   protected _preInitHook() {
-    this.state = { previousValue: "", inputError: "" };
+    this.state = { inputError: "" };
   }
 
   protected _preProxyHook() {

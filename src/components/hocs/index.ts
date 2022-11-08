@@ -1,1 +1,1 @@
-export { withRouter } from "./with-router";
+export { WithRouter } from "./with-router";

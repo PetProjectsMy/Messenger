@@ -3,7 +3,7 @@ import {
   validateLoginRegex,
   validatePasswordRegex,
 } from "utils/form-input-validator";
-import { TInputValidator } from "components";
+import { TInputValidator } from "components/input";
 import { EnumInputFields } from "./enum-input-fields";
 
 export const FormValidators: Record<

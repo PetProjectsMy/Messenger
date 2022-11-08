@@ -1,6 +1,7 @@
 import { Block } from "core/dom";
 import { Input, Button } from "components";
 import { TInputProps } from "components/input/component";
+import { deepMerge } from "utils/objects-handle";
 import template from "./template";
 
 type TInputFormProps = WithComponentCommonProps<{
@@ -8,16 +9,15 @@ type TInputFormProps = WithComponentCommonProps<{
   afterValidationCallback: () => void;
 }>;
 
+type TInputFormState = TAppState & {
+  formHasInputErrors: boolean;
+  apiResponseSuccess: string;
+  apiResponseError: string;
+};
+
 export class InputForm<
   TEnumInputFiledsNames extends Record<string, string>
-> extends Block<
-  TInputFormProps,
-  TAppState & {
-    formHasInputErrors: boolean;
-    apiResponseSuccess: string;
-    apiResponseError: string;
-  }
-> {
+> extends Block<TInputFormProps, TInputFormState> {
   protected helpers: {
     enumInputFiledsNames: TEnumInputFiledsNames;
   };
@@ -28,8 +28,6 @@ export class InputForm<
     mapInputToProps?: Record<string, TInputProps>,
     afterValidationCallback?: () => void
   ) {
-    console.log(`CREATE INPUT FORM`);
-
     const children: TComponentChildren = {};
     const refs: TComponentRefs = {};
 
@@ -66,7 +64,6 @@ export class InputForm<
       apiResponseError: "",
       apiResponseSuccess: "",
     });
-    console.log(`Input Form State${JSON.stringify(state)}`);
 
     super({
       children,
@@ -116,7 +113,14 @@ export class InputForm<
             () => {
               clearAPIResponseState.call(this);
               validateform();
-              afterValidationCallback.call(this);
+              if (!this.state.formHasInputErrors) {
+                console.log(
+                  `Form filled correctly: ${JSON.stringify(
+                    this.collectFormData()
+                  )}`
+                );
+                afterValidationCallback.call(this);
+              }
             },
           ],
         },
@@ -125,6 +129,7 @@ export class InputForm<
   }
 
   private _validateForm(): void {
+    const oldState = deepMerge({}, this.state) as TInputFormState;
     let formHasInputErrors = false;
 
     Object.values(this.refs).forEach((inputField: Input) => {
@@ -133,7 +138,7 @@ export class InputForm<
 
       for (const eventValidators of validatorsByEvent) {
         for (const validator of eventValidators) {
-          const validationResult = validator();
+          const validationResult = validator(false);
           if (!validationResult) {
             formHasInputErrors = true;
             return;
@@ -143,6 +148,11 @@ export class InputForm<
     });
 
     this.state.formHasInputErrors = formHasInputErrors;
+    if (this.state.formHasInputErrors) {
+      console.log(`Form has input errors: ${JSON.stringify(this.state)}`);
+      this.state.apiResponseError = "Form has input errors";
+    }
+    this._componentDidUpdate(oldState, this.state);
   }
 
   public collectFormData(): Record<string, string> {
