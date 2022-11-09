@@ -5,8 +5,8 @@ import { deepMerge } from "utils/objects-handle";
 import template from "./template";
 
 type TInputFormProps = WithComponentCommonProps<{
-  formTitle: string;
-  afterValidationCallback: () => void;
+  formTitle?: string;
+  afterValidationCallback?: () => void;
 }>;
 
 type TInputFormState = TAppState & {
@@ -19,32 +19,40 @@ export class InputForm<
   TEnumInputFiledsNames extends Record<string, string>
 > extends Block<TInputFormProps, TInputFormState> {
   protected helpers: {
-    enumInputFiledsNames: TEnumInputFiledsNames;
+    enumInputFieldsNames: TEnumInputFiledsNames;
   };
 
-  constructor(
-    formTitle: string,
-    enumInputFiledsNames: TEnumInputFiledsNames,
-    mapInputToProps?: Record<string, TInputProps>,
-    afterValidationCallback?: () => void
-  ) {
+  constructor({
+    enumInputFieldsNames,
+    mapInputToProps = {},
+    props = {},
+  }: {
+    enumInputFieldsNames: TEnumInputFiledsNames;
+    mapInputToProps?: Record<string, TInputProps>;
+    props?: TInputFormProps;
+    afterValidationCallback?: () => void;
+  }) {
     const children: TComponentChildren = {};
     const refs: TComponentRefs = {};
 
-    mapInputToProps = mapInputToProps ?? {};
-    Object.values(enumInputFiledsNames).forEach((fieldName) => {
+    Object.values(enumInputFieldsNames).forEach((fieldName) => {
+      console.log(
+        `MAPPED PROPS WRAPPER: ${JSON.stringify(
+          mapInputToProps![fieldName].htmlWrapper
+        )}`
+      );
       const inputField = new Input({
         props: {
-          ...(mapInputToProps![fieldName] ?? {}),
           componentName: `${fieldName} input with validation`,
           htmlWrapper: {
             componentAlias: "wrapped",
             htmlWrapperTemplate: `
-              <div class="form-field">
+              <field class="form-field">
                 {{{ wrapped }}}
-              </div>
+              </field>
               `,
           },
+          ...(mapInputToProps![fieldName] ?? {}),
         },
       });
 
@@ -52,7 +60,7 @@ export class InputForm<
       refs[fieldName] = inputField;
     });
 
-    const state = Object.values(enumInputFiledsNames).reduce(
+    const state = Object.values(enumInputFieldsNames).reduce(
       (acc, fieldName) => {
         acc[`${fieldName}_error`] = "";
         return acc;
@@ -68,20 +76,20 @@ export class InputForm<
     super({
       children,
       props: {
-        componentName: "Login Page",
-        formTitle,
-        afterValidationCallback: afterValidationCallback ?? (() => {}),
+        formTitle: "",
+        afterValidationCallback: () => {},
+        ...props,
       },
       refs,
       state,
       helpers: {
-        enumInputFiledsNames,
+        enumInputFieldsNames,
       },
     });
   }
 
   render() {
-    return template(this.helpers.enumInputFiledsNames);
+    return template(this.helpers.enumInputFieldsNames);
   }
 
   protected _preInitHook(): void {

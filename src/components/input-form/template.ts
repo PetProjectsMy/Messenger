@@ -6,9 +6,11 @@ export default function getInputFormTemplate(
   const tag = "form";
 
   let content = `
-    <legend>
-      <h1>{{{ formTitle }}}</h1>
-    </legend>
+    {{#if formTitle}} 
+      <legend>
+        <h1>{{{ formTitle }}}</h1>
+      </legend>
+    {{/if}}
     <fieldset class="form-fields">
   `;
   Object.values(enumFormFieldsNames).forEach((fieldName) => {

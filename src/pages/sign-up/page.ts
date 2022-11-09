@@ -26,12 +26,15 @@ export class SignUpPage extends Block {
       },
     });
 
-    children.signupForm = new InputForm(
-      "Sign Up",
-      EnumInputFields,
-      MapInputFieldsProps,
-      afterValidationCallback
-    );
+    children.signupForm = new InputForm({
+      enumInputFieldsNames: EnumInputFields,
+      mapInputToProps: MapInputFieldsProps,
+      props: {
+        afterValidationCallback,
+        formTitle: "Sign Up",
+        componentName: "SignUp Form Component",
+      },
+    });
     children.homeButton = new HomeButton();
 
     super({ children, props: { componentName: "SignUp Page" }, refs });

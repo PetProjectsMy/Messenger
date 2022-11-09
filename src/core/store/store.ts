@@ -106,6 +106,10 @@ export class Store<State extends Record<string, any>> {
     return Boolean(this.state.user);
   }
 
+  public getUserData(): TAPIUserResponse {
+    return this.state.user;
+  }
+
   public getPageType(): null | TAppPageClass {
     const { page } = this.state;
     if (!page) {

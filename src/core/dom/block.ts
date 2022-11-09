@@ -12,7 +12,7 @@ export class Block<
 
   protected htmlWrapped: boolean;
 
-  protected htmlWrapper: Nullable<ComponentWrapper>;
+  protected htmlWrapper: Nullable<TComponentWrapper>;
 
   protected props: TProps;
 
@@ -47,8 +47,12 @@ export class Block<
     this.state = state as TState;
     this.helpers = helpers;
 
-    this.htmlWrapper = props.htmlWrapper as ComponentWrapper;
-    this.htmlWrapped = !!this.htmlWrapper;
+    console.log(
+      `${props.componentName} HTML WRAPPER: ${JSON.stringify(
+        this.props.htmlWrapper
+      )}`
+    );
+    this.htmlWrapped = !!this.props.htmlWrapper;
 
     this.componentName = (props.componentName ??
       `Not Named Block of type ${this.constructor.name}`) as string;
@@ -224,7 +228,7 @@ export class Block<
 
     let templateString = this.render();
     if (this.htmlWrapped) {
-      const htmlWrapper = this.htmlWrapper as ComponentWrapper;
+      const htmlWrapper = this.props.htmlWrapper as TComponentWrapper;
       templateString = Handlebars.compile(htmlWrapper.htmlWrapperTemplate)({
         [`${htmlWrapper.componentAlias}`]: templateString,
       });

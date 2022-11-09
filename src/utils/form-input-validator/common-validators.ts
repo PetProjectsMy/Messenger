@@ -1,3 +1,11 @@
+export function validateNotEmptyValue(value: string): string {
+  if (value === "") {
+    return "Value is empty";
+  }
+
+  return "";
+}
+
 export function validateLoginRegex(value: string): string {
   if (value.length < 3) {
     return "length must be ≥ 3";
@@ -30,6 +38,54 @@ export function validatePasswordRegex(value: string): string {
   }
 
   return "";
+}
+
+export function validateTwoFieldsMatching({
+  fieldNames,
+  notMatchErrorText,
+}: {
+  fieldNames: { first: string; second: string };
+  notMatchErrorText: string;
+}): () => string {
+  return function validateMatching(): string {
+    const form = this.refs.Form;
+    const inputFirst = form.refs[fieldNames.first];
+    const inputSecond = form.refs[fieldNames.second];
+
+    const value = this.getValue();
+    const inputs = {} as any;
+    if (this === inputFirst) {
+      Object.assign(inputs, {
+        valueOther: inputSecond.getValue(),
+        this: fieldNames.first,
+        other: fieldNames.second,
+      });
+    } else {
+      Object.assign(inputs, {
+        valueOther: inputFirst.getValue(),
+        this: fieldNames.second,
+        other: fieldNames.first,
+      });
+    }
+
+    let error = "";
+
+    const valuesMatching = value === inputs.valueOther;
+    const inputOther = form.refs[inputs.other];
+    const stateOther = inputOther.state;
+
+    if (!valuesMatching) {
+      error = notMatchErrorText;
+      form.state[`${inputs.this}_error`] = error;
+      form.state[`${inputs.other}_error`] = error;
+    } else if (stateOther.inputError === notMatchErrorText) {
+      stateOther.inputError = "";
+      form.state[`${inputs.other}_error`] = "";
+      form._render();
+    }
+
+    return error;
+  };
 }
 
 export function validateNameRegex(value: string): string {

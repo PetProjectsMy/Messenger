@@ -1,8 +1,14 @@
 import { Block } from "core/dom";
 import avatarImagePlaceholder from "static/avatar-placeholder-profile.png";
-import { Button, HomeButton, ImageComponent } from "components";
-import { DataField } from "./data-field-component/component";
+import {
+  Button,
+  HomeButton,
+  ImageComponent,
+  InputForm,
+  Input,
+} from "components";
 import template from "./template";
+import { EnumInputFields, MapInputFieldsProps } from "./form-component";
 
 export class ProfilePage extends Block {
   constructor() {
@@ -16,34 +22,21 @@ export class ProfilePage extends Block {
       },
     });
 
-    const changeButtonRefs: TComponentRefs = {};
-    children.profileDataFields = [];
-    [
-      ["email", "email", "email@example.com"],
-      ["login", "login", "ExampleLogin"],
-      ["first name", "first_name", "Name"],
-      ["second name", "second_name", "Surname"],
-      ["chat nickname", "display_name", "Chat Nickname"],
-      ["phone", "phone", "8 (777) 888 77 88"],
-    ].forEach(([dataType, htmlName, inputPlaceholder]) => {
-      const dataField: DataField = new DataField({
-        componentName: `${dataType} field`,
-        htmlName,
-        inputPlaceholder,
-        dataType,
-      });
-      (children.profileDataFields as DataField[]).push(dataField);
-
-      changeButtonRefs[htmlName] = dataField;
+    const profileDataForm = new InputForm({
+      props: {
+        htmlClass: "profile-data-form",
+      },
+      enumInputFieldsNames: EnumInputFields,
+      mapInputToProps: MapInputFieldsProps,
     });
 
+    children.profileDataForm = profileDataForm;
     children.homeButton = new HomeButton();
-
     children.changeDataButton = new Button({
       state: {
         mode: "save",
       },
-      refs: changeButtonRefs,
+      refs: profileDataForm.refs,
       props: {
         componentName: "change/save data button",
         label: "change data",
@@ -59,7 +52,7 @@ export class ProfilePage extends Block {
                 this.state.mode = "save";
               }
 
-              Object.values(this.refs).forEach((dataField: DataField) => {
+              Object.values(this.refs).forEach((dataField: Input) => {
                 dataField.toggleDisableState();
               });
             },

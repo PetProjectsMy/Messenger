@@ -1,5 +1,6 @@
 import {
   makeValidator,
+  validateNotEmptyValue,
   validateLoginRegex,
   validatePasswordRegex,
 } from "utils/form-input-validator";
@@ -19,6 +20,7 @@ export const FormValidators: Record<
     validatorsList: [validatePasswordRegex],
   },
 ].reduce((acc, { field, validatorsList }) => {
+  validatorsList.unshift(validateNotEmptyValue);
   const validator = makeValidator({
     errorStateRef: `${field}_error`,
     validatorsList,

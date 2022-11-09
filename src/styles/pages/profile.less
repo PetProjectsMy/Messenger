@@ -12,12 +12,15 @@
 @name-section-flex: 100% - @image-section-flex;
 // --------------------------
 @footer-nav-section-flex: 20%;
+@footer-nav-section-height: @profile-form-height *
+  (@footer-nav-section-flex / 100%);
 @footer-section-background-color: slategrey;
 
-@main-section-flex: 100% - @header-section-flex - @footer-nav-section-flex;
+@main-section-height: @profile-form-height *
+  ((100% - @header-section-flex - @footer-nav-section-flex) / 100%);
 @main-section-background-color: azure;
 
-main.profile-data-form {
+main.profile-page {
   &:extend(.centered-container);
   &:extend(.vertical-block);
   .mixin-width-by-device(0.9, 0.6, 600px);
@@ -58,14 +61,15 @@ main.profile-data-form {
     }
   }
 
-  .profile-data-fields {
+  form.profile-data-form fieldset {
+    border: none;
     background-color: @main-section-background-color;
-    flex: @main-section-flex;
+    height: @main-section-height;
     &:extend(.vertical-block);
-    height: 100%;
     width: 100%;
 
-    .data-field {
+    field.data-field {
+      flex: 1;
       &:extend(.horizontal-block);
       width: 100%;
 
@@ -94,6 +98,6 @@ main.profile-data-form {
 
   .profile-nav-section {
     background-color: beige;
-    flex: @footer-nav-section-flex;
+    height: @footer-nav-section-flex;
   }
 }

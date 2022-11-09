@@ -11,12 +11,16 @@ export class LoginPage extends Block {
     const children: TComponentChildren = {};
     const refs: TComponentRefs = {};
 
-    children.loginForm = new InputForm(
-      "Login",
-      EnumInputFields,
-      MapInputFieldsProps,
-      afterValidationCallback
-    );
+    children.loginForm = new InputForm({
+      formTitle: "Login",
+      enumInputFieldsNames: EnumInputFields,
+      mapInputToProps: MapInputFieldsProps,
+      props: {
+        afterValidationCallback,
+        formTitle: "Login",
+        componentName: "Login Form Component",
+      },
+    });
 
     const LinkWithRouter = WithRouter(Link);
     children.signUpLink = new LinkWithRouter({

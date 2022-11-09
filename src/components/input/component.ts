@@ -2,11 +2,13 @@ import { Block } from "core/dom";
 import template from "./template";
 
 export type TInputValidator = (isFormRerenderNeeded?: boolean) => boolean;
+export type TInputValidatorsByEvents = Record<string, TInputValidator[]>;
 
 export type TInputProps = WithComponentCommonProps<{
+  value?: string;
   placeholder?: string;
   type?: string;
-  validators?: Record<string, TInputValidator[]>;
+  validators?: TInputValidatorsByEvents;
   disabledAttr?: boolean;
 }>;
 

@@ -1,7 +1,7 @@
 import request from "./http-trasnport";
 
 class ProfileAPIClass {
-  changeData(data: TProfileChangeDTO) {
+  changeProfile(data: TProfileChangeDTO) {
     return request.put("user/profile", { data });
   }
 }

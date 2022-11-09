@@ -4,7 +4,7 @@ import type { EventHandler } from "core/event-bus";
 declare global {
   export type ComponentEventHandler = EventHandler;
 
-  export type ComponentWrapper = {
+  export type TComponentWrapper = {
     componentAlias: string;
     htmlWrapperTemplate: string;
   };
@@ -15,7 +15,7 @@ declare global {
   };
 
   type HTMLElementProps = {
-    htmlWrapper?: ComponentWrapper;
+    htmlWrapper?: TComponentWrapper;
     hmtlWrapped?: boolean;
     htmlClass?: string;
     htmlId?: string;

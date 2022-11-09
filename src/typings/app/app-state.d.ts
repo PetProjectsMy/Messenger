@@ -17,12 +17,12 @@ declare global {
   export type TAPIUserResponse = {
     id: number;
     login: string;
-    firstName: string;
-    secondName: string;
-    displayName: string;
-    avatar: string;
+    first_name: string;
+    second_name: string;
+    display_name: string;
     phone: string;
     email: string;
+    avatar: string;
   };
 }
 

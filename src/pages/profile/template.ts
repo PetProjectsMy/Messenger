@@ -1,5 +1,5 @@
 export default `
-      <main class="profile-data-form">
+      <main class="profile-page">
         <header class="profile-form-header">
           <div class="image-section">
             {{{ avatarImage }}}
@@ -8,9 +8,7 @@ export default `
             <span class="user-name">username</span>
           </div>
         </header>
-        <ul class="profile-data-fields">
-            {{{ profileDataFields }}}
-        </ul>
+        {{{ profileDataForm }}}
         <nav class="profile-nav-section">
           {{{ changeDataButton }}}
           <a class="change-password" href="#app">Изменить пароль</a>

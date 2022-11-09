@@ -2,14 +2,6 @@ import * as InputValidators from "utils/form-input-validator";
 import { TInputValidator } from "components/input";
 import { EnumInputFields } from "./enum-input-fields";
 
-const validatePasswordsMatching = InputValidators.validateTwoFieldsMatching({
-  fieldNames: {
-    first: EnumInputFields.Password,
-    second: EnumInputFields.PasswordRepeat,
-  },
-  notMatchErrorText: "Passwords don't match",
-});
-
 export const FormValidators: Record<
   EnumInputFields,
   Record<string, TInputValidator[]>
@@ -23,22 +15,12 @@ export const FormValidators: Record<
     validatorsList: [InputValidators.validateNameRegex],
   },
   {
+    field: EnumInputFields.DisplayName,
+    validatorsList: [InputValidators.validateNameRegex],
+  },
+  {
     field: EnumInputFields.Login,
     validatorsList: [InputValidators.validateLoginRegex],
-  },
-  {
-    field: EnumInputFields.Password,
-    validatorsList: [
-      InputValidators.validatePasswordRegex,
-      validatePasswordsMatching,
-    ],
-  },
-  {
-    field: EnumInputFields.PasswordRepeat,
-    validatorsList: [
-      InputValidators.validatePasswordRegex,
-      validatePasswordsMatching,
-    ],
   },
   {
     field: EnumInputFields.Email,

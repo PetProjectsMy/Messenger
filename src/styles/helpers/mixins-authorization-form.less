@@ -23,7 +23,7 @@
       flex: 100% - @flex-fieldset;
     }
 
-    @margin: calc(@fields-total-margin / (2 * @fields-num + 1));
+    @margin: calc(@fields-total-margin / (@fields-num + 2));
     fieldset {
       flex: @flex-fieldset;
       justify-content: space-evenly;
@@ -35,14 +35,14 @@
         margin-top: @margin;
       }
 
-      .form-field {
+      field.form-field {
         & > * {
           width: 95%;
           text-align: center;
         }
 
         input {
-          height: 80%;
+          height: 100%;
         }
 
         span {
@@ -66,6 +66,7 @@
       }
 
       .submit-button-section {
+        flex: 1.2;
         margin-bottom: @margin;
 
         .submit-button {

@@ -1,8 +1,8 @@
 import { ProfileAPI } from "api";
 
 class ProfileEditServiceClass {
-  changeUserData(data: TProfileChangeDTO) {
-    ProfileAPI.changeData(data);
+  changeUserProfile(data: TProfileChangeDTO) {
+    ProfileAPI.changeProfile(data);
   }
 }
 
