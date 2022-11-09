@@ -1,5 +1,5 @@
 export { hasError as APIResponseHasError } from "./response-has-error";
 export {
-  transformUserData,
+  transformLoginFormDatatoAPI,
   transformSignUpFormDatatoAPI,
 } from "./data-transformers";

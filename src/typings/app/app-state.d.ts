@@ -11,10 +11,10 @@ declare global {
   export type TAppState = {
     appIsInited: boolean;
     page: EnumAppPages | null;
-    user: User | null;
+    user: TAPIUserResponse | null;
   };
 
-  export type User = {
+  export type TAPIUserResponse = {
     id: number;
     login: string;
     firstName: string;

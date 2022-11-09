@@ -1,7 +1,7 @@
 import request from "./http-trasnport";
 
 class SignUpAPIClass {
-  signup(data: SignUpFormDTO) {
+  signup(data: TSignUpFormDTO) {
     return request.post("auth/signup", { data });
   }
 }

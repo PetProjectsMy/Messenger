@@ -4,6 +4,7 @@ import { WithRouter } from "components/hocs";
 import { EnumAppRoutes } from "core/router";
 import template from "./template";
 import { EnumInputFields, MapInputFieldsProps } from "./form-component";
+import { afterValidationCallback } from "./api-service";
 
 export class LoginPage extends Block {
   constructor() {
@@ -13,7 +14,8 @@ export class LoginPage extends Block {
     children.loginForm = new InputForm(
       "Login",
       EnumInputFields,
-      MapInputFieldsProps
+      MapInputFieldsProps,
+      afterValidationCallback
     );
 
     const LinkWithRouter = WithRouter(Link);

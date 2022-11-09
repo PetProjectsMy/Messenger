@@ -113,7 +113,7 @@ export class InputForm<
             () => {
               clearAPIResponseState.call(this);
               validateform();
-              // afterValidationCallback.call(this); // DEBUG
+              afterValidationCallback.call(this); // DEBUG
               if (!this.state.formHasInputErrors) {
                 console.log(
                   `Form filled correctly: ${JSON.stringify(

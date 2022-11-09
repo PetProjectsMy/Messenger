@@ -15,15 +15,7 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
     Object.entries(this.routesData).forEach(
       ([routeName, routeData]: [EnumAppRoutes, TAppRouteData]) => {
         this.use(routeName, () => {
-          const isAuthorized = store.isUserAthorized();
-          const isPageSet = store.isPageSet();
-
-          if (!isPageSet && this.isStarted) {
-            throw new Error(
-              `Unexpected state of current page: typeof page is ${store.getPageType()}`
-            );
-          }
-          if (isAuthorized || !routeData.needAuthorization) {
+          if (store.isUserAthorized() || !routeData.needAuthorization) {
             store.dispatch({ page: routeData.block });
           } else {
             store.dispatch({

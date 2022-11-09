@@ -1,15 +1,16 @@
 import { SignUpAPI } from "api";
 
 export class SignUpServiceClass {
-  async signup(data: SignUpFormDTO) {
-    const apiResponse = await SignUpAPI.signup(data);
-    const { status, response } = apiResponse;
+  async signup(data: TSignUpFormDTO) {
+    const response = await SignUpAPI.signup(data);
 
     console.log(
-      `SIGNUP REQUEST:\nstatus ${status}; response: ${JSON.stringify(response)}`
+      `SIGN-UP REQUEST:\nstatus ${response.status}; response: ${JSON.stringify(
+        response.response
+      )}`
     );
 
-    return response;
+    return response.response;
   }
 }
 

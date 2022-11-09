@@ -74,6 +74,7 @@ class HTTPTransport {
       const url = `${this.baseURL}/${apiURL}`;
       xhr.open(method, isGet && !!data ? `${url}${queryStringify(data)}` : url);
       xhr.responseType = "json";
+      xhr.withCredentials = true;
 
       Object.entries(headers).forEach(([key, value]: [string, string]) => {
         xhr.setRequestHeader(key, value);

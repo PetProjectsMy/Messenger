@@ -1,30 +1,37 @@
-import { AuthorizationAPI } from "api/authorization";
+import { AuthorizationAPI } from "api";
 import { EnumAppRoutes } from "core/router";
-import { transformUserData, APIResponseHasError } from "utils/api";
-
-type LoginFormData = {
-  login: string;
-  password: string;
-};
+import { APIResponseHasError } from "utils/api";
 
 class AuthorizationServiceClass {
-  async login(data: LoginFormData) {
-    const apiResponse = await AuthorizationAPI.login(data);
-    const { status, response } = apiResponse;
+  async getUser() {
+    const response = await AuthorizationAPI.me();
+    return response.response;
+  }
+
+  async login(data: TLoginFormDTO) {
+    const response = await AuthorizationAPI.login(data);
 
     console.log(
-      `LOGIN REQUEST:\nstatus ${status}; response ${JSON.stringify(response)}`
+      `LOGIN REQUEST:\nstatus ${response.status}; response ${JSON.stringify(
+        response.response
+      )}`
     );
 
     if (!APIResponseHasError(response)) {
       const responseUser = await AuthorizationAPI.me();
+      console.log(
+        `USER REQUEST:\nstatus ${
+          responseUser.status
+        }; response ${JSON.stringify(responseUser.response)}`
+      );
+
       window.store.dispatch({
-        user: transformUserData(responseUser as TUserDTO),
+        user: responseUser,
       });
-      window.router.go(EnumAppRoutes.Profile);
+      window.router.go(EnumAppRoutes.Chats);
     }
 
-    return response;
+    return response.response;
   }
 
   async logout() {

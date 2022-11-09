@@ -1,12 +1,7 @@
 import request from "./http-trasnport";
 
-type LoginRequestData = {
-  login: string;
-  password: string;
-};
-
 class AuthorizationAPIClass {
-  login(data: LoginRequestData) {
+  login(data: TLoginFormDTO) {
     return request.post("auth/signin", { data });
   }
 

@@ -51,7 +51,9 @@ export class Store<State extends Record<string, any>> {
       set: function (target: State, prop: string, newValue: unknown) {
         const oldValue = target[prop];
         (target as Record<string, unknown>)[prop] = newValue;
-        console.log(`${prop}: ${oldValue} -> ${newValue}`);
+        console.log(
+          `${prop}: ${JSON.stringify(oldValue)} -> ${JSON.stringify(newValue)}`
+        );
 
         if (prop === "appIsInited") {
           if (!oldValue && newValue) {

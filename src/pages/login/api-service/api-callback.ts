@@ -1,34 +1,27 @@
-import { SignUpService } from "services";
+import { AuthorizationService } from "services";
 import {
-  transformSignUpFormDatatoAPI as transformFormDatatoAPI,
+  transformLoginFormDatatoAPI as transformFormDatatoAPI,
   APIResponseHasError,
 } from "utils/api";
 
 function makeAPIRequest() {
   // const formData = this.collectFormData();
   const formData = {
-    first_name: "Rtu",
-    second_name: "Rtu",
     login: "Rtu42",
     password: "Rtu42Rtu42",
-    password_repeat: "Rtu42Rtu42",
-    email: "Rtu42@mail.net",
-    phone: "87778888777",
   };
 
   const apiData = transformFormDatatoAPI(formData);
   console.log(`API data: ${JSON.stringify(apiData)}`);
-  return SignUpService.signup(apiData);
+  return AuthorizationService.login(apiData);
 }
 
 function handleAPIResponse(response: any) {
-  console.log(`SIGN-UP REQUEST RESPONSE: ${JSON.stringify(response)}`);
+  console.log(`LOGIN REQUEST RESPONSE: ${JSON.stringify(response)}`);
   if (APIResponseHasError(response)) {
     this.state.apiResponseError = response.reason;
-  } else {
-    this.state.apiResponseSuccess = "Sign Up Successfull";
+    this._render();
   }
-  this._render();
 }
 
 export async function afterValidationCallback() {

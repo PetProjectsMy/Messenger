@@ -1,18 +1,31 @@
 import { Block } from "core/dom";
 import { WithRouter } from "components/hocs";
 import { Link } from "components";
+import { LogoutButton } from "components/buttons/logout-button";
 import template from "./template";
 import { EnumNavigationPageLinks, MapNavigationLinkToProps } from "./links";
 
 export class NavigationPage extends Block {
   constructor() {
+    const children: TComponentChildren = {};
+
     const LinkWithRouter = WithRouter(Link);
-    const linkElements = Object.values(EnumNavigationPageLinks).reduce(
+    children.links = Object.values(EnumNavigationPageLinks).reduce(
       (acc: any[], linkName: EnumNavigationPageLinks) => {
         const props = MapNavigationLinkToProps[linkName];
         acc.push(
           new LinkWithRouter({
-            props,
+            props: {
+              ...props,
+              htmlWrapper: {
+                componentAlias: "wrapped",
+                htmlWrapperTemplate: `
+                <div class="naviagtion-link">
+                  {{{ wrapped }}}
+                </div>
+                `,
+              },
+            },
           })
         );
         return acc;
@@ -20,8 +33,10 @@ export class NavigationPage extends Block {
       []
     );
 
+    children.logoutButton = new LogoutButton();
+
     super({
-      children: { links: linkElements },
+      children,
       props: { componentName: "Navigation Page" },
     });
   }

@@ -11,8 +11,6 @@ const attributes = `
 const content = `
 {{#if label}}
   {{ label }}
-{{else}}
-  ""
 {{/if}}
 `;
 

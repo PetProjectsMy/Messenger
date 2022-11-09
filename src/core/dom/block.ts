@@ -35,7 +35,7 @@ export class Block<
     children?: TComponentChildren;
     refs?: TComponentRefs;
     state?: TComponentState;
-    helpers?: Record<string, unknown>;
+    helpers?: TComponentHelpers;
   } = {}) {
     super();
 
@@ -49,7 +49,6 @@ export class Block<
 
     this.htmlWrapper = props.htmlWrapper as ComponentWrapper;
     this.htmlWrapped = !!this.htmlWrapper;
-    delete this.props.htmlWrapper;
 
     this.componentName = (props.componentName ??
       `Not Named Block of type ${this.constructor.name}`) as string;

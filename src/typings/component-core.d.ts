@@ -43,6 +43,8 @@ declare global {
 
   export type TComponentState = Record<string, unknown>;
 
+  export type TComponentHelpers = Record<string, unknown>;
+
   export type TPageProxy = { component: Nullable<Block> };
 }
 

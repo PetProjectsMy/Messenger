@@ -1,8 +1,7 @@
-// import { authAPI } from "api/auth";
-
+import { AuthorizationAPI } from "api";
 import { Store } from "core/store";
 import { Router } from "core/router";
-import { transformUserData, APIResponseHasError } from "utils/api";
+import { APIResponseHasError } from "utils/api";
 
 export async function initApp() {
   try {
@@ -12,12 +11,12 @@ export async function initApp() {
     window.store = store;
     router.init();
     store.init();
-    // const { response } = (await authAPI.me()) as any;
-    const response = { reason: "error" };
+
+    const { response } = await AuthorizationAPI.me();
     if (APIResponseHasError(response)) {
       return;
     }
-    store.dispatch({ user: transformUserData(response as TUserDTO) });
+    store.dispatch({ user: response });
   } catch (err) {
     console.error(err);
   } finally {
