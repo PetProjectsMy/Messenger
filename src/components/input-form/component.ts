@@ -16,7 +16,8 @@ type TInputFormState = TAppState & {
 };
 
 export class InputForm<
-  TEnumInputFiledsNames extends Record<string, string>
+  TEnumInputFiledsNames extends Record<string, string>,
+  TInputClass extends typeof Input = typeof Input
 > extends Block<TInputFormProps, TInputFormState> {
   protected helpers: {
     enumInputFieldsNames: TEnumInputFiledsNames;
@@ -24,14 +25,18 @@ export class InputForm<
 
   constructor({
     enumInputFieldsNames,
+    InputClass = Input as TInputClass,
     mapInputToProps = {},
     mapInputToHelpers = {},
     props = {},
+    helpers = {},
   }: {
     enumInputFieldsNames: TEnumInputFiledsNames;
     mapInputToProps?: Record<string, TInputProps>;
     mapInputToHelpers?: Record<string, TComponentHelpers>;
+    InputClass?: TInputClass;
     props?: TInputFormProps;
+    helpers?: TComponentHelpers;
     afterValidationCallback?: () => void;
   }) {
     const children: TComponentChildren = {};
@@ -43,7 +48,7 @@ export class InputForm<
           mapInputToProps![fieldName].htmlWrapper
         )}`
       );
-      const inputField = new Input({
+      const inputField = new InputClass({
         props: {
           componentName: `${fieldName} input with validation`,
           htmlWrapper: {
@@ -98,11 +103,15 @@ export class InputForm<
   protected _afterPropsAssignHook(): void {
     super._afterPropsAssignHook();
 
-    Object.values(this.refs).forEach((inputField: Input) => {
+    Object.values(this.refs).forEach((inputField: Block) => {
       inputField.refs.Form = this;
     });
+  }
 
-    if (!this.children.submitButton) {
+  protected _beforeRenderHook(): void {
+    super._beforeRenderHook();
+
+    if (!this.children.submitButton === undefined) {
       this.children.submitButton = this._createSubmitButton(
         this.props.afterValidationCallback
       );

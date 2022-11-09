@@ -28,9 +28,11 @@ export default function getInputFormTemplate(
       {{#if apiResponseError }} 
         <span class="api-error"> {{ apiResponseError }} </span>
       {{/if}}
-      <div class="submit-button-section">
-        {{{ submitButton }}}
-      </div>
+      {{#if submitButton}}
+        <div class="submit-button-section">
+          {{{ submitButton }}}
+        </div>
+      {{/if}}
     </fieldset>
   `;
 

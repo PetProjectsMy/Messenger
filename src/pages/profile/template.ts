@@ -5,7 +5,7 @@ export default `
             {{{ avatarImage }}}
           </div>
           <div class="name-section">
-            <span class="user-name">username</span>
+            <span class="user-id">ID: {{ userID }}</span>
           </div>
         </header>
         {{{ profileDataForm }}}

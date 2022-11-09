@@ -15,9 +15,11 @@ import {
   MapInputFieldToHelpers,
 } from "./form-component";
 
-const InputFormWithStore = WithStore(InputForm) as any;
+const InputWithStore = WithStore(Input) as any;
+type TProfilePageProps = WithComponentCommonProps<{ userID: number }>;
+const ProfilePageBlock = WithStore(Block<TProfilePageProps>);
 
-export class ProfilePage extends Block {
+export class ProfilePage extends ProfilePageBlock {
   constructor() {
     const children: TComponentChildren = {};
 
@@ -29,10 +31,16 @@ export class ProfilePage extends Block {
       },
     });
 
-    const profileDataForm = new InputFormWithStore({
+    const profileDataForm = new InputForm({
       props: {
         htmlClass: "profile-data-form",
       },
+      helpers: {
+        afterPropsAssignHook() {
+          this.children.submitButton = null;
+        },
+      },
+      InputClass: InputWithStore,
       enumInputFieldsNames: EnumInputFields,
       mapInputToProps: MapInputFieldToProps,
       mapInputToHelpers: MapInputFieldToHelpers,
@@ -74,5 +82,9 @@ export class ProfilePage extends Block {
 
   protected render(): string {
     return template;
+  }
+
+  protected _afterPropsAssignHook(): void {
+    this.props.userID = this.store.getUserData().id;
   }
 }

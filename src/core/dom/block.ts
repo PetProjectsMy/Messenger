@@ -62,6 +62,7 @@ export class Block<
     this.props = this._makePropsProxy(this.props) as TProps;
 
     this._registerEvents();
+    this._beforeRenderHook();
     this.eventBus.emit(BlockEvents.INIT);
   }
 
@@ -259,7 +260,11 @@ export class Block<
 
   protected _beforePropsAssignHook() {}
 
-  protected _afterPropsAssignHook() {}
+  protected _afterPropsAssignHook() {
+    if (this.helpers.afterPropsAssignHook) {
+      (this.helpers.afterPropsAssignHook as Function).call(this);
+    }
+  }
 
   protected _beforePropsProxyHook() {
     this._bindEventListeners();
@@ -268,6 +273,8 @@ export class Block<
       (this.helpers.beforePropsProxyHook as Function).call(this);
     }
   }
+
+  protected _beforeRenderHook() {}
 }
 
 export type BlockClass = typeof Block;

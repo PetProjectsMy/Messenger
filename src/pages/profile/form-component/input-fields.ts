@@ -1,14 +1,8 @@
-import { TInputValidatorsByEvents } from "components/input/component";
+import { TInputProps } from "components/input/component";
 import { EnumInputFields } from "./enum-input-fields";
 import { FormValidators } from "./input-validators";
 
-type TInputInitFieldProps = {
-  htmlName: string;
-  validators: TInputValidatorsByEvents;
-  htmlWrapper?: TComponentWrapper;
-};
-
-export const MapInputFieldToProps: Record<string, TInputInitFieldProps> = {
+export const MapInputFieldToProps: Record<string, Partial<TInputProps>> = {
   [EnumInputFields.FirstName]: {
     htmlName: "first_name",
     validators: FormValidators[EnumInputFields.FirstName],
@@ -44,11 +38,12 @@ const MapInputFieldToDataType = {
   [EnumInputFields.Phone]: "phone",
 };
 
-Object.entries(MapInputFieldToProps).forEach(
-  ([fieldName, props]: [EnumInputFields, TInputInitFieldProps]) => {
-    props.htmlWrapper = {
-      componentAlias: "wrappedDataInput",
-      htmlWrapperTemplate: `
+Object.entries(MapInputFieldToProps).forEach(([fieldName, props]) => {
+  props.disabledAttr = true;
+  props.htmlClass = "data-input";
+  props.htmlWrapper = {
+    componentAlias: "wrappedDataInput",
+    htmlWrapperTemplate: `
       <field class="data-field">
         <div class="data-type-section">
           <span class="data-type"> ${MapInputFieldToDataType[fieldName]} </span>
@@ -58,39 +53,38 @@ Object.entries(MapInputFieldToProps).forEach(
         </div>
       </field>
     `,
-    };
-  }
-);
+  };
+});
 
 export const MapInputFieldToHelpers = {
   [EnumInputFields.FirstName]: {
     beforePropsProxyHook() {
-      this.props.value = this.refs.Form.store.state.getUserData().first_name;
+      this.props.value = this.store.getUserData().first_name;
     },
   },
   [EnumInputFields.SecondName]: {
     beforePropsProxyHook() {
-      this.props.value = this.refs.Form.store.state.getUserData().second_name;
+      this.props.value = this.store.getUserData().second_name;
     },
   },
   [EnumInputFields.DisplayName]: {
     beforePropsProxyHook() {
-      this.props.value = this.refs.Form.store.state.getUserData().display_name;
+      this.props.value = this.store.getUserData().display_name;
     },
   },
   [EnumInputFields.Login]: {
     beforePropsProxyHook() {
-      this.props.value = this.refs.Form.store.state.getUserData().login;
+      this.props.value = this.store.getUserData().login;
     },
   },
   [EnumInputFields.Email]: {
     beforePropsProxyHook() {
-      this.props.value = this.refs.Form.store.state.getUserData().email;
+      this.props.value = this.store.getUserData().email;
     },
   },
   [EnumInputFields.Phone]: {
     beforePropsProxyHook() {
-      this.props.value = this.refs.Form.store.state.getUserData().phone;
+      this.props.value = this.store.getUserData().phone;
     },
   },
 };
