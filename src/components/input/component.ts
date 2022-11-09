@@ -20,12 +20,13 @@ export class Input extends Block<TInputProps, TInputState> {
     return template;
   }
 
-  protected _preInitHook() {
-    this.state = { inputError: "" };
+  protected _afterPropsAssignHook() {
+    super._afterPropsAssignHook();
+    this.state.inputError = "";
   }
 
-  protected _preProxyHook() {
-    super._preProxyHook();
+  protected _beforePropsProxyHook() {
+    super._beforePropsProxyHook();
 
     this.props.validators = this.props.validators ?? {};
     this._bindValidators();

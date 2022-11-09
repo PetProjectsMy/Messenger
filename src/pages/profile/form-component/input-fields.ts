@@ -8,7 +8,7 @@ type TInputInitFieldProps = {
   htmlWrapper?: TComponentWrapper;
 };
 
-const MapInputFieldsPropsBase: Record<string, TInputInitFieldProps> = {
+export const MapInputFieldToProps: Record<string, TInputInitFieldProps> = {
   [EnumInputFields.FirstName]: {
     htmlName: "first_name",
     validators: FormValidators[EnumInputFields.FirstName],
@@ -44,7 +44,7 @@ const MapInputFieldToDataType = {
   [EnumInputFields.Phone]: "phone",
 };
 
-Object.entries(MapInputFieldsPropsBase).forEach(
+Object.entries(MapInputFieldToProps).forEach(
   ([fieldName, props]: [EnumInputFields, TInputInitFieldProps]) => {
     props.htmlWrapper = {
       componentAlias: "wrappedDataInput",
@@ -62,4 +62,35 @@ Object.entries(MapInputFieldsPropsBase).forEach(
   }
 );
 
-export const MapInputFieldsProps = MapInputFieldsPropsBase;
+export const MapInputFieldToHelpers = {
+  [EnumInputFields.FirstName]: {
+    beforePropsProxyHook() {
+      this.props.value = this.refs.Form.store.state.getUserData().first_name;
+    },
+  },
+  [EnumInputFields.SecondName]: {
+    beforePropsProxyHook() {
+      this.props.value = this.refs.Form.store.state.getUserData().second_name;
+    },
+  },
+  [EnumInputFields.DisplayName]: {
+    beforePropsProxyHook() {
+      this.props.value = this.refs.Form.store.state.getUserData().display_name;
+    },
+  },
+  [EnumInputFields.Login]: {
+    beforePropsProxyHook() {
+      this.props.value = this.refs.Form.store.state.getUserData().login;
+    },
+  },
+  [EnumInputFields.Email]: {
+    beforePropsProxyHook() {
+      this.props.value = this.refs.Form.store.state.getUserData().email;
+    },
+  },
+  [EnumInputFields.Phone]: {
+    beforePropsProxyHook() {
+      this.props.value = this.refs.Form.store.state.getUserData().phone;
+    },
+  },
+};

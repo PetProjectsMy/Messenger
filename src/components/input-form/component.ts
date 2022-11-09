@@ -25,10 +25,12 @@ export class InputForm<
   constructor({
     enumInputFieldsNames,
     mapInputToProps = {},
+    mapInputToHelpers = {},
     props = {},
   }: {
     enumInputFieldsNames: TEnumInputFiledsNames;
     mapInputToProps?: Record<string, TInputProps>;
+    mapInputToHelpers?: Record<string, TComponentHelpers>;
     props?: TInputFormProps;
     afterValidationCallback?: () => void;
   }) {
@@ -54,6 +56,7 @@ export class InputForm<
           },
           ...(mapInputToProps![fieldName] ?? {}),
         },
+        helpers: mapInputToHelpers[fieldName] ?? {},
       });
 
       children[`${fieldName}_child`] = inputField;
@@ -92,26 +95,30 @@ export class InputForm<
     return template(this.helpers.enumInputFieldsNames);
   }
 
-  protected _preInitHook(): void {
+  protected _afterPropsAssignHook(): void {
+    super._afterPropsAssignHook();
+
     Object.values(this.refs).forEach((inputField: Input) => {
       inputField.refs.Form = this;
     });
 
-    this._createSubmitButton(this.props.afterValidationCallback);
-
-    super._preInitHook();
+    if (!this.children.submitButton) {
+      this.children.submitButton = this._createSubmitButton(
+        this.props.afterValidationCallback
+      );
+    }
   }
 
   private _createSubmitButton(
     afterValidationCallback: () => void = () => {}
-  ): void {
+  ): Button {
     const clearAPIResponseState = () => {
       this.state.apiResponseSuccess = "";
       this.state.apiResponseError = "";
     };
     const validateform = this._validateForm.bind(this);
 
-    this.children.submitButton = new Button({
+    return new Button({
       props: {
         type: "button",
         label: "submit",

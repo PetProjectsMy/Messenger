@@ -39,13 +39,14 @@ export class Block<
   } = {}) {
     super();
 
+    this._beforePropsAssignHook();
     this.props = props;
     this.props.events = this.props.events ?? {};
-
     this.children = children;
     this.refs = refs;
     this.state = state as TState;
     this.helpers = helpers;
+    this._afterPropsAssignHook();
 
     console.log(
       `${props.componentName} HTML WRAPPER: ${JSON.stringify(
@@ -57,13 +58,11 @@ export class Block<
     this.componentName = (props.componentName ??
       `Not Named Block of type ${this.constructor.name}`) as string;
 
-    this._preProxyHook();
+    this._beforePropsProxyHook();
     this.props = this._makePropsProxy(this.props) as TProps;
 
     this._registerEvents();
-    this._preInitHook();
     this.eventBus.emit(BlockEvents.INIT);
-    this._postInitHook();
   }
 
   private _init() {
@@ -258,13 +257,17 @@ export class Block<
     return this.componentName;
   }
 
-  protected _preProxyHook() {
+  protected _beforePropsAssignHook() {}
+
+  protected _afterPropsAssignHook() {}
+
+  protected _beforePropsProxyHook() {
     this._bindEventListeners();
+
+    if (this.helpers.beforePropsProxyHook) {
+      (this.helpers.beforePropsProxyHook as Function).call(this);
+    }
   }
-
-  protected _preInitHook() {}
-
-  protected _postInitHook() {}
 }
 
 export type BlockClass = typeof Block;

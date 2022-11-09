@@ -7,8 +7,15 @@ import {
   InputForm,
   Input,
 } from "components";
+import { WithStore } from "components/hocs";
 import template from "./template";
-import { EnumInputFields, MapInputFieldsProps } from "./form-component";
+import {
+  EnumInputFields,
+  MapInputFieldToProps,
+  MapInputFieldToHelpers,
+} from "./form-component";
+
+const InputFormWithStore = WithStore(InputForm) as any;
 
 export class ProfilePage extends Block {
   constructor() {
@@ -22,12 +29,13 @@ export class ProfilePage extends Block {
       },
     });
 
-    const profileDataForm = new InputForm({
+    const profileDataForm = new InputFormWithStore({
       props: {
         htmlClass: "profile-data-form",
       },
       enumInputFieldsNames: EnumInputFields,
-      mapInputToProps: MapInputFieldsProps,
+      mapInputToProps: MapInputFieldToProps,
+      mapInputToHelpers: MapInputFieldToHelpers,
     });
 
     children.profileDataForm = profileDataForm;

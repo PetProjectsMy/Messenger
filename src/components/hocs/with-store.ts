@@ -1,14 +1,14 @@
-import { CoreRouter, EnumAppRoutes } from "core/router";
+import { Store } from "core/store";
 
-export function WithRouter<
+export function WithStore<
   P extends TComponentCommonProps,
   S extends TComponentState
 >(ComponentClass: BlockClass<P, S>) {
   return class WrappedComponent extends ComponentClass {
-    protected router: CoreRouter<EnumAppRoutes>;
+    protected store: Store<TAppState>;
 
     protected _beforePropsAssignHook() {
-      this.router = window.router;
+      this.store = window.store;
       super._beforePropsAssignHook();
     }
   };
