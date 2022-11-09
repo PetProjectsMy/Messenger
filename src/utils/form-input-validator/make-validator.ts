@@ -27,6 +27,7 @@ export function makeValidator({
     if (isFormRerenderNeeded && previousError !== error) {
       form._render();
     }
+    this.state.inputError = error;
 
     return !error;
   };

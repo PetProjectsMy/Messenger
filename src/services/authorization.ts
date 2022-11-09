@@ -1,41 +1,37 @@
 import { AuthorizationAPI } from "api/authorization";
 import { EnumAppRoutes } from "core/router";
-import type { Dispatch } from "core/store";
 import { transformUserData, APIResponseHasError } from "utils/api";
 
-type LoginPayload = {
+type LoginFormData = {
   login: string;
   password: string;
 };
 
 class AuthorizationServiceClass {
-  login = (dispatch: Dispatch<TAppState>, action: LoginPayload) => {
-    const response = await authAPI.login(action);
+  async login(data: LoginFormData) {
+    const apiResponse = await AuthorizationAPI.login(data);
+    const { status, response } = apiResponse;
 
-    if (APIResponseHasError(response)) {
-      dispatch({ loginFormError: response.reason });
-      return;
+    console.log(
+      `LOGIN REQUEST:\nstatus ${status}; response ${JSON.stringify(response)}`
+    );
+
+    if (!APIResponseHasError(response)) {
+      const responseUser = await AuthorizationAPI.me();
+      window.store.dispatch({
+        user: transformUserData(responseUser as TUserDTO),
+      });
+      window.router.go(EnumAppRoutes.Profile);
     }
 
-    const responseUser = await authAPI.me();
+    return response;
+  }
 
-    dispatch({ loginFormError: null });
-
-    if (APIResponseHasError(response)) {
-      dispatch(logout);
-      return;
-    }
-
-    dispatch({ user: transformUserData(responseUser as TUserDTO) });
-
-    window.router.go(EnumAppRoutes.Profile);
-  };
+  async logout() {
+    await AuthorizationAPI.logout();
+    window.store.dispatch({ user: null });
+    window.router.go(EnumAppRoutes.Login);
+  }
 }
 
-export const logout = async (dispatch: Dispatch<TAppState>) => {
-  await authAPI.logout();
-
-  dispatch({ user: null });
-
-  window.router.go(EnumAppRoutes.Login);
-};
+export const AuthorizationService = new AuthorizationServiceClass();

@@ -94,7 +94,7 @@ class HTTPTransport {
       } else {
         xhr.send(JSON.stringify(data));
       }
-    });
+    }) as Promise<any>;
   };
 }
 

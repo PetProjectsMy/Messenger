@@ -4,7 +4,7 @@ import {
   APIResponseHasError,
 } from "utils/api";
 
-async function makeAPIRequest() {
+function makeAPIRequest() {
   const formData = this.collectFormData();
   // const formData = {
   //   first_name: "Rtu",
@@ -22,16 +22,12 @@ async function makeAPIRequest() {
 }
 
 function handleAPIResponse(apiResponse: any) {
-  apiResponse.then((r: any) => {
-    const { status, response } = r;
-    console.log(`status: ${status}; response: ${JSON.stringify(response)}`);
-
+  apiResponse.then((response: any) => {
     if (APIResponseHasError(response)) {
       this.state.apiResponseError = response.reason;
     } else {
       this.state.apiResponseSuccess = "Sign Up Successfull";
     }
-
     this._render();
   });
 }

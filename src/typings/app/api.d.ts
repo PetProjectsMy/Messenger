@@ -22,6 +22,11 @@ declare global {
     password: string;
     phone: string;
   };
+
+  export type LoginFormDTO = {
+    login: string;
+    password: string;
+  };
 }
 
 export {};
