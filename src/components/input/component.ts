@@ -83,6 +83,8 @@ export class Input extends Block<TInputProps, TInputState> {
   }
 
   public toggleDisableState() {
+    const oldState = this.props.disabledAttr;
     this.props.disabledAttr = !this.props.disabledAttr;
+    console.log(`DISABLE ATTR: ${oldState} -> ${this.props.disabledAttr}`);
   }
 }

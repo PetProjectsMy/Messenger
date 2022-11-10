@@ -46,17 +46,10 @@ export class Block<
     this.refs = refs;
     this.state = state as TState;
     this.helpers = helpers;
-    this._afterPropsAssignHook();
-
-    console.log(
-      `${props.componentName} HTML WRAPPER: ${JSON.stringify(
-        this.props.htmlWrapper
-      )}`
-    );
     this.htmlWrapped = !!this.props.htmlWrapper;
-
     this.componentName = (props.componentName ??
       `Not Named Block of type ${this.constructor.name}`) as string;
+    this._afterPropsAssignHook();
 
     this._beforePropsProxyHook();
     this.props = this._makePropsProxy(this.props) as TProps;

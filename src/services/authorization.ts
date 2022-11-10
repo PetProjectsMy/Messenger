@@ -9,29 +9,29 @@ class AuthorizationServiceClass {
   }
 
   async login(data: TLoginFormDTO) {
-    const response = await AuthorizationAPI.login(data);
+    const requestLogin = await AuthorizationAPI.login(data);
 
     console.log(
-      `LOGIN REQUEST:\nstatus ${response.status}; response ${JSON.stringify(
-        response.response
+      `LOGIN REQUEST:\nstatus ${requestLogin.status}; response ${JSON.stringify(
+        requestLogin.response
       )}`
     );
 
-    if (!APIResponseHasError(response)) {
-      const responseUser = await AuthorizationAPI.me();
+    if (!APIResponseHasError(requestLogin.response)) {
+      const requestUser = await AuthorizationAPI.me();
       console.log(
-        `USER REQUEST:\nstatus ${
-          responseUser.status
-        }; response ${JSON.stringify(responseUser.response)}`
+        `USER REQUEST:\nstatus ${requestUser.status}; response ${JSON.stringify(
+          requestUser.response
+        )}`
       );
 
       window.store.dispatch({
-        user: responseUser,
+        user: requestUser.response,
       });
       window.router.go(EnumAppRoutes.Chats);
     }
 
-    return response.response;
+    return requestLogin.response;
   }
 
   async logout() {

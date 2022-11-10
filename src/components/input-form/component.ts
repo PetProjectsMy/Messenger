@@ -6,6 +6,7 @@ import template from "./template";
 
 type TInputFormProps = WithComponentCommonProps<{
   formTitle?: string;
+  isSubmitButtonNeeded?: Boolean;
   afterValidationCallback?: () => void;
 }>;
 
@@ -15,8 +16,22 @@ type TInputFormState = TAppState & {
   apiResponseError: string;
 };
 
+export function submitButtonOnClickCallback() {
+  const { form } = this.refs;
+
+  form.clearAPIResponseState();
+  form._validateForm();
+  // form.props.afterValidationCallback.call(form); // DEBUG
+  if (!form.state.formHasInputErrors) {
+    console.log(
+      `Form filled correctly: ${JSON.stringify(form.collectFormData())}`
+    );
+    form.props.afterValidationCallback!.call(form);
+  }
+}
+
 export class InputForm<
-  TEnumInputFiledsNames extends Record<string, string>,
+  TEnumInputFiledsNames extends Record<string, string> = {},
   TInputClass extends typeof Input = typeof Input
 > extends Block<TInputFormProps, TInputFormState> {
   protected helpers: {
@@ -37,17 +52,11 @@ export class InputForm<
     InputClass?: TInputClass;
     props?: TInputFormProps;
     helpers?: TComponentHelpers;
-    afterValidationCallback?: () => void;
   }) {
     const children: TComponentChildren = {};
     const refs: TComponentRefs = {};
 
     Object.values(enumInputFieldsNames).forEach((fieldName) => {
-      console.log(
-        `MAPPED PROPS WRAPPER: ${JSON.stringify(
-          mapInputToProps![fieldName].htmlWrapper
-        )}`
-      );
       const inputField = new InputClass({
         props: {
           componentName: `${fieldName} input with validation`,
@@ -92,6 +101,7 @@ export class InputForm<
       state,
       helpers: {
         enumInputFieldsNames,
+        ...helpers,
       },
     });
   }
@@ -106,48 +116,27 @@ export class InputForm<
     Object.values(this.refs).forEach((inputField: Block) => {
       inputField.refs.Form = this;
     });
+
+    this.props.isSubmitButtonNeeded = this.props.isSubmitButtonNeeded ?? true;
   }
 
   protected _beforeRenderHook(): void {
     super._beforeRenderHook();
 
-    if (!this.children.submitButton === undefined) {
-      this.children.submitButton = this._createSubmitButton(
-        this.props.afterValidationCallback
-      );
+    if (this.props.isSubmitButtonNeeded && !this.children.submitButton) {
+      this.children.submitButton = this._createSubmitButton();
     }
   }
 
-  private _createSubmitButton(
-    afterValidationCallback: () => void = () => {}
-  ): Button {
-    const clearAPIResponseState = () => {
-      this.state.apiResponseSuccess = "";
-      this.state.apiResponseError = "";
-    };
-    const validateform = this._validateForm.bind(this);
-
+  private _createSubmitButton(): Button {
     return new Button({
+      refs: { form: this },
       props: {
         type: "button",
         label: "submit",
         htmlClass: "submit-button",
         events: {
-          click: [
-            () => {
-              clearAPIResponseState.call(this);
-              validateform();
-              afterValidationCallback.call(this); // DEBUG
-              if (!this.state.formHasInputErrors) {
-                console.log(
-                  `Form filled correctly: ${JSON.stringify(
-                    this.collectFormData()
-                  )}`
-                );
-                afterValidationCallback.call(this);
-              }
-            },
-          ],
+          click: [submitButtonOnClickCallback],
         },
       },
     });
@@ -188,5 +177,14 @@ export class InputForm<
       },
       {} as Record<string, string>
     );
+  }
+
+  clearAPIResponseState = () => {
+    this.state.apiResponseSuccess = "";
+    this.state.apiResponseError = "";
+  };
+
+  getAPIResponseError() {
+    return this.state.apiResponseError;
   }
 }

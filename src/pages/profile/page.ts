@@ -7,6 +7,7 @@ import {
   InputForm,
   Input,
 } from "components";
+import { submitButtonOnClickCallback } from "components/input-form";
 import { WithStore } from "components/hocs";
 import template from "./template";
 import {
@@ -14,6 +15,7 @@ import {
   MapInputFieldToProps,
   MapInputFieldToHelpers,
 } from "./form-component";
+import { afterValidationCallback } from "./api-service";
 
 const InputWithStore = WithStore(Input) as any;
 type TProfilePageProps = WithComponentCommonProps<{ userID: number }>;
@@ -31,14 +33,12 @@ export class ProfilePage extends ProfilePageBlock {
       },
     });
 
-    const profileDataForm = new InputForm({
+    children.profileDataForm = new InputForm({
       props: {
+        componentName: "User Profile Form",
         htmlClass: "profile-data-form",
-      },
-      helpers: {
-        afterPropsAssignHook() {
-          this.children.submitButton = null;
-        },
+        isSubmitButtonNeeded: false,
+        afterValidationCallback,
       },
       InputClass: InputWithStore,
       enumInputFieldsNames: EnumInputFields,
@@ -46,36 +46,7 @@ export class ProfilePage extends ProfilePageBlock {
       mapInputToHelpers: MapInputFieldToHelpers,
     });
 
-    children.profileDataForm = profileDataForm;
     children.homeButton = new HomeButton();
-    children.changeDataButton = new Button({
-      state: {
-        mode: "save",
-      },
-      refs: profileDataForm.refs,
-      props: {
-        componentName: "change/save data button",
-        label: "change data",
-        htmlClass: "change-data-button",
-        events: {
-          click: [
-            function changeMode() {
-              if (this.state.mode === "save") {
-                this.props.label = "save data";
-                this.state.mode = "change";
-              } else {
-                this.props.label = "change data";
-                this.state.mode = "save";
-              }
-
-              Object.values(this.refs).forEach((dataField: Input) => {
-                dataField.toggleDisableState();
-              });
-            },
-          ],
-        },
-      },
-    });
 
     super({ children });
   }
@@ -85,6 +56,58 @@ export class ProfilePage extends ProfilePageBlock {
   }
 
   protected _afterPropsAssignHook(): void {
+    super._afterPropsAssignHook();
+
+    this.children.changeDataButton = this._createDataChangeButton();
     this.props.userID = this.store.getUserData().id;
+  }
+
+  private _createDataChangeButton(): Button {
+    const enum FormMode {
+      DataSaved = "data_saved",
+      DataChanging = "data_changing",
+    }
+
+    function onClickCallback() {
+      const { form } = this.refs;
+      console.log(`FORM: ${form.componentName}`);
+
+      if (this.state.mode === FormMode.DataSaved) {
+        form.state.apiResponseSuccess = "";
+        form._render();
+
+        this.state.mode = FormMode.DataChanging;
+        this.props.label = "save data";
+
+        Object.values(form.refs).forEach((dataField: Input) => {
+          dataField.toggleDisableState();
+        });
+      } else {
+        submitButtonOnClickCallback.call(this);
+        if (form.getAPIResponseError() === "") {
+          this.state.mode = FormMode.DataSaved;
+          this.props.label = "change data";
+
+          Object.values(form.refs).forEach((dataField: Input) => {
+            dataField.toggleDisableState();
+          });
+        }
+      }
+    }
+
+    return new Button({
+      state: {
+        mode: FormMode.DataSaved,
+      },
+      refs: { form: this.children.profileDataForm as Block },
+      props: {
+        componentName: "change/save data button",
+        label: "change data",
+        htmlClass: "change-data-button",
+        events: {
+          click: [onClickCallback],
+        },
+      },
+    });
   }
 }

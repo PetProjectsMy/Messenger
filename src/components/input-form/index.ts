@@ -1,1 +1,1 @@
-export { InputForm } from "./component";
+export { InputForm, submitButtonOnClickCallback } from "./component";
