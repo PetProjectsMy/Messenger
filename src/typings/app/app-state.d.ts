@@ -4,25 +4,25 @@ import { CoreRouter, EnumAppRoutes } from "core/router";
 
 declare global {
   interface Window {
-    store: Store<TAppState>;
+    store: Store;
     router: CoreRouter<EnumAppRoutes>;
   }
+
+  export type TAppStateUserData = {
+    id: number;
+    firstName: string;
+    secondName: string;
+    displayName: string;
+    login: string;
+    email: string;
+    phone: string;
+    avatar: string; // path to avatar
+  };
 
   export type TAppState = {
     appIsInited: boolean;
     page: EnumAppPages | null;
-    user: TAPIUserResponse | null;
-  };
-
-  export type TAPIUserResponse = {
-    id: number;
-    login: string;
-    first_name: string;
-    second_name: string;
-    display_name: string;
-    phone: string;
-    email: string;
-    avatar: string;
+    user: TAppStateUserData | null;
   };
 }
 

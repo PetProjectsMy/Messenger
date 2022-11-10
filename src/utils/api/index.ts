@@ -3,4 +3,5 @@ export {
   transformLoginFormDatatoAPI,
   transformSignUpFormDatatoAPI,
   transformProfileFormDatatoAPI,
-} from "./data-transformers";
+} from "./to-api-data-transformers";
+export { transformProfilChangeAPIResponseToAppUserData } from "./from-api-data-transformers";

@@ -2,7 +2,10 @@ import { TInputProps } from "components/input/component";
 import { EnumInputFields } from "./enum-input-fields";
 import { FormValidators } from "./input-validators";
 
-export const MapInputFieldToProps: Record<string, Partial<TInputProps>> = {
+export const MapInputFieldToProps: Record<
+  EnumInputFields,
+  Partial<TInputProps>
+> = {
   [EnumInputFields.FirstName]: {
     htmlName: "first_name",
     validators: FormValidators[EnumInputFields.FirstName],
@@ -38,12 +41,13 @@ const MapInputFieldToDataType = {
   [EnumInputFields.Phone]: "phone",
 };
 
-Object.entries(MapInputFieldToProps).forEach(([fieldName, props]) => {
-  props.disabledAttr = true;
-  props.htmlClass = "data-input";
-  props.htmlWrapper = {
-    componentAlias: "wrappedDataInput",
-    htmlWrapperTemplate: `
+Object.entries(MapInputFieldToProps).forEach(
+  ([fieldName, props]: [EnumInputFields, Partial<TInputProps>]) => {
+    props.disabledAttr = true;
+    props.htmlClass = "data-input";
+    props.htmlWrapper = {
+      componentAlias: "wrappedDataInput",
+      htmlWrapperTemplate: `
       <field class="data-field">
         <div class="data-type-section">
           <span class="data-type"> ${MapInputFieldToDataType[fieldName]} </span>
@@ -53,38 +57,30 @@ Object.entries(MapInputFieldToProps).forEach(([fieldName, props]) => {
         </div>
       </field>
     `,
-  };
-});
+    };
+  }
+);
 
-export const MapInputFieldToHelpers = {
-  [EnumInputFields.FirstName]: {
-    beforePropsProxyHook() {
-      this.props.value = this.store.getUserData().first_name;
-    },
-  },
-  [EnumInputFields.SecondName]: {
-    beforePropsProxyHook() {
-      this.props.value = this.store.getUserData().second_name;
-    },
-  },
-  [EnumInputFields.DisplayName]: {
-    beforePropsProxyHook() {
-      this.props.value = this.store.getUserData().display_name;
-    },
-  },
-  [EnumInputFields.Login]: {
-    beforePropsProxyHook() {
-      this.props.value = this.store.getUserData().login;
-    },
-  },
-  [EnumInputFields.Email]: {
-    beforePropsProxyHook() {
-      this.props.value = this.store.getUserData().email;
-    },
-  },
-  [EnumInputFields.Phone]: {
-    beforePropsProxyHook() {
-      this.props.value = this.store.getUserData().phone;
-    },
-  },
+const MapInputFieldToUserDataRecord: Record<
+  EnumInputFields,
+  Keys<TAppStateUserData>
+> = {
+  [EnumInputFields.FirstName]: "firstName",
+  [EnumInputFields.SecondName]: "secondName",
+  [EnumInputFields.DisplayName]: "displayName",
+  [EnumInputFields.Login]: "login",
+  [EnumInputFields.Email]: "email",
+  [EnumInputFields.Phone]: "phone",
 };
+
+export const MapInputFieldToHelpers = Object.entries(
+  MapInputFieldToUserDataRecord
+).reduce((acc, [fieldName, recordName]) => {
+  acc[fieldName] = {
+    beforePropsProxyHook() {
+      this.props.value = this.store.getUserData(recordName);
+    },
+  };
+
+  return acc;
+}, {} as any);

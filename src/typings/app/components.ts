@@ -1,5 +1,9 @@
 import * as Components from "components";
-import { Block } from "core/dom";
+import {
+  Block,
+  BlockCommonEvents,
+  TBlockCommonEventsHandlersArgs,
+} from "core/dom";
 
 declare global {
   export type BlockClass<
@@ -20,6 +24,10 @@ declare global {
     | typeof Components.Input
     | typeof Components.Link
     | typeof Components.TextComponent;
+
+  export type WithCommonEvents<Events> = Events & typeof BlockCommonEvents;
+  export type WithCommonHandlersArgs<HandlersArgs> = HandlersArgs &
+    TBlockCommonEventsHandlersArgs;
 }
 
 export {};

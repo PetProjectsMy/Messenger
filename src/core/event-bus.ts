@@ -1,7 +1,7 @@
 export type EventHandler<Args extends any[] = unknown[]> = (
   ...args: Args
 ) => void;
-export default class EventBus<
+export class EventBus<
   Events extends Record<string, string>,
   Args extends Record<Values<Events>, unknown[]>
 > {

@@ -1,19 +1,22 @@
 import { nanoid } from "nanoid";
 import { deepEqual } from "utils/objects-handle";
-import EventBus from "core/event-bus";
+import { EventBus } from "core/event-bus";
 
-export const enum BlockEvents {
+export const enum BlockCommonEvents {
   INIT = "init",
   FLOW_CDM = "flow:component-did-mount",
   FLOW_CDU = "flow:component-did-update",
   FLOW_RENDER = "flow:render",
 }
 
-type EventHanlderArgs = {
-  [BlockEvents.FLOW_CDM]: [];
-  [BlockEvents.INIT]: [];
-  [BlockEvents.FLOW_CDU]: [Values<TComponentProps>, Values<TComponentProps>];
-  [BlockEvents.FLOW_RENDER]: [];
+export type TBlockCommonEventsHandlersArgs = {
+  [BlockCommonEvents.FLOW_CDM]: [];
+  [BlockCommonEvents.INIT]: [];
+  [BlockCommonEvents.FLOW_CDU]: [
+    Values<TComponentProps>,
+    Values<TComponentProps>
+  ];
+  [BlockCommonEvents.FLOW_RENDER]: [];
 };
 
 export default class BlockBase {
@@ -26,7 +29,10 @@ export default class BlockBase {
 
   protected _element: Nullable<HTMLElement> = null;
 
-  protected eventBus = new EventBus<typeof BlockEvents, EventHanlderArgs>();
+  protected eventBus = new EventBus<
+    typeof BlockCommonEvents,
+    TBlockCommonEventsHandlersArgs
+  >();
 
   protected props: TComponentProps = {};
 
@@ -43,7 +49,7 @@ export default class BlockBase {
   protected componentDidMount(): void {}
 
   protected dispatchComponentDidMount(): void {
-    this.eventBus.emit(BlockEvents.FLOW_CDM);
+    this.eventBus.emit(BlockCommonEvents.FLOW_CDM);
   }
 
   protected _componentDidUpdate(
@@ -55,7 +61,7 @@ export default class BlockBase {
       return;
     }
 
-    this.eventBus.emit(BlockEvents.FLOW_RENDER);
+    this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
     this._addEvents();
   }
 

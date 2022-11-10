@@ -1,6 +1,6 @@
 import Handlebars from "handlebars";
 import { nanoid } from "nanoid";
-import BlockBase, { BlockEvents } from "./block-base";
+import BlockBase, { BlockCommonEvents } from "./block-base";
 
 export class Block<
   TProps extends TComponentCommonProps = TComponentCommonProps,
@@ -56,11 +56,11 @@ export class Block<
 
     this._registerEvents();
     this._beforeRenderHook();
-    this.eventBus.emit(BlockEvents.INIT);
+    this.eventBus.emit(BlockCommonEvents.INIT);
   }
 
   private _init() {
-    this.eventBus.emit(BlockEvents.FLOW_RENDER);
+    this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
     this.wasRendered = true;
   }
 
@@ -76,7 +76,7 @@ export class Block<
         const oldValue = target[prop];
         target[prop] = value;
 
-        self.eventBus.emit(BlockEvents.FLOW_CDU, oldValue, value);
+        self.eventBus.emit(BlockCommonEvents.FLOW_CDU, oldValue, value);
         return true;
       },
       deleteProperty() {
@@ -97,12 +97,15 @@ export class Block<
     });
   }
 
-  private _registerEvents() {
+  protected _registerEvents() {
     const { eventBus } = this;
-    eventBus.on(BlockEvents.INIT, this._init.bind(this));
-    eventBus.on(BlockEvents.FLOW_CDM, this._componentDidMount.bind(this));
-    eventBus.on(BlockEvents.FLOW_CDU, this._componentDidUpdate.bind(this));
-    eventBus.on(BlockEvents.FLOW_RENDER, this._render.bind(this));
+    eventBus.on(BlockCommonEvents.INIT, this._init.bind(this));
+    eventBus.on(BlockCommonEvents.FLOW_CDM, this._componentDidMount.bind(this));
+    eventBus.on(
+      BlockCommonEvents.FLOW_CDU,
+      this._componentDidUpdate.bind(this)
+    );
+    eventBus.on(BlockCommonEvents.FLOW_RENDER, this._render.bind(this));
   }
 
   private _makeStubs(): Record<string, string | string[]> {
@@ -266,6 +269,8 @@ export class Block<
       (this.helpers.beforePropsProxyHook as Function).call(this);
     }
   }
+
+  protected _beforeRegisterEventsHook() {}
 
   protected _beforeRenderHook() {}
 }

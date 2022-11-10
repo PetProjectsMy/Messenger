@@ -9,6 +9,7 @@ import {
 } from "components";
 import { submitButtonOnClickCallback } from "components/input-form";
 import { WithStore } from "components/hocs";
+import type { EventBus } from "core/event-bus";
 import template from "./template";
 import {
   EnumInputFields,
@@ -21,7 +22,20 @@ const InputWithStore = WithStore(Input) as any;
 type TProfilePageProps = WithComponentCommonProps<{ userID: number }>;
 const ProfilePageBlock = WithStore(Block<TProfilePageProps>);
 
+const enum EnumProfilePageEvents {
+  UserDidUpdate = "events: user data did update",
+}
+
+type ProfilePageEventsHandlersArgs = {
+  [EnumProfilePageEvents.UserDidUpdate]: [];
+};
+
 export class ProfilePage extends ProfilePageBlock {
+  protected eventBus: EventBus<
+    WithCommonEvents<typeof EnumProfilePageEvents>,
+    WithCommonHandlersArgs<ProfilePageEventsHandlersArgs>
+  >;
+
   constructor() {
     const children: TComponentChildren = {};
 
@@ -110,4 +124,20 @@ export class ProfilePage extends ProfilePageBlock {
       },
     });
   }
+
+  // protected _beforeRegisterEventsHook() {
+  //   super._beforeRegisterEventsHook();
+
+  //   this.eventBus.on(EnumProfilePageEvents.UserDidUpdate, () => {});
+  // }
+
+  // private _updateUserInfo() {
+  //   const userData = this.store.getUserData();
+
+  //   Object.values((this.children.profileDataForm as Block).refs).forEach(
+  //     (inputBlock: Input) => {
+  //       inputBlock.setValue(this.store.get);
+  //     }
+  //   );
+  // }
 }

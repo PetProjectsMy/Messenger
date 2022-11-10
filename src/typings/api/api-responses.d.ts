@@ -3,27 +3,26 @@ declare global {
     reason: string;
   };
 
-  export type TSignUpFormDTO = {
-    first_name: string;
-    second_name: string;
+  export type TUserAPIResponse = {
+    id: number;
     login: string;
-    email: string;
-    password: string;
-    phone: string;
-  };
-
-  export type TLoginFormDTO = {
-    login: string;
-    password: string;
-  };
-
-  export type TProfileChangeDTO = {
     first_name: string;
     second_name: string;
     display_name: string;
-    login: string;
-    email: string;
     phone: string;
+    email: string;
+    avatar: string;
+  };
+
+  export type TProfileChangeAPIResponse = {
+    id: number;
+    login: string;
+    first_name: string;
+    second_name: string;
+    display_name: string;
+    phone: string;
+    email: string;
+    avatar: string;
   };
 }
 

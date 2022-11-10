@@ -1,24 +1,13 @@
 import { getPageComponent, EnumAppPages } from "utils/pages";
 import { renderDOM } from "core/dom";
 import { EnumAppRoutes } from "core/router";
-import EventBus from "../event-bus";
+import { EventBus } from "../event-bus";
 
 export const defaultState: TAppState = {
   appIsInited: false,
   page: null,
   user: null,
 };
-
-export type Dispatch<State> = (
-  nextStateOrAction: Partial<State> | Action<State>,
-  payload?: any
-) => void;
-
-export type Action<State> = (
-  dispatch: Dispatch<State>,
-  state: State,
-  payload: any
-) => void;
 
 export const enum EnumStoreEvents {
   PageChanged = "page changed",
@@ -27,28 +16,34 @@ export const enum EnumStoreEvents {
 
 type TStoreEvents = typeof EnumStoreEvents;
 
-type EventHanlderArgs = {
+type TBlockCommonEventsHandlersArgs = {
   [EnumStoreEvents.AppInit]: [EnumAppRoutes, string];
   [EnumStoreEvents.PageChanged]: [EnumAppPages];
 };
 
-export class Store<State extends Record<string, any>> {
-  private eventBus = new EventBus<TStoreEvents, EventHanlderArgs>();
+export class Store {
+  private eventBus = new EventBus<
+    TStoreEvents,
+    TBlockCommonEventsHandlersArgs
+  >();
 
-  private state: State;
+  private state: TAppState;
 
-  constructor(state: State = defaultState as unknown as State) {
+  constructor(state: TAppState = defaultState) {
     this.state = this._makeStateProxy(state);
   }
 
-  protected _makeStateProxy(store: State) {
-    return new Proxy(store, {
-      get(target, prop: string) {
-        const value = target[prop];
-        return value;
+  protected _makeStateProxy(state: TAppState) {
+    return new Proxy(state, {
+      get(target, prop: Keys<TAppState>) {
+        return target[prop];
       },
 
-      set: function (target: State, prop: string, newValue: unknown) {
+      set: function (
+        target: TAppState,
+        prop: Keys<TAppState>,
+        newValue: unknown
+      ) {
         const oldValue = target[prop];
         (target as Record<string, unknown>)[prop] = newValue;
         console.log(
@@ -106,29 +101,37 @@ export class Store<State extends Record<string, any>> {
     return Boolean(this.state.user);
   }
 
-  public getUserData(): TAPIUserResponse {
+  public getUserData(dataType?: Keys<TAppStateUserData>) {
+    console.log(`user[${dataType}] = ${this.state.user[dataType]}`);
+
+    if (dataType) {
+      const userData = this.state.user;
+      return userData ? userData[dataType] : userData;
+    }
+
     return this.state.user;
   }
 
-  public getPageType(): null | TAppPageClass {
+  public getPageType(): Nullable<string> {
     const { page } = this.state;
     if (!page) {
       return page;
     }
+
     return page.constructor.name;
   }
 
-  public set(nextState: Partial<State>) {
+  public set(nextState: Partial<TAppState>) {
     console.log(`${"-".repeat(30)}\nold state: ${JSON.stringify(this.state)}`);
     console.log(`props to change: ${JSON.stringify(nextState)}`);
     Object.assign(this.state, nextState);
   }
 
-  dispatch(nextStateOrAction: Partial<State> | Action<State>, payload?: any) {
+  dispatch(nextStateOrAction: Partial<TAppState> | Function) {
     if (typeof nextStateOrAction === "function") {
-      nextStateOrAction(this.dispatch.bind(this), this.state, payload);
+      nextStateOrAction();
     } else {
-      this.set({ ...nextStateOrAction });
+      this.set(nextStateOrAction);
     }
   }
 
@@ -141,12 +144,15 @@ export class Store<State extends Record<string, any>> {
       }
     );
 
-    this.eventBus.on(EnumStoreEvents.PageChanged, (newPage: EnumAppPages) => {
-      const PageComponent = getPageComponent(newPage);
-      const page = new PageComponent();
-      renderDOM({ component: page });
-      document.title = `App / ${page.componentName}`;
-      console.log(`Store event '${EnumStoreEvents.PageChanged}' emitted`);
-    });
+    this.eventBus.on(
+      EnumStoreEvents.PageChanged,
+      function (newPage: EnumAppPages) {
+        const PageComponent = getPageComponent(newPage);
+        const page = new PageComponent();
+        renderDOM({ component: page });
+        document.title = `App / ${page.componentName}`;
+        console.log(`Store event '${EnumStoreEvents.PageChanged}' emitted`);
+      }
+    );
   }
 }

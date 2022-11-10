@@ -82,6 +82,10 @@ export class Input extends Block<TInputProps, TInputState> {
     return (element as HTMLInputElement).value;
   }
 
+  public setValue(value: string) {
+    this.props.value = value;
+  }
+
   public toggleDisableState() {
     const oldState = this.props.disabledAttr;
     this.props.disabledAttr = !this.props.disabledAttr;

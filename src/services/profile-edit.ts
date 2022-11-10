@@ -1,16 +1,28 @@
 import { ProfileAPI } from "api";
+import {
+  APIResponseHasError,
+  transformProfilChangeAPIResponseToAppUserData as transformData,
+} from "utils/api";
 
 class ProfileEditServiceClass {
   async changeUserProfile(data: TProfileChangeDTO) {
-    const response = await ProfileAPI.changeProfile(data);
+    const requestChangeProfile = await ProfileAPI.changeProfile(data);
+    const { status, response } = requestChangeProfile;
 
     console.log(
-      `PROFILE CHANGE REQUEST:\nstatus ${
-        response.status
-      }; response: ${JSON.stringify(response.response)}`
+      `PROFILE CHANGE REQUEST:\nstatus ${status}; response: ${JSON.stringify(
+        response
+      )}`
     );
 
-    return response.response;
+    if (!APIResponseHasError(response)) {
+      const userData = transformData(response);
+      window.store.dispatch({
+        user: userData,
+      });
+    }
+
+    return response;
   }
 }
 
