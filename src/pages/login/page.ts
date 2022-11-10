@@ -12,7 +12,6 @@ export class LoginPage extends Block {
     const refs: TComponentRefs = {};
 
     children.loginForm = new InputForm({
-      formTitle: "Login",
       enumInputFieldsNames: EnumInputFields,
       mapInputToProps: MapInputFieldsProps,
       props: {

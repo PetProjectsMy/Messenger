@@ -16,7 +16,7 @@ type TInputFormState = TAppState & {
   apiResponseError: string;
 };
 
-export function submitButtonOnClickCallback() {
+export async function submitButtonOnClickCallback() {
   const { form } = this.refs;
 
   form.clearAPIResponseState();
@@ -26,7 +26,7 @@ export function submitButtonOnClickCallback() {
     console.log(
       `Form filled correctly: ${JSON.stringify(form.collectFormData())}`
     );
-    form.props.afterValidationCallback!.call(form);
+    await form.props.afterValidationCallback!.call(form);
   }
 }
 

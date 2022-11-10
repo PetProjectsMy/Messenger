@@ -54,7 +54,9 @@ export class Block<
     this._beforePropsProxyHook();
     this.props = this._makePropsProxy(this.props) as TProps;
 
+    this._beforeRegisterEventsHook();
     this._registerEvents();
+
     this._beforeRenderHook();
     this.eventBus.emit(BlockCommonEvents.INIT);
   }

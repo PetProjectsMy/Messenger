@@ -61,7 +61,7 @@ Object.entries(MapInputFieldToProps).forEach(
   }
 );
 
-const MapInputFieldToUserDataRecord: Record<
+export const MapInputFieldToUserDataRecord: Record<
   EnumInputFields,
   Keys<TAppStateUserData>
 > = {

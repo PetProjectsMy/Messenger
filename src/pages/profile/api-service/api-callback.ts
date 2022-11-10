@@ -1,6 +1,7 @@
 import { ProfileEditService } from "services";
 import {
   transformProfileFormDatatoAPI as transformFormDatatoAPI,
+  transformProfilChangeAPIResponseToAppUserData as transformResponseToUserData,
   APIResponseHasError,
 } from "utils/api";
 
@@ -15,13 +16,15 @@ function handleAPIResponse(response: any) {
   console.log(`PROFILE CHANGE REQUEST RESPONSE: ${JSON.stringify(response)}`);
   if (APIResponseHasError(response)) {
     this.state.apiResponseError = response.reason;
-  } else {
-    this.state.apiResponseSuccess = "Profile Change Successfull";
+    return;
   }
-  this._render();
+
+  this.state.apiResponseSuccess = "Profile Data Updated Successfully";
+  window.store.dispatch({ user: transformResponseToUserData(response) });
 }
 
 export async function afterValidationCallback() {
   const response = await makeAPIRequest.call(this);
   handleAPIResponse.call(this, response);
+  this._render();
 }

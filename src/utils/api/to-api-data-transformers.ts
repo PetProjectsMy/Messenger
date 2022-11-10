@@ -1,6 +1,6 @@
 import { EnumInputFields as EnumSignUpFormFields } from "pages/sign-up/form-component";
 import { EnumInputFields as EnumLoginFormFields } from "pages/login/form-component";
-import { EnumInputFields as EnumProfileFormFields } from "pages/profile/form-component";
+import { EnumInputFields as EnumProfileFormFields } from "pages/profile/components/form";
 
 export function transformSignUpFormDatatoAPI(
   data: Record<EnumSignUpFormFields, string>

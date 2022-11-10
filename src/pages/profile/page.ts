@@ -1,24 +1,15 @@
 import { Block } from "core/dom";
 import avatarImagePlaceholder from "static/avatar-placeholder-profile.png";
-import {
-  Button,
-  HomeButton,
-  ImageComponent,
-  InputForm,
-  Input,
-} from "components";
-import { submitButtonOnClickCallback } from "components/input-form";
+import { HomeButton, ImageComponent, Input } from "components";
 import { WithStore } from "components/hocs";
 import type { EventBus } from "core/event-bus";
 import template from "./template";
+import { DataChangeButton, ProfilePageInputForm } from "./components";
 import {
   EnumInputFields,
-  MapInputFieldToProps,
-  MapInputFieldToHelpers,
-} from "./form-component";
-import { afterValidationCallback } from "./api-service";
+  MapInputFieldToUserDataRecord,
+} from "./components/form";
 
-const InputWithStore = WithStore(Input) as any;
 type TProfilePageProps = WithComponentCommonProps<{ userID: number }>;
 const ProfilePageBlock = WithStore(Block<TProfilePageProps>);
 
@@ -47,19 +38,7 @@ export class ProfilePage extends ProfilePageBlock {
       },
     });
 
-    children.profileDataForm = new InputForm({
-      props: {
-        componentName: "User Profile Form",
-        htmlClass: "profile-data-form",
-        isSubmitButtonNeeded: false,
-        afterValidationCallback,
-      },
-      InputClass: InputWithStore,
-      enumInputFieldsNames: EnumInputFields,
-      mapInputToProps: MapInputFieldToProps,
-      mapInputToHelpers: MapInputFieldToHelpers,
-    });
-
+    children.profileDataForm = new ProfilePageInputForm();
     children.homeButton = new HomeButton();
 
     super({ children });
@@ -72,72 +51,34 @@ export class ProfilePage extends ProfilePageBlock {
   protected _afterPropsAssignHook(): void {
     super._afterPropsAssignHook();
 
-    this.children.changeDataButton = this._createDataChangeButton();
-    this.props.userID = this.store.getUserData().id;
-  }
-
-  private _createDataChangeButton(): Button {
-    const enum FormMode {
-      DataSaved = "data_saved",
-      DataChanging = "data_changing",
-    }
-
-    function onClickCallback() {
-      const { form } = this.refs;
-      console.log(`FORM: ${form.componentName}`);
-
-      if (this.state.mode === FormMode.DataSaved) {
-        form.state.apiResponseSuccess = "";
-        form._render();
-
-        this.state.mode = FormMode.DataChanging;
-        this.props.label = "save data";
-
-        Object.values(form.refs).forEach((dataField: Input) => {
-          dataField.toggleDisableState();
-        });
-      } else {
-        submitButtonOnClickCallback.call(this);
-        if (form.getAPIResponseError() === "") {
-          this.state.mode = FormMode.DataSaved;
-          this.props.label = "change data";
-
-          Object.values(form.refs).forEach((dataField: Input) => {
-            dataField.toggleDisableState();
-          });
-        }
-      }
-    }
-
-    return new Button({
-      state: {
-        mode: FormMode.DataSaved,
-      },
-      refs: { form: this.children.profileDataForm as Block },
-      props: {
-        componentName: "change/save data button",
-        label: "change data",
-        htmlClass: "change-data-button",
-        events: {
-          click: [onClickCallback],
-        },
-      },
+    this.children.changeDataButton = new DataChangeButton({
+      form: this.children.profileDataForm as Block,
+      page: this,
     });
+    this.props.userID = (this.store.getUserData() as TAppStateUserData).id;
   }
 
-  // protected _beforeRegisterEventsHook() {
-  //   super._beforeRegisterEventsHook();
+  protected _beforeRegisterEventsHook() {
+    super._beforeRegisterEventsHook();
 
-  //   this.eventBus.on(EnumProfilePageEvents.UserDidUpdate, () => {});
-  // }
+    this.eventBus.on(
+      EnumProfilePageEvents.UserDidUpdate,
+      this._updateUserInfo.bind(this)
+    );
+  }
 
-  // private _updateUserInfo() {
-  //   const userData = this.store.getUserData();
+  userDidUpdate() {
+    this.eventBus.emit(EnumProfilePageEvents.UserDidUpdate);
+  }
 
-  //   Object.values((this.children.profileDataForm as Block).refs).forEach(
-  //     (inputBlock: Input) => {
-  //       inputBlock.setValue(this.store.get);
-  //     }
-  //   );
-  // }
+  private _updateUserInfo() {
+    const userData = this.store.getUserData() as TAppStateUserData;
+
+    Object.entries((this.children.profileDataForm as Block).refs).forEach(
+      ([inputName, inputBlock]: [EnumInputFields, Input]) => {
+        const recordName = MapInputFieldToUserDataRecord[inputName];
+        inputBlock.setValue(`${userData[recordName]}`);
+      }
+    );
+  }
 }
