@@ -52,7 +52,7 @@ export class Block<
     this._afterPropsAssignHook();
 
     this._beforePropsProxyHook();
-    this.props = this._makePropsProxy(this.props) as TProps;
+    this.props = this._makeProxy(this.props) as TProps;
 
     this._beforeRegisterEventsHook();
     this._registerEvents();
@@ -66,10 +66,10 @@ export class Block<
     this.wasRendered = true;
   }
 
-  protected _makePropsProxy(props: TComponentProps) {
+  protected _makeProxy(propsOrState: TComponentProps | TComponentState) {
     const self = this;
 
-    return new Proxy(props, {
+    return new Proxy(propsOrState, {
       get(target, prop: string) {
         const value = target[prop];
         return value;

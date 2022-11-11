@@ -8,6 +8,10 @@ const attributes = `
     type="text"
   {{/if}}
 
+  {{#if accept}}
+    accept="{{ acept }}"
+  {{/if}}
+
   {{#if value }}
     value="{{ value }}"
   {{/if}}

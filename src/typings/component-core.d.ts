@@ -41,7 +41,7 @@ declare global {
 
   export type TComponentRefs = Record<string, Block>;
 
-  export type TComponentState = Record<string, unknown>;
+  export type TComponentState = Record<string, string | boolean>;
 
   export type TComponentHelpers = Record<string, unknown>;
 

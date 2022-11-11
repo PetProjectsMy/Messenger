@@ -1,7 +1,7 @@
 export default `
   <form class="avatar-change-form">
     <div class="browse-button-section">
-      <input type="file" accept="image/*" style="display:none;">
+      {{{ avatarFileInput }}}
       <button type="button" id="upload-avatar">
         upload avatar
       </button>

@@ -1,8 +1,9 @@
 import { Block } from "core/dom";
-import { Input, Button } from "components";
+import { Input } from "components";
 import { TInputProps } from "components/input/component";
 import { deepMerge } from "utils/objects-handle";
-import template from "./template";
+import { FormSubmitButton } from "./submit-button";
+import template from "./form-template";
 
 type TInputFormProps = WithComponentCommonProps<{
   formTitle?: string;
@@ -10,25 +11,11 @@ type TInputFormProps = WithComponentCommonProps<{
   afterValidationCallback?: () => void;
 }>;
 
-type TInputFormState = TAppState & {
+type TInputFormState = {
   formHasInputErrors: boolean;
   apiResponseSuccess: string;
   apiResponseError: string;
 };
-
-export async function submitButtonOnClickCallback() {
-  const { form } = this.refs;
-
-  form.clearAPIResponseState();
-  form._validateForm();
-  // form.props.afterValidationCallback.call(form); // DEBUG
-  if (!form.state.formHasInputErrors) {
-    console.log(
-      `Form filled correctly: ${JSON.stringify(form.collectFormData())}`
-    );
-    await form.props.afterValidationCallback!.call(form);
-  }
-}
 
 export class InputForm<
   TEnumInputFiledsNames extends Record<string, string> = {},
@@ -94,6 +81,7 @@ export class InputForm<
       children,
       props: {
         formTitle: "",
+        isSubmitButtonNeeded: true,
         afterValidationCallback: () => {},
         ...props,
       },
@@ -116,32 +104,17 @@ export class InputForm<
     Object.values(this.refs).forEach((inputField: Block) => {
       inputField.refs.Form = this;
     });
-
-    this.props.isSubmitButtonNeeded = this.props.isSubmitButtonNeeded ?? true;
   }
 
   protected _beforeRenderHook(): void {
     super._beforeRenderHook();
 
     if (this.props.isSubmitButtonNeeded && !this.children.submitButton) {
-      this.children.submitButton = this._createSubmitButton();
+      this.children.submitButton = new FormSubmitButton({ form: this });
     }
   }
 
-  private _createSubmitButton(): Button {
-    return new Button({
-      refs: { form: this },
-      props: {
-        type: "button",
-        label: "submit",
-        htmlClass: "submit-button",
-        events: {
-          click: [submitButtonOnClickCallback],
-        },
-      },
-    });
-  }
-
+  // @ts-ignore '_validateForm' is declared but its value is never read
   private _validateForm(): void {
     const oldState = deepMerge({}, this.state) as TInputFormState;
     let formHasInputErrors = false;

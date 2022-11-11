@@ -8,6 +8,7 @@ export type TInputProps = WithComponentCommonProps<{
   value?: string;
   placeholder?: string;
   type?: string;
+  accept?: string;
   validators?: TInputValidatorsByEvents;
   disabledAttr?: boolean;
 }>;

@@ -9,6 +9,7 @@ import {
   EnumInputFields,
   MapInputFieldToUserDataRecord,
 } from "./components/data-form";
+import { AvatarUploadForm } from "./components/avatar-upload-form";
 
 type TProfilePageProps = WithComponentCommonProps<{ userID: number }>;
 const ProfilePageBlock = WithStore(Block<TProfilePageProps>);
@@ -37,6 +38,7 @@ export class ProfilePage extends ProfilePageBlock {
         componentName: "Avatar Image",
       },
     });
+    children.avatarUploadForm = new AvatarUploadForm();
 
     children.profileDataForm = new ProfilePageInputForm();
     children.homeButton = new HomeButton();
