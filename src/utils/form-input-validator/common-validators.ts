@@ -57,31 +57,30 @@ export function validateTwoFieldsMatching({
     if (this === inputFirst) {
       Object.assign(inputs, {
         valueOther: inputSecond.getValue(),
-        this: fieldNames.first,
-        other: fieldNames.second,
+        this: inputFirst,
+        other: inputSecond,
       });
     } else {
       Object.assign(inputs, {
         valueOther: inputFirst.getValue(),
-        this: fieldNames.second,
-        other: fieldNames.first,
+        this: inputSecond,
+        other: inputFirst,
       });
     }
 
     let error = "";
 
     const valuesMatching = value === inputs.valueOther;
-    const inputOther = form.refs[inputs.other];
-    const stateOther = inputOther.state;
+    const stateThis = inputs.this.state;
+    const stateOther = inputs.other.state;
 
     if (!valuesMatching) {
       error = notMatchErrorText;
-      form.state[`${inputs.this}_error`] = error;
-      form.state[`${inputs.other}_error`] = error;
+      stateThis.inputError = error;
+      stateOther.inputError = error;
     } else if (stateOther.inputError === notMatchErrorText) {
       stateOther.inputError = "";
-      form.state[`${inputs.other}_error`] = "";
-      form._render();
+      stateThis.inputError = "";
     }
 
     return error;

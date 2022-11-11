@@ -46,13 +46,15 @@ export class Block<
     this.refs = refs;
     this.state = state as TState;
     this.helpers = helpers;
-    this.htmlWrapped = !!this.props.htmlWrapper;
     this.componentName = (props.componentName ??
       `Not Named Block of type ${this.constructor.name}`) as string;
+
     this._afterPropsAssignHook();
+    this.htmlWrapped = !!this.props.htmlWrapper;
 
     this._beforePropsProxyHook();
     this.props = this._makeProxy(this.props) as TProps;
+    this.state = this._makeProxy(this.state) as TState;
 
     this._beforeRegisterEventsHook();
     this._registerEvents();

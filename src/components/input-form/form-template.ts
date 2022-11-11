@@ -14,14 +14,9 @@ export default function getInputFormTemplate(
     <fieldset class="form-fields">
   `;
   Object.values(enumFormFieldsNames).forEach((fieldName) => {
-    const errorName = `${fieldName}_error`;
-
     content = `
       ${content}
       {{{ ${fieldName}_child }}}
-      {{#if ${errorName}}}
-        <span class="${errorName}"> {{ ${errorName} }} </span>
-      {{/if}}
     `;
   });
   content = `

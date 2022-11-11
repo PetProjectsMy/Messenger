@@ -4,7 +4,7 @@ import {
   validateLoginRegex,
   validatePasswordRegex,
 } from "utils/form-input-validator";
-import { TInputValidator } from "components/input";
+import { TInputValidator } from "components/input-with-validation";
 import { EnumInputFields } from "./enum-input-fields";
 
 export const FormValidators: Record<
@@ -22,7 +22,6 @@ export const FormValidators: Record<
 ].reduce((acc, { field, validatorsList }) => {
   validatorsList.unshift(validateNotEmptyValue);
   const validator = makeValidator({
-    errorStateRef: `${field}_error`,
     validatorsList,
   });
   acc[field] = { blur: [validator] };

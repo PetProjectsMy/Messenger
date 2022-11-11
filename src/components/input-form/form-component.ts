@@ -1,6 +1,6 @@
 import { Block } from "core/dom";
-import { Input } from "components";
-import { TInputProps } from "components/input/component";
+import { InputWithValidation, type Input } from "components";
+import { TInputProps } from "components/input";
 import { deepMerge } from "utils/objects-handle";
 import { FormSubmitButton } from "./submit-button";
 import template from "./form-template";
@@ -19,7 +19,7 @@ type TInputFormState = {
 
 export class InputForm<
   TEnumInputFiledsNames extends Record<string, string> = {},
-  TInputClass extends typeof Input = typeof Input
+  TInputClass extends typeof InputWithValidation = typeof InputWithValidation
 > extends Block<TInputFormProps, TInputFormState> {
   protected helpers: {
     enumInputFieldsNames: TEnumInputFiledsNames;
@@ -27,7 +27,7 @@ export class InputForm<
 
   constructor({
     enumInputFieldsNames,
-    InputClass = Input as TInputClass,
+    InputClass = InputWithValidation as TInputClass,
     mapInputToProps = {},
     mapInputToHelpers = {},
     props = {},
@@ -47,14 +47,6 @@ export class InputForm<
       const inputField = new InputClass({
         props: {
           componentName: `${fieldName} input with validation`,
-          htmlWrapper: {
-            componentAlias: "wrapped",
-            htmlWrapperTemplate: `
-              <field class="form-field">
-                {{{ wrapped }}}
-              </field>
-              `,
-          },
           ...(mapInputToProps![fieldName] ?? {}),
         },
         helpers: mapInputToHelpers[fieldName] ?? {},
@@ -64,18 +56,11 @@ export class InputForm<
       refs[fieldName] = inputField;
     });
 
-    const state = Object.values(enumInputFieldsNames).reduce(
-      (acc, fieldName) => {
-        acc[`${fieldName}_error`] = "";
-        return acc;
-      },
-      {} as any
-    );
-    Object.assign(state, {
+    const state = {
       formHasInputErrors: true,
       apiResponseError: "",
       apiResponseSuccess: "",
-    });
+    };
 
     super({
       children,
@@ -119,13 +104,13 @@ export class InputForm<
     const oldState = deepMerge({}, this.state) as TInputFormState;
     let formHasInputErrors = false;
 
-    Object.values(this.refs).forEach((inputField: Input) => {
+    Object.values(this.refs).forEach((inputField: InputWithValidation) => {
       const validators = inputField.getValidators();
       const validatorsByEvent = Object.values(validators);
 
       for (const eventValidators of validatorsByEvent) {
         for (const validator of eventValidators) {
-          const validationResult = validator(false);
+          const validationResult = validator();
           if (!validationResult) {
             formHasInputErrors = true;
             return;

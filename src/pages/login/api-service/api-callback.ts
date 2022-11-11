@@ -16,7 +16,6 @@ function handleAPIResponse(response: any) {
   console.log(`LOGIN REQUEST RESPONSE: ${JSON.stringify(response)}`);
   if (APIResponseHasError(response)) {
     this.state.apiResponseError = response.reason;
-    this._render();
   }
 }
 

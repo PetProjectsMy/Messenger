@@ -1,1 +1,1 @@
-export { TInputValidator, TInputProps, Input } from "./component";
+export { TInputProps, Input } from "./component";

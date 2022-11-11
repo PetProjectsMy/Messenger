@@ -1,10 +1,10 @@
-import { TInputProps } from "components/input/component";
+import { TInputWithValidationProps } from "components/input-with-validation";
 import { EnumInputFields } from "./enum-input-fields";
 import { FormValidators } from "./input-validators";
 
 export const MapInputFieldToProps: Record<
   EnumInputFields,
-  Partial<TInputProps>
+  Partial<TInputWithValidationProps>
 > = {
   [EnumInputFields.FirstName]: {
     htmlName: "first_name",
@@ -42,7 +42,10 @@ const MapInputFieldToDataType = {
 };
 
 Object.entries(MapInputFieldToProps).forEach(
-  ([fieldName, props]: [EnumInputFields, Partial<TInputProps>]) => {
+  ([fieldName, props]: [
+    EnumInputFields,
+    Partial<TInputWithValidationProps>
+  ]) => {
     props.disabledAttr = true;
     props.htmlClass = "data-input";
     props.htmlWrapper = {

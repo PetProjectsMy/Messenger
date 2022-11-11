@@ -14,7 +14,6 @@ export class DataChangeButton extends Button {
 
       if (this.state.mode === FormMode.DataSaved) {
         form.state.apiResponseSuccess = "";
-        form._render();
 
         this.state.mode = FormMode.DataChanging;
         this.props.label = "save data";

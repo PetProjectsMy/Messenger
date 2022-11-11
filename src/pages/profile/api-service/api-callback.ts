@@ -26,5 +26,4 @@ function handleAPIResponse(response: any) {
 export async function afterValidationCallback() {
   const response = await makeAPIRequest.call(this);
   handleAPIResponse.call(this, response);
-  this._render();
 }
