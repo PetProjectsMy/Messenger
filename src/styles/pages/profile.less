@@ -114,7 +114,26 @@ main.profile-page {
   }
 
   .profile-nav-section {
+    &:extend(.horizontal-block);
     background-color: beige;
     height: @footer-nav-section-flex;
+
+    section {
+      &:extend(.vertical-block);
+      flex: 1;
+      height: 100%;
+    }
+
+    section.avatar-change-section {
+      form {
+        &:extend(.vertical-block);
+        height: 100%;
+        width: 100%;
+
+        input.avatar {
+          display: no;
+        }
+      }
+    }
   }
 }

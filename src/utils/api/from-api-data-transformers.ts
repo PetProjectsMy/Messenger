@@ -1,4 +1,4 @@
-export function transformProfilChangeAPIResponseToAppUserData(
+export function transformProfileChangeAPIResponseToAppUserData(
   data: TProfileChangeAPIResponse
 ): TAppStateUserData {
   return {

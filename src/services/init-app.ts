@@ -3,7 +3,7 @@ import { Store } from "core/store";
 import { Router } from "core/router";
 import {
   APIResponseHasError,
-  transformProfilChangeAPIResponseToAppUserData as transformToUserData,
+  transformProfileChangeAPIResponseToAppUserData as transformToUserData,
 } from "utils/api";
 
 export async function initApp() {

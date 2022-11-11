@@ -5,11 +5,7 @@ import {
 } from "utils/api";
 
 function makeAPIRequest() {
-  // const formData = this.collectFormData();
-  const formData = {
-    login: "Rtu42",
-    password: "Rtu42Rtu42",
-  };
+  const formData = this.collectFormData();
 
   const apiData = transformFormDatatoAPI(formData);
   console.log(`API data: ${JSON.stringify(apiData)}`);

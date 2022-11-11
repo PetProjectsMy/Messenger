@@ -1,7 +1,7 @@
 import { ProfileAPI } from "api";
 import {
   APIResponseHasError,
-  transformProfilChangeAPIResponseToAppUserData as transformData,
+  transformProfileChangeAPIResponseToAppUserData as transformData,
 } from "utils/api";
 
 class ProfileEditServiceClass {

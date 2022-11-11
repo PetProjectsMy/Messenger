@@ -1,6 +1,9 @@
-import { AuthorizationAPI } from "api";
+import { AuthorizationAPI, ProfileAPI } from "api";
 import { EnumAppRoutes } from "core/router";
-import { APIResponseHasError } from "utils/api";
+import {
+  APIResponseHasError,
+  transformProfileChangeAPIResponseToAppUserData as transformProfileAPIResponse,
+} from "utils/api";
 
 class AuthorizationServiceClass {
   async getUser() {
@@ -25,8 +28,12 @@ class AuthorizationServiceClass {
         )}`
       );
 
+      const requestProfileData = await ProfileAPI.getProfileData(
+        requestUser.response.id
+      );
+      const userData = transformProfileAPIResponse(requestProfileData.response);
       window.store.dispatch({
-        user: requestUser.response,
+        user: userData,
       });
       window.router.go(EnumAppRoutes.Chats);
     }
