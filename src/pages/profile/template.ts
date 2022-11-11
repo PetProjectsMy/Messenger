@@ -21,19 +21,19 @@ export default `
           <section class="home-button-section">
             {{{ homeButton }}}
           </section>
+          <section class="avatar-change-section">
+            <form class="avatar-change-form">
+              <div class="browse-button-section">
+                <input type="file"  accept="image/*" style="display:none;">
+                <button type="button" id="upload-avatar">
+                  upload avatar
+                </button>
+              </div>
+              <div class="submit-button-section">
+                <input type="submit" value="submit">
+              </div>
+            </form> 
+          </section>
         </nav>
       </main>
-`;
-
-const a = `
-<section class="avatar-change-section">
-<form class="avatar-change-form">
-  <div>
-    <input id="avatar" type="file" name="avatar" accept="image/*">
-  </div>
-  <div>
-    <input type="submit" value="submit">
-  </div>
-</form> 
-</section>
 `;

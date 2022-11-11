@@ -8,7 +8,7 @@ import { DataChangeButton, ProfilePageInputForm } from "./components";
 import {
   EnumInputFields,
   MapInputFieldToUserDataRecord,
-} from "./components/form";
+} from "./components/data-form";
 
 type TProfilePageProps = WithComponentCommonProps<{ userID: number }>;
 const ProfilePageBlock = WithStore(Block<TProfilePageProps>);

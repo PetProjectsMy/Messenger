@@ -20,7 +20,10 @@ class AuthorizationServiceClass {
       )}`
     );
 
-    if (!APIResponseHasError(requestLogin.response)) {
+    if (
+      !APIResponseHasError(requestLogin.response) ||
+      requestLogin.response === "User already in system"
+    ) {
       const requestUser = await AuthorizationAPI.me();
       console.log(
         `USER REQUEST:\nstatus ${requestUser.status}; response ${JSON.stringify(

@@ -1,30 +1,29 @@
 @import "../helpers/common";
 @import "../helpers/mixins-common";
 
-@profile-form-height: 90vh;
+@profile-page-height: 90vh;
 // --------------------------
 @header-section-flex: 25%;
-@profile-header-height: @profile-form-height * (@header-section-flex / 100%);
+@profile-header-height: @profile-page-height * (@header-section-flex / 100%);
 
 @image-section-flex: 75%;
 @image-max-height: @profile-header-height * (@image-section-flex / 100%);
 
 @name-section-flex: 100% - @image-section-flex;
 // --------------------------
-@footer-nav-section-flex: 20%;
-@footer-nav-section-height: @profile-form-height *
-  (@footer-nav-section-flex / 100%);
+@nav-section-flex: 20%;
+@nav-section-height: @profile-page-height * (@nav-section-flex / 100%);
 @footer-section-background-color: slategrey;
 
-@main-section-height: @profile-form-height *
-  ((100% - @header-section-flex - @footer-nav-section-flex) / 100%);
+@main-section-flex: 100% - @header-section-flex - @nav-section-flex;
+@main-section-height: @profile-page-height * (@main-section-flex / 100%);
 @main-section-background-color: azure;
 
 main.profile-page {
   &:extend(.centered-container);
   &:extend(.vertical-block);
   .mixin-width-by-device(0.9, 0.6, 600px);
-  height: @profile-form-height;
+  height: @profile-page-height;
 
   & > * {
     &:extend(.vertical-block);
@@ -32,7 +31,8 @@ main.profile-page {
   }
 
   .profile-form-header {
-    flex: @profile-header-height;
+    // height: @profile-header-height;
+    flex: @header-section-flex;
     background-color: @footer-section-background-color;
 
     .image-section {
@@ -64,7 +64,7 @@ main.profile-page {
   form.profile-data-form fieldset {
     border: none;
     background-color: @main-section-background-color;
-    height: @main-section-height;
+    flex: @main-section-height;
     &:extend(.vertical-block);
     width: 100%;
 
@@ -116,22 +116,39 @@ main.profile-page {
   .profile-nav-section {
     &:extend(.horizontal-block);
     background-color: beige;
-    height: @footer-nav-section-flex;
+    flex: @nav-section-flex;
 
     section {
       &:extend(.vertical-block);
       flex: 1;
       height: 100%;
+
+      div {
+        &:extend(.vertical-block);
+        flex: 1;
+      }
+    }
+
+    section.data-change-buttons {
     }
 
     section.avatar-change-section {
-      form {
+      width: 33%;
+
+      form.avatar-change-form {
         &:extend(.vertical-block);
         height: 100%;
         width: 100%;
 
-        input.avatar {
-          display: no;
+        .browse-button-section,
+        .submit-button-section {
+          &:extend(.vertical-block);
+          width: 100%;
+          flex: 1;
+
+          input[id="upload-avatar"] {
+            display: block;
+          }
         }
       }
     }
