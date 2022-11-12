@@ -4,6 +4,6 @@ export default `
       {{{ avatarFileInput }}}
       {{{ avatarChooseButton }}}
     </div>
-    {{{ avatarSubmit }}}
+    {{{ avatarSubmitButton }}}
   </form>
 `;

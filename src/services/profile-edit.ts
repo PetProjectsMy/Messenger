@@ -29,17 +29,16 @@ class ProfileEditServiceClass {
     avatarFormData: FormData,
     afterRequestCallback: (response: any) => void = () => {}
   ) {
-    console.log("CHANGE AVATAR");
     const requestChangeAvatar = await ProfileAPI.changeAvatar(avatarFormData);
-    // const { status, response } = requestChangeAvatar;
+    const { status, response } = requestChangeAvatar;
 
-    // console.log(
-    //   `PROFILE CHANGE REQUEST:\nstatus ${status}; response: ${JSON.stringify(
-    //     response
-    //   )}`
-    // );
+    console.log(
+      `PROFILE CHANGE REQUEST:\nstatus ${status}; response: ${JSON.stringify(
+        response
+      )}`
+    );
 
-    // afterRequestCallback(response);
+    afterRequestCallback(response);
   }
 }
 

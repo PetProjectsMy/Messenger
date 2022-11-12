@@ -23,7 +23,7 @@ export class AvatarUploadForm extends Block {
       InputButtonRef: avatarChooseButton,
       onFileChangeCallback() {
         const fileInput = this._element;
-        const submitState = this.refs.avatarSubmit.state;
+        const submitState = this.refs.avatarSubmitButton.state;
 
         console.log(`FILE CHANGE`, fileInput.value);
         if (!fileInput.value) {
@@ -54,21 +54,23 @@ export class AvatarUploadForm extends Block {
     };
 
     const afterRequestCallback = function (response: any) {
+      let uploadingStatus = "Changed successfully";
+
       if (!APIResponseHasError(response)) {
         const userData = transformData(response);
-        const oldAvatarURL = window.store.getUserData("avatar");
         window.store.dispatch({
           user: userData,
         });
 
-        const newAvatarURL = userData.avatar;
-        console.log(`OLD AVATAR: ${oldAvatarURL}; NEW AVATAR: ${newAvatarURL}`);
-        this.refs.profileImage.componentDidUpdate(oldAvatarURL, newAvatarURL);
+        this.refs.profileImage.props.src = userData.avatar;
+      } else {
+        uploadingStatus = response.reason;
       }
+
+      this.children.avatarSubmitButton.state.uploadingStatus = uploadingStatus;
     }.bind(this);
 
-    const onClickCallback = function (event) {
-      console.log(`CURRENT TARGET: ${event.currentTarget}`);
+    const onClickCallback = function () {
       const { form, avatarInput } = this.refs;
       const fileInput = avatarInput._element;
 
@@ -77,11 +79,7 @@ export class AvatarUploadForm extends Block {
         return;
       }
 
-      console.log(`SUBMIT: ${fileInput.value}`);
       const formData = new FormData(form._element);
-      for (const [name, value] of formData) {
-        console.log(`FORM DATA ${name}: ${value}`);
-      }
       ProfileEditService.changeUserAvatar(formData, afterRequestCallback);
     };
 
@@ -111,9 +109,10 @@ export class AvatarUploadForm extends Block {
   protected _afterPropsAssignHook(): void {
     super._afterPropsAssignHook();
 
-    const avatarSubmit = this._createAvatarSubmitButton();
-    this.children.avatarSubmit = avatarSubmit;
-    (this.children.avatarFileInput as Block).refs.avatarSubmit = avatarSubmit;
+    const avatarSubmitButton = this._createAvatarSubmitButton();
+    this.children.avatarSubmitButton = avatarSubmitButton;
+    (this.children.avatarFileInput as Block).refs.avatarSubmitButton =
+      avatarSubmitButton;
   }
 
   protected render() {
