@@ -34,13 +34,19 @@ export default class BlockBase {
     TBlockCommonEventsHandlersArgs
   >();
 
+  protected componentName: string;
+
   protected props: TComponentProps = {};
 
   protected helpers: Record<string, unknown>;
 
   readonly id: string = nanoid(7);
 
-  protected componentName: string;
+  protected htmlWrapped: boolean;
+
+  protected htmlWrapper?: TComponentWrapper;
+
+  protected wrappedId?: string;
 
   protected _componentDidMount(): void {
     this.componentDidMount();
@@ -61,8 +67,8 @@ export default class BlockBase {
       return;
     }
 
+    console.log(`FLOW RENDER: ${oldPropsOrState} -> ${newPropsOrState}`);
     this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
-    this._addEventListenersToEleement();
   }
 
   protected componentDidUpdate(
@@ -105,15 +111,34 @@ export default class BlockBase {
     });
   }
 
-  protected _addEventListenersToEleement(
-    targetElement: Nullable<HTMLElement> = null
-  ): void {
-    const element = targetElement ?? this.getElement();
-    if (!BlockBase.isHTMLElement(element)) {
+  private _getEventsTargetElement() {
+    let targetElement = this._element;
+    if (!targetElement) {
+      return targetElement;
+    }
+
+    if (this.htmlWrapped) {
+      const wrappedElement = targetElement.querySelector(
+        `[wrapped-id="${this.wrappedId}"]`
+      ) as HTMLElement;
+
+      if (!wrappedElement) {
+        throw new Error(
+          `${this.componentName}: whereas htmlWrapper provided, no wrapped element created`
+        );
+      }
+
+      targetElement = wrappedElement;
+    }
+
+    return targetElement;
+  }
+
+  protected _addEventListenersToElement() {
+    const targetElement = this._getEventsTargetElement();
+    if (!targetElement) {
       throw new Error(
-        `${
-          this.componentName
-        }: wrong element ${element} of type ${typeof element} to add event listeners`
+        `Incorrect element ${targetElement} of type ${typeof targetElement} to add event listeners`
       );
     }
 
@@ -121,7 +146,7 @@ export default class BlockBase {
 
     Object.entries(events).forEach(([event, listeners]) => {
       listeners.forEach((listener) => {
-        element!.addEventListener(event, listener);
+        targetElement!.addEventListener(event, listener);
       });
     });
   }
@@ -137,7 +162,6 @@ export default class BlockBase {
     }
 
     const events = this.props.events as Record<string, EventListener[]>;
-
     Object.entries(events).forEach(([event, listeners]) => {
       listeners.forEach((listener) => {
         element!.removeEventListener(event, listener);

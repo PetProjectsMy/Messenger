@@ -10,10 +10,6 @@ export class Block<
 
   public componentName: string = "Unnamed Block";
 
-  protected htmlWrapped: boolean;
-
-  protected htmlWrapper: Nullable<TComponentWrapper>;
-
   protected helpers: TComponentHelpers;
 
   protected props: TProps;
@@ -23,8 +19,6 @@ export class Block<
   protected state: TState;
 
   private wasRendered: Boolean = false;
-
-  private wrappedId?: string;
 
   constructor({
     props = {} as TProps,
@@ -196,31 +190,14 @@ export class Block<
 
     const fragment = this._compile();
     const newElement = fragment.firstElementChild as HTMLElement;
-
-    let eventsTargerElement = newElement;
-
-    if (this.htmlWrapped) {
-      const wrappedElement = newElement.querySelector(
-        `[wrapped-id="${this.wrappedId}"]`
-      ) as HTMLElement;
-
-      if (!wrappedElement) {
-        throw new Error(
-          `${this.componentName}: whereas htmlWrapper provided, no wrapped element created`
-        );
-      }
-
-      eventsTargerElement = wrappedElement;
-    }
-
-    this._addEventListenersToEleement(eventsTargerElement);
-    eventsTargerElement.removeAttribute("wrapped-id");
+    newElement.removeAttribute("wrapped-id");
 
     if (this.wasRendered) {
       this._element!.replaceWith(newElement);
     }
 
     this._element = newElement;
+    this._addEventListenersToElement();
   }
 
   private _compile(): DocumentFragment {

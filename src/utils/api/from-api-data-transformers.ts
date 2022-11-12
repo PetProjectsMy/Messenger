@@ -1,6 +1,12 @@
+import { baseURL } from "api";
+
 export function transformProfileChangeAPIResponseToAppUserData(
   data: TProfileChangeAPIResponse
 ): TAppStateUserData {
+  const avatar = data.avatar
+    ? `${baseURL}/resources${data.avatar}`
+    : data.avatar;
+
   return {
     id: data.id,
     firstName: data.first_name,
@@ -9,6 +15,6 @@ export function transformProfileChangeAPIResponseToAppUserData(
     login: data.login,
     email: data.email,
     phone: data.phone,
-    avatar: data.avatar,
+    avatar,
   };
 }

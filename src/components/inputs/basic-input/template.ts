@@ -9,7 +9,7 @@ const attributes = `
   {{/if}}
 
   {{#if accept}}
-    accept="{{ acept }}"
+    accept="{{ accept }}"
   {{/if}}
 
   {{#if value }}

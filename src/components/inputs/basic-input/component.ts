@@ -33,6 +33,12 @@ export class Input extends Block<TInputProps> {
     return (element as HTMLInputElement).value;
   }
 
+  protected _afterPropsAssignHook(): void {
+    super._afterPropsAssignHook();
+
+    this.props.value ??= "";
+  }
+
   public setValue(value: string) {
     this.props.value = value;
   }

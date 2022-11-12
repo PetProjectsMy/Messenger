@@ -6,16 +6,22 @@ const enum METHODS {
 }
 
 const DefualtHeaders = {
-  GET: { accept: "application/json" },
-  POST: { "Content-Type": "application/json", accept: "application/json" },
-  PUT: { "Content-Type": "application/json", accept: "application/json" },
-  DELETE: { accept: "application/json" },
+  [METHODS.GET]: { accept: "application/json" },
+  [METHODS.POST]: {
+    "Content-Type": "application/json",
+    accept: "application/json",
+  },
+  [METHODS.PUT]: {
+    "Content-Type": "application/json",
+    accept: "application/json",
+  },
+  [METHODS.DELETE]: { accept: "application/json" },
 };
 
 type TRequestOptions = {
   method: METHODS;
   headers?: Record<string, string>;
-  data?: Record<string, string>;
+  data?: Record<string, string> | FormData;
   timeout?: number;
 };
 
@@ -60,7 +66,7 @@ class HTTPTransport {
 
   request = (apiURL: string, options: TRequestOptions) => {
     const { method, data, timeout = 5000 } = options;
-    const headers = options.headers ?? DefualtHeaders[method];
+    const headers = { ...DefualtHeaders[method], ...options.headers };
 
     return new Promise((resolve, reject) => {
       if (!method) {
@@ -77,7 +83,9 @@ class HTTPTransport {
       xhr.withCredentials = true;
 
       Object.entries(headers).forEach(([key, value]: [string, string]) => {
-        xhr.setRequestHeader(key, value);
+        if (value !== "multipart/form-data") {
+          xhr.setRequestHeader(key, value);
+        }
       });
 
       xhr.onload = () => {
@@ -92,6 +100,8 @@ class HTTPTransport {
 
       if (isGet || !data) {
         xhr.send();
+      } else if (data instanceof FormData) {
+        xhr.send(data);
       } else {
         xhr.send(JSON.stringify(data));
       }
@@ -99,6 +109,8 @@ class HTTPTransport {
   };
 }
 
+export const baseURL = "https://ya-praktikum.tech/api/v2";
+
 export default new HTTPTransport({
-  baseURL: "https://ya-praktikum.tech/api/v2",
+  baseURL,
 });

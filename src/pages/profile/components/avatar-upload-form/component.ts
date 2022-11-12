@@ -1,9 +1,14 @@
-import { Button, FileInput, Input } from "components";
+import { Button, FileInput, type ImageComponent } from "components";
 import { Block } from "core/dom";
+import { ProfileEditService } from "services";
+import {
+  APIResponseHasError,
+  transformProfileChangeAPIResponseToAppUserData as transformData,
+} from "utils/api";
 import template from "./template";
 
 export class AvatarUploadForm extends Block {
-  constructor() {
+  constructor(profilePageImageRef: ImageComponent) {
     const children = {} as TComponentChildren;
 
     const avatarChooseButton = new Button({
@@ -35,21 +40,56 @@ export class AvatarUploadForm extends Block {
     });
     children.avatarFileInput = avatarFileInput;
 
-    super({ children });
+    super({ children, refs: { profileImage: profilePageImageRef } });
   }
 
-  protected _afterPropsAssignHook(): void {
-    const avatarSubmit = new Input({
-      refs: {
-        form: this,
-        avatarInput: this.children.avatarFileInput as Block,
-      },
-      state: {
-        uploadingStatus: "",
-      },
+  private _createAvatarSubmitButton() {
+    const refs = {
+      form: this,
+      avatarInput: this.children.avatarFileInput as Block,
+    };
+
+    const state = {
+      uploadingStatus: "",
+    };
+
+    const afterRequestCallback = function (response: any) {
+      if (!APIResponseHasError(response)) {
+        const userData = transformData(response);
+        const oldAvatarURL = window.store.getUserData("avatar");
+        window.store.dispatch({
+          user: userData,
+        });
+
+        const newAvatarURL = userData.avatar;
+        console.log(`OLD AVATAR: ${oldAvatarURL}; NEW AVATAR: ${newAvatarURL}`);
+        this.refs.profileImage.componentDidUpdate(oldAvatarURL, newAvatarURL);
+      }
+    }.bind(this);
+
+    const onClickCallback = function (event) {
+      console.log(`CURRENT TARGET: ${event.currentTarget}`);
+      const { form, avatarInput } = this.refs;
+      const fileInput = avatarInput._element;
+
+      if (!fileInput.value) {
+        this.state.uploadingStatus = "File not selected";
+        return;
+      }
+
+      console.log(`SUBMIT: ${fileInput.value}`);
+      const formData = new FormData(form._element);
+      for (const [name, value] of formData) {
+        console.log(`FORM DATA ${name}: ${value}`);
+      }
+      ProfileEditService.changeUserAvatar(formData, afterRequestCallback);
+    };
+
+    return new Button({
+      refs,
+      state,
       props: {
-        type: "submit",
-        value: "submit",
+        label: "submit",
         htmlWrapper: {
           componentAlias: "wrapped",
           htmlWrapperTemplate: `
@@ -62,27 +102,16 @@ export class AvatarUploadForm extends Block {
           `,
         },
         events: {
-          click: [
-            function (event: Event) {
-              event.preventDefault();
-
-              const { form, avatarInput } = this.refs;
-              const fileInput = avatarInput._element;
-              console.log(fileInput.value);
-
-              if (!fileInput.value) {
-                this.state.uploadingStatus = "File not selected";
-                return;
-              }
-
-              console.log(`SUBMIT: ${fileInput.value}`);
-              const formData = new FormData(form._element);
-            },
-          ],
+          click: [onClickCallback],
         },
       },
     });
+  }
 
+  protected _afterPropsAssignHook(): void {
+    super._afterPropsAssignHook();
+
+    const avatarSubmit = this._createAvatarSubmitButton();
     this.children.avatarSubmit = avatarSubmit;
     (this.children.avatarFileInput as Block).refs.avatarSubmit = avatarSubmit;
   }

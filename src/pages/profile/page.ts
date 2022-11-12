@@ -31,14 +31,17 @@ export class ProfilePage extends ProfilePageBlock {
   constructor() {
     const children: TComponentChildren = {};
 
-    children.avatarImage = new ImageComponent({
+    const storeAvatar = window.store.getUserData("avatar");
+    const imageSource = storeAvatar || avatarImagePlaceholder;
+    const avatarImage = new ImageComponent({
       props: {
-        src: avatarImagePlaceholder,
+        src: imageSource,
         alt: "avatar placeholder",
         componentName: "Avatar Image",
       },
     });
-    children.avatarUploadForm = new AvatarUploadForm();
+    children.avatarImage = avatarImage;
+    children.avatarUploadForm = new AvatarUploadForm(avatarImage);
 
     children.profileDataForm = new ProfilePageInputForm();
     children.homeButton = new HomeButton();
