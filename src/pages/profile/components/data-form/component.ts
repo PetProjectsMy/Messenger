@@ -1,10 +1,10 @@
-import { InputForm, Input } from "components";
+import { InputForm, InputWithValidation } from "components";
 import { WithStore } from "components/hocs";
 import { afterValidationCallback } from "../../api-service";
 import { MapInputFieldToProps, MapInputFieldToHelpers } from "./input-fields";
 import { EnumInputFields } from "./enum-input-fields";
 
-const InputWithStore = WithStore(Input) as any;
+const InputWithStore = WithStore(InputWithValidation) as any;
 
 export class ProfilePageInputForm extends InputForm {
   constructor() {

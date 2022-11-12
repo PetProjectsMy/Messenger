@@ -103,7 +103,6 @@ export class Store {
 
   public getUserData(dataType?: Keys<TAppStateUserData>) {
     if (dataType) {
-      console.log(`user[${dataType}] = ${this.state.user![dataType]}`);
       const userData = this.state.user;
       return userData ? userData[dataType] : userData;
     }

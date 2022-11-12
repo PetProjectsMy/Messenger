@@ -1,6 +1,5 @@
 import { Block } from "core/dom";
-import { Input } from "components";
-import { TInputProps } from "components/input";
+import { TInputProps, Input } from "../basic-input";
 
 export type TInputValidator = () => boolean;
 export type TInputValidatorsByEvents = Record<string, TInputValidator[]>;

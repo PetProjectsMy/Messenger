@@ -14,6 +14,8 @@ export class Block<
 
   protected htmlWrapper: Nullable<TComponentWrapper>;
 
+  protected helpers: TComponentHelpers;
+
   protected props: TProps;
 
   public refs: TComponentRefs;
@@ -22,7 +24,7 @@ export class Block<
 
   private wasRendered: Boolean = false;
 
-  private wrappedId: string = nanoid(5);
+  private wrappedId?: string;
 
   constructor({
     props = {} as TProps,
@@ -51,6 +53,9 @@ export class Block<
 
     this._afterPropsAssignHook();
     this.htmlWrapped = !!this.props.htmlWrapper;
+    if (this.htmlWrapped) {
+      this.wrappedId = nanoid(5);
+    }
 
     this._beforePropsProxyHook();
     this.props = this._makeProxy(this.props) as TProps;
@@ -68,19 +73,16 @@ export class Block<
     this.wasRendered = true;
   }
 
-  protected _makeProxy(propsOrState: TComponentProps | TComponentState) {
+  protected _makeProxy(object: Record<string, any>) {
     const self = this;
 
-    return new Proxy(propsOrState, {
-      get(target, prop: string) {
-        const value = target[prop];
-        return value;
-      },
+    return new Proxy(object, {
       set(target, prop: string, value) {
         const oldValue = target[prop];
         target[prop] = value;
 
         self.eventBus.emit(BlockCommonEvents.FLOW_CDU, oldValue, value);
+
         return true;
       },
       deleteProperty() {
@@ -211,7 +213,7 @@ export class Block<
       eventsTargerElement = wrappedElement;
     }
 
-    this._addEvents(eventsTargerElement);
+    this._addEventListenersToEleement(eventsTargerElement);
     eventsTargerElement.removeAttribute("wrapped-id");
 
     if (this.wasRendered) {
@@ -267,7 +269,7 @@ export class Block<
   }
 
   protected _beforePropsProxyHook() {
-    this._bindEventListeners();
+    this._bindEventListenersToBlock();
 
     if (this.helpers.beforePropsProxyHook) {
       (this.helpers.beforePropsProxyHook as Function).call(this);

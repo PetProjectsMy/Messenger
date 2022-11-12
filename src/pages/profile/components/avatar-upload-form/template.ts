@@ -1,8 +1,8 @@
 export default `
   <form class="avatar-change-form">
-    <div class="browse-button-section">
+    <div class="choose-button-section">
       {{{ avatarFileInput }}}
-      {{{ avatarUploadButton }}}
+      {{{ avatarChooseButton }}}
     </div>
     {{{ avatarSubmit }}}
   </form>

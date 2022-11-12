@@ -20,6 +20,7 @@ declare global {
     htmlClass?: string;
     htmlId?: string;
     htmlName?: string;
+    htmlStyle?: string;
   };
   type WithHTMLProps<PropsType> = PropsType & HTMLElementProps;
 
@@ -41,7 +42,7 @@ declare global {
 
   export type TComponentRefs = Record<string, Block>;
 
-  export type TComponentState = Record<string, string | boolean>;
+  export type TComponentState = Record<string, unknown>;
 
   export type TComponentHelpers = Record<string, unknown>;
 

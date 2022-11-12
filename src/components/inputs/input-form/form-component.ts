@@ -1,7 +1,7 @@
 import { Block } from "core/dom";
-import { InputWithValidation, type Input } from "components";
-import { TInputProps } from "components/input";
 import { deepMerge } from "utils/objects-handle";
+import { InputWithValidation } from "../input-with-validation";
+import { type Input, TInputProps } from "../basic-input";
 import { FormSubmitButton } from "./submit-button";
 import template from "./form-template";
 

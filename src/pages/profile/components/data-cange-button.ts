@@ -1,6 +1,6 @@
 import { type Block } from "core/dom";
 import { Button, type Input } from "components";
-import { submitButtonOnClickCallback } from "components/input-form";
+import { submitButtonOnClickCallback } from "components/inputs/input-form";
 
 export class DataChangeButton extends Button {
   constructor(refs: { form: Block; page: Block }) {

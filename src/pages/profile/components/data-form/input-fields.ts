@@ -1,4 +1,4 @@
-import { TInputWithValidationProps } from "components/input-with-validation";
+import { TInputWithValidationProps } from "components/inputs/input-with-validation";
 import { EnumInputFields } from "./enum-input-fields";
 import { FormValidators } from "./input-validators";
 

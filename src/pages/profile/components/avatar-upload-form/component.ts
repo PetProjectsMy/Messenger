@@ -1,4 +1,4 @@
-import { Button, Input } from "components";
+import { Button, FileInput, Input } from "components";
 import { Block } from "core/dom";
 import template from "./template";
 
@@ -6,50 +6,57 @@ export class AvatarUploadForm extends Block {
   constructor() {
     const children = {} as TComponentChildren;
 
-    const avatarFileInput = new Input({
+    const avatarChooseButton = new Button({
       props: {
-        type: "file",
+        label: "upload avatar",
+        htmlClass: "choose-avatar",
+      },
+    });
+    children.avatarChooseButton = avatarChooseButton;
+
+    const avatarFileInput = new FileInput({
+      InputButtonRef: avatarChooseButton,
+      onFileChangeCallback() {
+        const fileInput = this._element;
+        const submitState = this.refs.avatarSubmit.state;
+
+        console.log(`FILE CHANGE`, fileInput.value);
+        if (!fileInput.value) {
+          submitState.uploadingStatus = "File not selected";
+        } else {
+          submitState.uploadingStatus = "File selected";
+        }
+      },
+      props: {
         accept: "image/*",
+        htmlName: "avatar",
         htmlClass: "upload-avatar",
       },
     });
     children.avatarFileInput = avatarFileInput;
 
-    children.avatarUploadButton = new Button({
-      refs: {
-        avatarInput: avatarFileInput,
-      },
-      props: {
-        label: "upload avatar",
-        htmlClass: "upload-avatar",
-        events: {
-          click: [
-            function () {
-              const fileInput = this.refs.avatarInput._element;
-              fileInput.click();
-            },
-          ],
-        },
-      },
-    });
+    super({ children });
+  }
 
-    children.avatarSubmit = new Input({
+  protected _afterPropsAssignHook(): void {
+    const avatarSubmit = new Input({
       refs: {
-        avatarInput: avatarFileInput,
+        form: this,
+        avatarInput: this.children.avatarFileInput as Block,
       },
       state: {
-        noFileSelected: true,
+        uploadingStatus: "",
       },
       props: {
         type: "submit",
         value: "submit",
         htmlWrapper: {
-          componentAlias: "wrappedAvatarSubmit",
+          componentAlias: "wrapped",
           htmlWrapperTemplate: `
             <div class="submit-button-section">
-              {{{ wrappedAvatarSubmit }}}
-              \\{{#if noFileSelected }}
-                 <span>  No file selected </span>
+              {{{ wrapped }}}
+              \\{{#if uploadingStatus }}
+                  <span>  \\{{ uploadingStatus }} </span>
               \\{{/if}}
             </div>
           `,
@@ -58,15 +65,26 @@ export class AvatarUploadForm extends Block {
           click: [
             function (event: Event) {
               event.preventDefault();
-              const fileInput = this.refs.avatarInput._element;
-              console.log(fileInput.files);
+
+              const { form, avatarInput } = this.refs;
+              const fileInput = avatarInput._element;
+              console.log(fileInput.value);
+
+              if (!fileInput.value) {
+                this.state.uploadingStatus = "File not selected";
+                return;
+              }
+
+              console.log(`SUBMIT: ${fileInput.value}`);
+              const formData = new FormData(form._element);
             },
           ],
         },
       },
     });
 
-    super({ children });
+    this.children.avatarSubmit = avatarSubmit;
+    (this.children.avatarFileInput as Block).refs.avatarSubmit = avatarSubmit;
   }
 
   protected render() {

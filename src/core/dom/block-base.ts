@@ -62,7 +62,7 @@ export default class BlockBase {
     }
 
     this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
-    this._addEvents();
+    this._addEventListenersToEleement();
   }
 
   protected componentDidUpdate(
@@ -85,7 +85,15 @@ export default class BlockBase {
     return this._element;
   }
 
-  protected _bindEventListeners() {
+  public dispatchEventListener(event: string, listener: EventListener) {
+    const events = this.props.events as Record<string, EventListener[]>;
+
+    events[event] ??= [];
+    events[event].push(listener);
+    this._element?.addEventListener(event, listener);
+  }
+
+  protected _bindEventListenersToBlock() {
     const events = this.props.events as Record<string, EventListener[]>;
     if (!events) {
       return;
@@ -97,7 +105,9 @@ export default class BlockBase {
     });
   }
 
-  protected _addEvents(targetElement: Nullable<HTMLElement> = null): void {
+  protected _addEventListenersToEleement(
+    targetElement: Nullable<HTMLElement> = null
+  ): void {
     const element = targetElement ?? this.getElement();
     if (!BlockBase.isHTMLElement(element)) {
       throw new Error(

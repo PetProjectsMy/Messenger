@@ -1,4 +1,4 @@
-import { TInputValidator } from "components/input-with-validation";
+import { TInputValidator } from "components/inputs/input-with-validation";
 
 export type TInputSingleValidator = (value: string) => string;
 
