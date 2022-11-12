@@ -1,6 +1,4 @@
-function isObject(object: any) {
-  return object != null && typeof object === "object";
-}
+import { isObject } from "./is-object";
 
 export function deepEqual(object1: any, object2: any) {
   if (!isObject(object1) || !isObject(object2)) {

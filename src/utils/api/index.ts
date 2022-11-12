@@ -4,4 +4,7 @@ export {
   transformSignUpFormDatatoAPI,
   transformProfileFormDatatoAPI,
 } from "./to-api-data-transformers";
-export { transformProfileChangeAPIResponseToAppUserData } from "./from-api-data-transformers";
+export {
+  transformProfileChangeResponseToUserData,
+  transformChatsGetResponseToChatsData,
+} from "./from-api-data-transformers";

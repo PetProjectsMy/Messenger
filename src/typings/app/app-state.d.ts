@@ -8,7 +8,7 @@ declare global {
     router: CoreRouter<EnumAppRoutes>;
   }
 
-  export type TAppStateUserData = {
+  export type TAppUserData = {
     id: number;
     firstName: string;
     secondName: string;
@@ -19,10 +19,21 @@ declare global {
     avatar: string; // path to avatar
   };
 
+  type TChatData = {
+    title: string;
+    avatar: string;
+    lastMessage: {
+      content: string;
+    };
+  };
+
+  export type TAppChatsData = Record<number, TChatData>;
+
   export type TAppState = {
     appIsInited: boolean;
-    page: EnumAppPages | null;
-    user: TAppStateUserData | null;
+    page: Nullable<EnumAppPages>;
+    user: Nullable<TAppUserData>;
+    chats: Nullable<TAppChatsData>;
   };
 }
 

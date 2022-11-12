@@ -2,7 +2,7 @@ import { AuthorizationAPI, ProfileAPI } from "api";
 import { EnumAppRoutes } from "core/router";
 import {
   APIResponseHasError,
-  transformProfileChangeAPIResponseToAppUserData as transformProfileAPIResponse,
+  transformProfileChangeResponseToUserData as transformProfileAPIResponse,
 } from "utils/api";
 
 class AuthorizationServiceClass {

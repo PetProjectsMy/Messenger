@@ -1,7 +1,7 @@
 import { ProfileEditService } from "services";
 import {
   transformProfileFormDatatoAPI as transformFormDatatoAPI,
-  transformProfileChangeAPIResponseToAppUserData as transformResponseToUserData,
+  transformProfileChangeResponseToUserData as transformResponseToUserData,
   APIResponseHasError,
 } from "utils/api";
 

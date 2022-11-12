@@ -7,6 +7,7 @@ export const defaultState: TAppState = {
   appIsInited: false,
   page: null,
   user: null,
+  chats: null,
 };
 
 export const enum EnumStoreEvents {
@@ -101,7 +102,16 @@ export class Store {
     return Boolean(this.state.user);
   }
 
-  public getUserData(dataType?: Keys<TAppStateUserData>) {
+  public userHasAnyChats(): Boolean {
+    const { chats } = this.state;
+    if (!chats) {
+      return false;
+    }
+
+    return Object.keys(chats).length > 0;
+  }
+
+  public getUserData(dataType?: Keys<TAppUserData>) {
     if (dataType) {
       const userData = this.state.user;
       return userData ? userData[dataType] : userData;
@@ -119,7 +129,7 @@ export class Store {
     return page.constructor.name;
   }
 
-  public set(nextState: Partial<TAppState>) {
+  private setState(nextState: Partial<TAppState>) {
     console.log(`${"-".repeat(30)}\nold state: ${JSON.stringify(this.state)}`);
     console.log(`props to change: ${JSON.stringify(nextState)}`);
     Object.assign(this.state, nextState);
@@ -129,7 +139,7 @@ export class Store {
     if (typeof nextStateOrAction === "function") {
       nextStateOrAction();
     } else {
-      this.set(nextStateOrAction);
+      this.setState(nextStateOrAction);
     }
   }
 

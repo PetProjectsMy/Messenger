@@ -60,7 +60,7 @@ export class ProfilePage extends ProfilePageBlock {
       form: this.children.profileDataForm as Block,
       page: this,
     });
-    this.props.userID = (this.store.getUserData() as TAppStateUserData).id;
+    this.props.userID = (this.store.getUserData() as TAppUserData).id;
   }
 
   protected _beforeRegisterEventsHook() {
@@ -77,7 +77,7 @@ export class ProfilePage extends ProfilePageBlock {
   }
 
   private _updateUserInfo() {
-    const userData = this.store.getUserData() as TAppStateUserData;
+    const userData = this.store.getUserData() as TAppUserData;
 
     Object.entries((this.children.profileDataForm as Block).refs).forEach(
       ([inputName, inputBlock]: [EnumInputFields, Input]) => {

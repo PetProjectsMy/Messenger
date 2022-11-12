@@ -1,0 +1,1 @@
+export { MessagesDisplayArea } from "./component";

@@ -1,32 +1,44 @@
 import { Block } from "core/dom";
-import { HomeButton, ImageComponent } from "components";
-import avatarImagePlaceholder from "static/avatar-placeholder-chats.svg";
-import { chatsPageTemplate } from "./template";
-import ChatComponent from "./chat-component";
+import { ChatsService } from "services/chats";
+import {
+  APIResponseHasError,
+  transformChatsGetResponseToChatsData,
+} from "utils/api";
+import { WithStore } from "components/hocs";
+import template from "./template";
+import { ChatsPageMainSection, ChatsPageNavigationSection } from "./components";
 
-export class ChatsPage extends Block {
+export class ChatsPage extends WithStore(Block) {
   constructor() {
-    const children: { chats: ChatComponent[] } & TComponentChildren = {
-      chats: [],
-    };
+    super({ props: { componentName: "Chats Page" } });
+  }
 
-    for (let i = 1; i <= 10; ++i) {
-      children.chats.push(new ChatComponent());
+  protected async _afterPropsAssignHook() {
+    super._afterPropsAssignHook();
+
+    this._getChats();
+    this._createChildren();
+  }
+
+  private _createChildren() {
+    this.children.navigationSection = new ChatsPageNavigationSection();
+    this.children.chatSection = new ChatsPageMainSection();
+  }
+
+  private async _getChats() {
+    const response = await ChatsService.getChats();
+
+    if (APIResponseHasError(response)) {
+      throw new Error(
+        `CHATS PAGE ERROR: get chats request: ${response.reason}`
+      );
     }
 
-    children.homeButton = new HomeButton();
-    children.avatarImage = new ImageComponent({
-      props: {
-        src: avatarImagePlaceholder,
-        alt: "avatar placeholder",
-        componentName: "Avatar Image",
-      },
-    });
-
-    super({ children, props: { componentName: "Chats Page" } });
+    const chatsData = transformChatsGetResponseToChatsData(response);
+    this.store.dispatch({ chats: chatsData });
   }
 
   protected render(): string {
-    return chatsPageTemplate;
+    return template;
   }
 }

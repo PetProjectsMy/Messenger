@@ -3,7 +3,7 @@ import { Block } from "core/dom";
 import { ProfileEditService } from "services";
 import {
   APIResponseHasError,
-  transformProfileChangeAPIResponseToAppUserData as transformData,
+  transformProfileChangeResponseToUserData as transformData,
 } from "utils/api";
 import template from "./template";
 
