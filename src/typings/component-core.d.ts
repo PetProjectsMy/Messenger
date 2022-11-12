@@ -21,6 +21,7 @@ declare global {
     htmlId?: string;
     htmlName?: string;
     htmlStyle?: string;
+    backgroundImage?: string;
   };
   type WithHTMLProps<PropsType> = PropsType & HTMLElementProps;
 

@@ -1,3 +1,3 @@
 export { SignUpService } from "./signup";
 export { AuthorizationService } from "./authorization";
-export { ProfileEditService } from "./profile-edit";
+export { ProfileService } from "./profile-edit";

@@ -2,7 +2,7 @@ import { EnumAppPages } from "utils/pages";
 
 declare global {
   export type TAppRouteData = {
-    path: string;
+    path?: string;
     block: EnumAppPages;
     needAuthorization: Boolean;
   };

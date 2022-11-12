@@ -1,5 +1,5 @@
 import { CoreRouter } from "./router-core";
-import { AppRoutesData, EnumAppRoutes } from "./app-routes";
+import { AppRoutesData, EnumAppRoutes, MapPathToRoute } from "./app-routes";
 
 export class PathRouter implements CoreRouter<EnumAppRoutes> {
   private routes: Record<EnumAppRoutes, Function> = {} as any;
@@ -76,7 +76,10 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
     window.history.forward();
   }
 
-  matchRouteByPath(pathname: string): { route: EnumAppRoutes; path: string } {
+  matchRouteByPath(pathname: string): {
+    route: EnumAppRoutes;
+    path: Nullable<string>;
+  } {
     if (pathname === "/") {
       let route;
       if (window.store.isUserAthorized()) {
@@ -88,28 +91,14 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
       return { route, path };
     }
 
-    for (const route of Object.keys(this.routes)) {
-      const { path } = this.routesData[route as EnumAppRoutes];
-      if (path === pathname) {
-        console.log(
-          `Route matching: '${pathname}' == '${path}' of route '${route}'`
-        );
-
-        if (
-          route === EnumAppRoutes.NotAuthorized ||
-          route === EnumAppRoutes.NotFound
-        ) {
-          return { route: EnumAppRoutes.NotFound, path: pathname };
-        }
-
-        return { route: route as EnumAppRoutes, path };
-      }
-      console.log(
-        `Route matching: '${pathname}' != '${path}' of route '${route}'`
-      );
+    let route = MapPathToRoute[pathname];
+    if (route) {
+      console.log(`pathname "${pathname}" matches "${route}" route`);
+    } else {
+      console.log(`no routes matching pathname "${pathname}"`);
+      route = EnumAppRoutes.NotFound;
     }
-
-    return { route: EnumAppRoutes.NotFound, path: pathname };
+    return { route, path: pathname };
   }
 
   getPathByRoute(route: EnumAppRoutes) {

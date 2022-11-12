@@ -240,6 +240,12 @@ export class Block<
   protected _beforePropsAssignHook() {}
 
   protected _afterPropsAssignHook() {
+    const { backgroundImage } = this.props;
+    if (backgroundImage) {
+      const style = this.props.htmlStyle ?? "";
+      this.props.htmlStyle = `${style}background-image: url('${backgroundImage}')`;
+    }
+
     if (this.helpers.afterPropsAssignHook) {
       (this.helpers.afterPropsAssignHook as Function).call(this);
     }

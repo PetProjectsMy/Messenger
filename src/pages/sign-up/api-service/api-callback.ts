@@ -2,7 +2,7 @@ import { SignUpService } from "services";
 import { ProfileAPI } from "api";
 import {
   transformSignUpFormDatatoAPI,
-  transformProfileChangeResponseToUserData,
+  transformProfileAPIResponseToUserData,
   APIResponseHasError,
 } from "utils/api";
 
@@ -24,7 +24,7 @@ async function handleAPIResponse(response: any) {
     const userID = response.id;
     const userData = (await ProfileAPI.getProfileData(userID)).response;
     window.store.dispatch({
-      user: transformProfileChangeResponseToUserData(userData),
+      user: transformProfileAPIResponseToUserData(userData),
     });
   }
 }

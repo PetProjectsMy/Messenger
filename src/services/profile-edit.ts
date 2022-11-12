@@ -1,16 +1,29 @@
 import { ProfileAPI } from "api";
 import {
   APIResponseHasError,
-  transformProfileChangeResponseToUserData as transformData,
+  transformProfileAPIResponseToUserData as transformData,
 } from "utils/api";
 
-class ProfileEditServiceClass {
-  async changeUserProfile(data: TProfileChangeDTO) {
-    const requestChangeProfile = await ProfileAPI.changeProfile(data);
-    const { status, response } = requestChangeProfile;
+class ProfileServiceClass {
+  async getUserProfile(userID: number) {
+    const request = await ProfileAPI.getProfileData(userID);
+    const { status, response } = request;
 
     console.log(
-      `PROFILE CHANGE REQUEST:\nstatus ${status}; response: ${JSON.stringify(
+      `PROFILE GET ID(${userID})REQUEST: status ${status}; response: ${JSON.stringify(
+        response
+      )}`
+    );
+
+    return response;
+  }
+
+  async changeUserProfile(data: TProfileChangeDTO) {
+    const request = await ProfileAPI.changeProfile(data);
+    const { status, response } = request;
+
+    console.log(
+      `PROFILE CHANGE DATA REQUEST: status ${status}; response: ${JSON.stringify(
         response
       )}`
     );
@@ -29,17 +42,18 @@ class ProfileEditServiceClass {
     avatarFormData: FormData,
     afterRequestCallback: (response: any) => void = () => {}
   ) {
-    const requestChangeAvatar = await ProfileAPI.changeAvatar(avatarFormData);
-    const { status, response } = requestChangeAvatar;
+    const request = await ProfileAPI.changeAvatar(avatarFormData);
+    const { status, response } = request;
 
     console.log(
-      `PROFILE CHANGE REQUEST:\nstatus ${status}; response: ${JSON.stringify(
+      `PROFILE CHANGE AVATAR REQUEST: status ${status}; response: ${JSON.stringify(
         response
       )}`
     );
 
     afterRequestCallback(response);
+    return response;
   }
 }
 
-export const ProfileEditService = new ProfileEditServiceClass();
+export const ProfileService = new ProfileServiceClass();

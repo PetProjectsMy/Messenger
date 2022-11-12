@@ -9,15 +9,10 @@ type TTextComponentProps = WithComponentCommonProps<{
 export class TextComponent extends Block<TTextComponentProps> {
   protected props: TTextComponentProps;
 
-  constructor({
-    props = {},
-    refs = {},
-  }: {
-    props?: TTextComponentProps;
-    refs?: TComponentRefs;
-  }) {
-    props.htmlTag = props.htmlTag ?? "span";
-    super({ props, refs });
+  protected _afterPropsAssignHook() {
+    super._afterPropsAssignHook();
+
+    this.props.htmlTag ??= "span";
   }
 
   protected render(): string {

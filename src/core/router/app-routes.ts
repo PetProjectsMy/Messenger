@@ -37,13 +37,19 @@ export const AppRoutesData = {
     needAuthorization: true,
   },
   [EnumAppRoutes.NotFound]: {
-    path: "/not-found",
     block: EnumAppPages.NotFound,
     needAuthorization: false,
   },
   [EnumAppRoutes.NotAuthorized]: {
-    path: "/not-authorized",
     block: EnumAppPages.Forbidden,
     needAuthorization: false,
   },
+};
+
+export const MapPathToRoute: Record<string, EnumAppRoutes> = {
+  "/naviagtion": EnumAppRoutes.NavigationPage,
+  "/signup": EnumAppRoutes.SignUp,
+  "/login": EnumAppRoutes.Login,
+  "/chats": EnumAppRoutes.Chats,
+  "/profile": EnumAppRoutes.Profile,
 };

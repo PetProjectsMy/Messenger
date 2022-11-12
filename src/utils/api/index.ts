@@ -5,6 +5,6 @@ export {
   transformProfileFormDatatoAPI,
 } from "./to-api-data-transformers";
 export {
-  transformProfileChangeResponseToUserData,
+  transformProfileAPIResponseToUserData,
   transformChatsGetResponseToChatsData,
 } from "./from-api-data-transformers";

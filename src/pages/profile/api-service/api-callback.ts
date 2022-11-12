@@ -1,7 +1,7 @@
-import { ProfileEditService } from "services";
+import { ProfileService } from "services";
 import {
   transformProfileFormDatatoAPI as transformFormDatatoAPI,
-  transformProfileChangeResponseToUserData as transformResponseToUserData,
+  transformProfileAPIResponseToUserData as transformResponseToUserData,
   APIResponseHasError,
 } from "utils/api";
 
@@ -9,7 +9,7 @@ function makeAPIRequest() {
   const formData = this.collectFormData();
   const apiData = transformFormDatatoAPI(formData);
   console.log(`API data: ${JSON.stringify(apiData)}`);
-  return ProfileEditService.changeUserProfile(apiData);
+  return ProfileService.changeUserProfile(apiData);
 }
 
 function handleAPIResponse(response: any) {

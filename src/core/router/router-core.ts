@@ -14,5 +14,8 @@ export interface CoreRouter<EnumAppRoutes> {
 
   forward(): void;
 
-  matchRouteByPath(pathname: string): { route: EnumAppRoutes; path: string };
+  matchRouteByPath(pathname: string): {
+    route: EnumAppRoutes;
+    path: Nullable<string>;
+  };
 }

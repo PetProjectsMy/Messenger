@@ -1,47 +1,31 @@
-import { AuthorizationAPI, ProfileAPI } from "api";
+import { AuthorizationAPI } from "api";
 import { EnumAppRoutes } from "core/router";
-import {
-  APIResponseHasError,
-  transformProfileChangeResponseToUserData as transformProfileAPIResponse,
-} from "utils/api";
 
 class AuthorizationServiceClass {
   async getUser() {
-    const response = await AuthorizationAPI.me();
-    return response.response;
-  }
-
-  async login(data: TLoginFormDTO) {
-    const requestLogin = await AuthorizationAPI.login(data);
+    const request = await AuthorizationAPI.me();
+    const { status, response } = request;
 
     console.log(
-      `LOGIN REQUEST:\nstatus ${requestLogin.status}; response ${JSON.stringify(
-        requestLogin.response
-      )}`
+      `LOGIN REQUEST: status ${status}; response ${JSON.stringify(response)}`
     );
 
-    if (
-      !APIResponseHasError(requestLogin.response) ||
-      requestLogin.response === "User already in system"
-    ) {
-      const requestUser = await AuthorizationAPI.me();
-      console.log(
-        `USER REQUEST:\nstatus ${requestUser.status}; response ${JSON.stringify(
-          requestUser.response
-        )}`
-      );
+    return response;
+  }
 
-      const requestProfileData = await ProfileAPI.getProfileData(
-        requestUser.response.id
-      );
-      const userData = transformProfileAPIResponse(requestProfileData.response);
-      window.store.dispatch({
-        user: userData,
-      });
-      window.router.go(EnumAppRoutes.Chats);
-    }
+  async login(
+    data: TLoginFormDTO,
+    afterRequestCallback: TAfterRequestCallback = () => {}
+  ) {
+    const requestLogin = await AuthorizationAPI.login(data);
+    const { status, response } = requestLogin;
 
-    return requestLogin.response;
+    console.log(
+      `LOGIN REQUEST: status ${status}; response ${JSON.stringify(response)}`
+    );
+
+    afterRequestCallback(response);
+    return response;
   }
 
   async logout() {

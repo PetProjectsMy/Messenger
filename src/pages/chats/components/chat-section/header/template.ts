@@ -1,10 +1,10 @@
 export default `
   <header class="main-section-header">
-    <div class="avatar-section">
-      {{{ chatAvatar }}}
+    <div class="chat-info-section">
+      {{{ chatTitle }}}
     </div>
-    <div class="info-section">
-      <span class="contact-name">Contact Name</span>
+    <div class="functional-button-section">
+      {{{ functionalButton }}}
     </div>
   </header>
 `;

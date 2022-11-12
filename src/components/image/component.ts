@@ -6,20 +6,7 @@ export type TImageProps = {
   alt: string;
 } & TComponentCommonProps;
 
-export class ImageComponent extends Block {
-  protected props: TImageProps;
-
-  constructor({
-    props,
-    refs = {},
-  }: {
-    props: TImageProps;
-    refs?: TComponentRefs;
-  }) {
-    props.componentName = props.componentName ?? "Image";
-    super({ props, refs });
-  }
-
+export class ImageComponent extends Block<TImageProps> {
   protected render(): string {
     return template;
   }

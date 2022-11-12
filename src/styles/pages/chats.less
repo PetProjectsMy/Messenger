@@ -30,9 +30,10 @@
 @message-input-section-flex: @navigation-section-header-flex;
 @message-input-section-height: 100vh * (@navigation-section-header-flex / 100%);
 
-@chat-info-avatar-max-size: calc(@chat-list-avatar-max-size * 0.7);
 @chat-display-section-flex: 100% - @main-section-header-flex -
   @message-input-section-flex;
+@chat-display-delimiter-line-width: 96%;
+@chat-display-delimiter-line-color: #ffffff;
 // ------------------------------------
 
 .chats-page {
@@ -143,34 +144,39 @@
   .main-section-header {
     flex: @main-section-header-flex;
 
-    @p: calc(0.1 * @chat-info-avatar-max-size);
-    .avatar-section {
-      &:extend(.vertical-block);
-      flex: 45%;
-      padding: @p 1% @p 0;
-
-      img {
-        border-radius: 50%;
-        align-self: flex-end;
-        height: calc(0.8 * @chat-info-avatar-max-size);
-        width: $height;
-      }
-    }
-
-    .info-section {
-      &:extend(.vertical-block);
-      flex: 55%;
+    & > *[class$="section"] {
+      flex: 1;
       height: 100%;
-      padding: @p 0 @p 1%;
+      &:extend(.vertical-block);
+    }
 
-      .contact-name {
+    .chat-info-section {
+      .chat-title {
         width: 100%;
-        text-align: left;
         font-size: 1.5em;
+        text-align: left;
+        padding-left: 100% - @chat-display-delimiter-line-width;
       }
     }
 
-    .mixin-one-side-horizontal-border(@color: #FFFFFF, @thickness: 0.2em, @side: ~"bottom");
+    .functional-button-section {
+      align-items: flex-end;
+
+      button {
+        height: 100%;
+        width: 100vh * (@main-section-header-flex / 100%);
+        padding-right: 100% - @chat-display-delimiter-line-width;
+        background-size: cover;
+        background-color: transparent;
+      }
+    }
+
+    .mixin-one-side-horizontal-border(
+      @color: @chat-display-delimiter-line-color, 
+      @percent-width: @chat-display-delimiter-line-width, 
+      @thickness: 0.2em, 
+      @side: ~"bottom"
+    );
   }
 
   .chat-display-section {
@@ -190,7 +196,12 @@
 
   .message-input-section {
     flex: @message-input-section-flex;
-    .mixin-one-side-horizontal-border(@color: #FFFFFF, @thickness: 0.2em, @side: ~"top");
+    .mixin-one-side-horizontal-border(
+      @color: @chat-display-delimiter-line-color,
+      @percent-width: @chat-display-delimiter-line-width, 
+      @thickness: 0.2em, 
+      @side: ~"top"
+    );
 
     & > * {
       &:extend(.vertical-block);

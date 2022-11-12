@@ -6,7 +6,6 @@ export async function submitButtonOnClickCallback() {
 
   form.clearAPIResponseState();
   form._validateForm();
-  // form.props.afterValidationCallback.call(form); // DEBUG
   if (!form.state.formHasInputErrors) {
     console.log(
       `Form filled correctly: ${JSON.stringify(form.collectFormData())}`

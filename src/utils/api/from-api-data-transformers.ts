@@ -1,7 +1,7 @@
 import { baseURL } from "api";
 
-export function transformProfileChangeResponseToUserData(
-  data: TProfileChangeAPIResponse
+export function transformProfileAPIResponseToUserData(
+  data: TProfileAPIResponse
 ): TAppUserData {
   const avatar = data.avatar
     ? `${baseURL}/resources${data.avatar}`

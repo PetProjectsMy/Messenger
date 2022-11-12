@@ -1,9 +1,9 @@
 import { Button, FileInput, type ImageComponent } from "components";
 import { Block } from "core/dom";
-import { ProfileEditService } from "services";
+import { ProfileService } from "services";
 import {
   APIResponseHasError,
-  transformProfileChangeResponseToUserData as transformData,
+  transformProfileAPIResponseToUserData as transformData,
 } from "utils/api";
 import template from "./template";
 
@@ -80,7 +80,7 @@ export class AvatarUploadForm extends Block {
       }
 
       const formData = new FormData(form._element);
-      ProfileEditService.changeUserAvatar(formData, afterRequestCallback);
+      ProfileService.changeUserAvatar(formData, afterRequestCallback);
     };
 
     return new Button({

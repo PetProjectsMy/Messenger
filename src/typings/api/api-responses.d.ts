@@ -14,7 +14,7 @@ declare global {
     avatar: string;
   };
 
-  export type TProfileChangeAPIResponse = {
+  export type TProfileAPIResponse = {
     id: number;
     login: string;
     first_name: string;
