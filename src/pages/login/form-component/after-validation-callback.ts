@@ -22,13 +22,11 @@ async function afterRequestCallback(response: any) {
     response.reason === "User already in system"
   ) {
     const userID = (await AuthorizationService.getUser()).id;
-    const userData = transformProfileAPIResponseToUserData(
+    const user = transformProfileAPIResponseToUserData(
       await ProfileService.getUserProfile(userID)
     );
 
-    window.store.dispatch({
-      user: userData,
-    });
+    window.store.dispatch({ user });
     window.router.go(EnumAppRoutes.Chats);
   }
 }

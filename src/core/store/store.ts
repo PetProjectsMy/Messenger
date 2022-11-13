@@ -1,7 +1,10 @@
-import { getPageComponent, EnumAppPages } from "utils/pages";
+import { getPageComponent } from "utils/pages";
+import { EnumAppPages } from "pages";
 import { renderDOM } from "core/dom";
 import { EnumAppRoutes } from "core/router";
+import { EnumStoreEvents } from "./enum-store-events";
 import { EventBus } from "../event-bus";
+import * as StateProxies from "./state-proxies";
 
 export const defaultState: TAppState = {
   appIsInited: false,
@@ -10,25 +13,19 @@ export const defaultState: TAppState = {
   chats: null,
 };
 
-export const enum EnumStoreEvents {
-  PageChanged = "page changed",
-  AppInit = "appInit",
-}
-
 type TStoreEvents = typeof EnumStoreEvents;
 
-type TBlockCommonEventsHandlersArgs = {
-  [EnumStoreEvents.AppInit]: [EnumAppRoutes, string];
+type TStoreEventsHandlersArgs = {
+  [EnumStoreEvents.AppInit]: [{ route: EnumAppRoutes; path: string }];
   [EnumStoreEvents.PageChanged]: [EnumAppPages];
 };
 
 export class Store {
-  private eventBus = new EventBus<
-    TStoreEvents,
-    TBlockCommonEventsHandlersArgs
-  >();
+  private eventBus = new EventBus<TStoreEvents, TStoreEventsHandlersArgs>();
 
   private state: TAppState;
+
+  private page: TAppPage;
 
   constructor(state: TAppState = defaultState) {
     this.state = this._makeStateProxy(state);
@@ -48,43 +45,24 @@ export class Store {
         const oldValue = target[prop];
         (target as Record<string, unknown>)[prop] = newValue;
         console.log(
-          `${prop}: ${JSON.stringify(oldValue)} -> ${JSON.stringify(newValue)}`
+          `STORE ${prop.toUpperCase()}: ${JSON.stringify(
+            oldValue
+          )} -> ${JSON.stringify(newValue)}`
         );
 
-        if (prop === "appIsInited") {
-          if (!oldValue && newValue) {
-            let startPathname = window.location.pathname;
-            console.log(`Router starts on window path '${startPathname}'`);
-            const matchingRoute = window.router.matchRouteByPath(startPathname);
-            const startRoute = matchingRoute.route;
-            startPathname = matchingRoute.path;
-            console.log(
-              `Start route is '${startRoute}' on path '${startPathname}'`
-            );
-            this.eventBus.emit(
-              EnumStoreEvents.AppInit,
-              startRoute,
-              startPathname
-            );
-          }
-        } else if (prop === "page") {
-          if (oldValue !== newValue) {
-            if (!newValue) {
-              throw new Error(
-                `Incorrect app page ${newValue} of type ${typeof newValue} of store next state page`
-              );
-            }
-
-            this.eventBus.emit(
-              EnumStoreEvents.PageChanged,
-              newValue as EnumAppPages
-            );
-          }
+        switch (prop) {
+          case "appIsInited":
+            StateProxies.appIsInitedSetter.call(this, oldValue, newValue);
+            break;
+          case "page":
+            StateProxies.pageSetter.call(this, oldValue, newValue);
+            break;
+          case "user":
+            StateProxies.userSetter.call(this, oldValue, newValue);
+            break;
+          default:
         }
 
-        console.log(
-          `new state: ${JSON.stringify(this.state)}\n${"+".repeat(30)}\n`
-        );
         return true;
       }.bind(this),
 
@@ -130,8 +108,6 @@ export class Store {
   }
 
   private setState(nextState: Partial<TAppState>) {
-    console.log(`${"-".repeat(30)}\nold state: ${JSON.stringify(this.state)}`);
-    console.log(`props to change: ${JSON.stringify(nextState)}`);
     Object.assign(this.state, nextState);
   }
 
@@ -146,8 +122,8 @@ export class Store {
   init() {
     this.eventBus.on(
       EnumStoreEvents.AppInit,
-      (startRoute: EnumAppRoutes, startPathname) => {
-        window.router.start(startRoute, startPathname);
+      ({ route, path }: { route: EnumAppRoutes; path: string }) => {
+        window.router.start(route, path);
         console.log(`Store event '${EnumStoreEvents.AppInit}' emitted`);
       }
     );
@@ -157,10 +133,11 @@ export class Store {
       function (newPage: EnumAppPages) {
         const PageComponent = getPageComponent(newPage);
         const page = new PageComponent();
+        this.page = page;
         renderDOM({ component: page });
         document.title = `App / ${page.componentName}`;
         console.log(`Store event '${EnumStoreEvents.PageChanged}' emitted`);
-      }
+      }.bind(this)
     );
   }
 }

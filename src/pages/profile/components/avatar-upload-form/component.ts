@@ -61,8 +61,6 @@ export class AvatarUploadForm extends Block {
         window.store.dispatch({
           user: userData,
         });
-
-        this.refs.profileImage.props.src = userData.avatar;
       } else {
         uploadingStatus = response.reason;
       }
@@ -80,6 +78,7 @@ export class AvatarUploadForm extends Block {
       }
 
       const formData = new FormData(form._element);
+      fileInput.value = "";
       ProfileService.changeUserAvatar(formData, afterRequestCallback);
     };
 

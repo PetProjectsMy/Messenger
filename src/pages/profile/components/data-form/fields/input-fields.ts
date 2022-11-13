@@ -57,6 +57,9 @@ Object.entries(MapInputFieldToProps).forEach(
         </div>
         <div class="data-input-section">
           {{{ wrappedDataInput }}}
+          \\{{#if inputError}}
+            <span class="input-error"> \\{{ inputError }} </span>
+          \\{{/if}}
         </div>
       </field>
     `,

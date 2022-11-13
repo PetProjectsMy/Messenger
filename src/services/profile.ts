@@ -1,8 +1,4 @@
 import { ProfileAPI } from "api";
-import {
-  APIResponseHasError,
-  transformProfileAPIResponseToUserData as transformData,
-} from "utils/api";
 
 class ProfileServiceClass {
   async getUserProfile(userID: number) {
@@ -18,29 +14,26 @@ class ProfileServiceClass {
     return response;
   }
 
-  async changeUserProfile(data: TProfileChangeDTO) {
+  async changeUserProfile(
+    data: TProfileChangeDTO,
+    afterRequestCallback: TAfterRequestCallback
+  ) {
     const request = await ProfileAPI.changeProfile(data);
     const { status, response } = request;
 
     console.log(
-      `PROFILE CHANGE DATA REQUEST: status ${status}; response: ${JSON.stringify(
+      `PROFILE CHANGE REQUEST: status ${status}; response: ${JSON.stringify(
         response
       )}`
     );
 
-    if (!APIResponseHasError(response)) {
-      const userData = transformData(response);
-      window.store.dispatch({
-        user: userData,
-      });
-    }
-
+    afterRequestCallback(response);
     return response;
   }
 
   async changeUserAvatar(
     avatarFormData: FormData,
-    afterRequestCallback: (response: any) => void = () => {}
+    afterRequestCallback: TAfterRequestCallback
   ) {
     const request = await ProfileAPI.changeAvatar(avatarFormData);
     const { status, response } = request;

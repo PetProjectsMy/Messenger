@@ -1,5 +1,5 @@
 declare global {
-  export type TAfterRequestCallback = (response: any) => void;
+  export type TAfterRequestCallback = (response: any) => Promise<void> | void;
 }
 
 export {};

@@ -1,2 +1,2 @@
-export { EnumInputFields } from "./enum-input-fields";
-export { MapInputFieldToUserDataRecord } from "./input-fields";
+export { ProfilePageInputForm } from "./component";
+export { EnumInputFields } from "./fields";

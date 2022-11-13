@@ -5,10 +5,8 @@ import { WithStore } from "components/hocs";
 import type { EventBus } from "core/event-bus";
 import template from "./template";
 import { DataChangeButton, ProfilePageInputForm } from "./components";
-import {
-  EnumInputFields,
-  MapInputFieldToUserDataRecord,
-} from "./components/data-form";
+import { EnumInputFields } from "./components/data-form";
+import { MapInputFieldToUserDataRecord } from "./components/data-form/fields";
 import { AvatarUploadForm } from "./components/avatar-upload-form";
 
 type TProfilePageProps = WithComponentCommonProps<{ userID: number }>;
@@ -16,10 +14,12 @@ const ProfilePageBlock = WithStore(Block<TProfilePageProps>);
 
 const enum EnumProfilePageEvents {
   UserDidUpdate = "events: user data did update",
+  AvatarDidUpdate = "events: user avatar did update",
 }
 
 type ProfilePageEventsHandlersArgs = {
   [EnumProfilePageEvents.UserDidUpdate]: [];
+  [EnumProfilePageEvents.AvatarDidUpdate]: [];
 };
 
 export class ProfilePage extends ProfilePageBlock {
@@ -46,7 +46,9 @@ export class ProfilePage extends ProfilePageBlock {
     children.profileDataForm = new ProfilePageInputForm();
     children.homeButton = new HomeButton();
 
-    super({ children });
+    const refs = {} as TComponentRefs;
+
+    super({ children, refs });
   }
 
   protected render(): string {
@@ -58,9 +60,8 @@ export class ProfilePage extends ProfilePageBlock {
 
     this.children.changeDataButton = new DataChangeButton({
       form: this.children.profileDataForm as Block,
-      page: this,
     });
-    this.props.userID = (this.store.getUserData() as TAppUserData).id;
+    this.props.userID = this.store.getUserData("id") as number;
   }
 
   protected _beforeRegisterEventsHook() {
@@ -70,10 +71,19 @@ export class ProfilePage extends ProfilePageBlock {
       EnumProfilePageEvents.UserDidUpdate,
       this._updateUserInfo.bind(this)
     );
+
+    this.eventBus.on(
+      EnumProfilePageEvents.AvatarDidUpdate,
+      this._updateUserAvatar.bind(this)
+    );
   }
 
   userDidUpdate() {
     this.eventBus.emit(EnumProfilePageEvents.UserDidUpdate);
+  }
+
+  avatarDidUpdate() {
+    this.eventBus.emit(EnumProfilePageEvents.AvatarDidUpdate);
   }
 
   private _updateUserInfo() {
@@ -82,8 +92,13 @@ export class ProfilePage extends ProfilePageBlock {
     Object.entries((this.children.profileDataForm as Block).refs).forEach(
       ([inputName, inputBlock]: [EnumInputFields, Input]) => {
         const recordName = MapInputFieldToUserDataRecord[inputName];
-        inputBlock.setValue(`${userData[recordName]}`);
+        inputBlock.setProps({ value: `${userData[recordName]}` });
       }
     );
+  }
+
+  private _updateUserAvatar() {
+    const newAvatar = this.store.getUserData("avatar") as string;
+    (this.children.avatarImage as ImageComponent).setProps({ src: newAvatar });
   }
 }

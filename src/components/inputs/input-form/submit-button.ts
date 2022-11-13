@@ -1,15 +1,11 @@
 import { Button } from "components";
 import { type Block } from "core/dom";
 
-export async function submitButtonOnClickCallback() {
+export async function formSubmitButtonCallback() {
   const { form } = this.refs;
 
-  form.clearAPIResponseState();
   form._validateForm();
-  if (!form.state.formHasInputErrors) {
-    console.log(
-      `Form filled correctly: ${JSON.stringify(form.collectFormData())}`
-    );
+  if (form.apiResponseError !== form.constructor.validationFailedError) {
     await form.props.afterValidationCallback!.call(form);
   }
 }
@@ -23,7 +19,7 @@ export class FormSubmitButton extends Button {
         label: "submit",
         htmlClass: "submit-button",
         events: {
-          click: [submitButtonOnClickCallback],
+          click: [formSubmitButtonCallback],
         },
       },
     });

@@ -1,4 +1,4 @@
-import { EnumAppPages } from "utils/pages";
+import { EnumAppPages } from "pages";
 
 declare global {
   export type TAppRouteData = {

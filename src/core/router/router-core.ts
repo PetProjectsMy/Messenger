@@ -16,6 +16,6 @@ export interface CoreRouter<EnumAppRoutes> {
 
   matchRouteByPath(pathname: string): {
     route: EnumAppRoutes;
-    path: Nullable<string>;
+    path: string;
   };
 }

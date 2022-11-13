@@ -32,9 +32,11 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
       return;
     }
 
-    console.log(`Start: replace state to '${startPathname}'`);
+    console.log(`Router starts on window path '${window.location.pathname}'`);
+    console.log(`Start route is '${startRoute}' on path '${startPathname}'`);
     if (startRoute !== EnumAppRoutes.NotFound) {
       window.history.replaceState({}, "", startPathname);
+      console.log(`Router Start: replace state to '${startPathname}'`);
     }
     this.onRouteChange(startRoute);
 
@@ -78,7 +80,7 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
 
   matchRouteByPath(pathname: string): {
     route: EnumAppRoutes;
-    path: Nullable<string>;
+    path: string;
   } {
     if (pathname === "/") {
       let route;
@@ -87,7 +89,7 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
       } else {
         route = EnumAppRoutes.Login;
       }
-      const { path } = this.routesData[route];
+      const path = this.routesData[route].path as string;
       return { route, path };
     }
 

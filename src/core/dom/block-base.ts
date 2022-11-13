@@ -67,7 +67,6 @@ export default class BlockBase {
       return;
     }
 
-    console.log(`FLOW RENDER: ${oldPropsOrState} -> ${newPropsOrState}`);
     this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
   }
 
@@ -77,14 +76,6 @@ export default class BlockBase {
   ): boolean {
     const result = !deepEqual(oldPropsOrState, newPropsOrState);
     return result;
-  }
-
-  protected setProps(nextProps: TComponentProps): void {
-    if (!nextProps) {
-      return;
-    }
-
-    Object.assign(this.props, nextProps);
   }
 
   public getElement(): Nullable<HTMLElement> {
@@ -129,6 +120,7 @@ export default class BlockBase {
       }
 
       targetElement = wrappedElement;
+      wrappedElement.removeAttribute("wrapped-id");
     }
 
     return targetElement;

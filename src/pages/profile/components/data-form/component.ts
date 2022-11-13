@@ -1,8 +1,11 @@
 import { InputForm, InputWithValidation } from "components";
 import { WithStore } from "components/hocs";
-import { afterValidationCallback } from "../../api-service";
-import { MapInputFieldToProps, MapInputFieldToHelpers } from "./input-fields";
-import { EnumInputFields } from "./enum-input-fields";
+import { afterValidationCallback } from "./after-validation-callback";
+import {
+  EnumInputFields,
+  MapInputFieldToProps,
+  MapInputFieldToHelpers,
+} from "./fields";
 
 const InputWithStore = WithStore(InputWithValidation) as any;
 

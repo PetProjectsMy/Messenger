@@ -1,1 +1,2 @@
-export { defaultState, Store, EnumStoreEvents } from "./store";
+export { EnumStoreEvents } from "./enum-store-events";
+export { defaultState, Store } from "./store";

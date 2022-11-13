@@ -1,16 +1,20 @@
 import { SignUpAPI } from "api";
 
 export class SignUpServiceClass {
-  async signup(data: TSignUpFormDTO) {
-    const response = await SignUpAPI.signup(data);
+  async signup(
+    data: TSignUpFormDTO,
+    afterRequestCallback?: TAfterRequestCallback
+  ) {
+    const request = await SignUpAPI.signup(data);
+    const { status, response } = request;
 
     console.log(
-      `SIGN-UP REQUEST:\nstatus ${response.status}; response: ${JSON.stringify(
-        response.response
-      )}`
+      `SIGN-UP REQUEST: status ${status}; response: ${JSON.stringify(response)}`
     );
 
-    return response.response;
+    if (afterRequestCallback) {
+      await afterRequestCallback(response);
+    }
   }
 }
 

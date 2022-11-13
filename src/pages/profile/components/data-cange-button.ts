@@ -1,9 +1,9 @@
 import { type Block } from "core/dom";
 import { Button, type Input } from "components";
-import { submitButtonOnClickCallback } from "components/inputs/input-form";
+import { formSubmitButtonCallback } from "components/inputs/input-form";
 
 export class DataChangeButton extends Button {
-  constructor(refs: { form: Block; page: Block }) {
+  constructor(refs: { form: Block }) {
     const enum FormMode {
       DataSaved = "data_saved",
       DataChanging = "data_changing",
@@ -22,10 +22,9 @@ export class DataChangeButton extends Button {
           dataField.toggleDisableState();
         });
       } else {
-        await submitButtonOnClickCallback.call(this);
-        if (form.getAPIResponseError() === "") {
-          this.refs.page.userDidUpdate();
+        await formSubmitButtonCallback.call(this);
 
+        if (form.getAPIResponseError() === "") {
           this.state.mode = FormMode.DataSaved;
           this.props.label = "change data";
 

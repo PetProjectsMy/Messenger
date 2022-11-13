@@ -1,4 +1,4 @@
-import { EnumAppPages } from "utils/pages";
+import { EnumAppPages } from "pages";
 import { Store } from "core/store";
 import { CoreRouter, EnumAppRoutes } from "core/router";
 

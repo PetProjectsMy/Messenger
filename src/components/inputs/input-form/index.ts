@@ -1,2 +1,2 @@
 export { InputForm } from "./form-component";
-export { submitButtonOnClickCallback } from "./submit-button";
+export { formSubmitButtonCallback } from "./submit-button";

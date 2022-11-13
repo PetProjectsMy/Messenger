@@ -39,10 +39,6 @@ export class Input extends Block<TInputProps> {
     this.props.value ??= "";
   }
 
-  public setValue(value: string) {
-    this.props.value = value;
-  }
-
   public toggleDisableState() {
     this.props.disabledAttr = !this.props.disabledAttr;
   }

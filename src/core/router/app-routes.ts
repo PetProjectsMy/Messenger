@@ -1,4 +1,4 @@
-import { EnumAppPages } from "utils/pages";
+import { EnumAppPages } from "pages";
 
 export const enum EnumAppRoutes {
   NavigationPage = "navigation_page_route",

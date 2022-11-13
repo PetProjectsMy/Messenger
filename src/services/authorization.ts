@@ -15,7 +15,7 @@ class AuthorizationServiceClass {
 
   async login(
     data: TLoginFormDTO,
-    afterRequestCallback: TAfterRequestCallback = () => {}
+    afterRequestCallback?: TAfterRequestCallback
   ) {
     const requestLogin = await AuthorizationAPI.login(data);
     const { status, response } = requestLogin;
@@ -24,8 +24,9 @@ class AuthorizationServiceClass {
       `LOGIN REQUEST: status ${status}; response ${JSON.stringify(response)}`
     );
 
-    afterRequestCallback(response);
-    return response;
+    if (afterRequestCallback) {
+      await afterRequestCallback(response);
+    }
   }
 
   async logout() {

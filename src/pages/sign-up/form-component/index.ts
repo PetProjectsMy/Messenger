@@ -1,2 +1,2 @@
-export { EnumInputFields } from "./enum-input-fields";
-export { MapInputFieldsProps } from "./input-fields";
+export { SignUpPageForm } from "./component";
+export { EnumInputFields } from "./fields";

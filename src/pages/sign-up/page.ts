@@ -1,24 +1,25 @@
 import { Block } from "core/dom";
-import { Link, HomeButton, InputForm } from "components";
+import { Link, HomeButton } from "components";
 import { WithRouter } from "components/hocs";
 import { EnumAppRoutes } from "core/router";
-import { EnumInputFields, MapInputFieldsProps } from "./form-component";
+import { SignUpPageForm } from "./form-component";
 import template from "./template";
-import { afterValidationCallback } from "./api-service";
+
+const LinkWithRouter = WithRouter(Link);
 
 export class SignUpPage extends Block {
   constructor() {
     const children: TComponentChildren = {};
     const refs: TComponentRefs = {};
 
-    children.signInLink = new (WithRouter(Link))({
+    children.signInLink = new LinkWithRouter({
       props: {
         label: "Sign In",
         htmlName: "Sign in",
         htmlClass: "sign-in-link",
         events: {
           click: [
-            function goToLogin() {
+            function () {
               this.router.go(EnumAppRoutes.Login);
             },
           ],
@@ -26,15 +27,7 @@ export class SignUpPage extends Block {
       },
     });
 
-    children.signupForm = new InputForm({
-      enumInputFieldsNames: EnumInputFields,
-      mapInputToProps: MapInputFieldsProps,
-      props: {
-        afterValidationCallback,
-        formTitle: "Sign Up",
-        componentName: "SignUp Form Component",
-      },
-    });
+    children.signupForm = new SignUpPageForm();
     children.homeButton = new HomeButton();
 
     super({ children, props: { componentName: "SignUp Page" }, refs });

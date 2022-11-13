@@ -62,6 +62,14 @@ export class Block<
     this.eventBus.emit(BlockCommonEvents.INIT);
   }
 
+  public setProps(nextProps: Partial<TProps>): void {
+    if (!nextProps) {
+      return;
+    }
+
+    Object.assign(this.props, nextProps);
+  }
+
   private _init() {
     this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
     this.wasRendered = true;
@@ -190,7 +198,6 @@ export class Block<
 
     const fragment = this._compile();
     const newElement = fragment.firstElementChild as HTMLElement;
-    newElement.removeAttribute("wrapped-id");
 
     if (this.wasRendered) {
       this._element!.replaceWith(newElement);

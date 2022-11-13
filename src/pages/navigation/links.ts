@@ -1,4 +1,4 @@
-import { EnumAppPages } from "utils/pages";
+import { EnumAppPages } from "pages";
 import { EnumAppRoutes } from "core/router";
 import { TLinkProps } from "components/link";
 

@@ -1,5 +1,4 @@
 import { Block } from "core/dom";
-import { deepMerge } from "utils/objects-handle";
 import { InputWithValidation } from "../input-with-validation";
 import { type Input, TInputProps } from "../basic-input";
 import { FormSubmitButton } from "./submit-button";
@@ -12,7 +11,6 @@ type TInputFormProps = WithComponentCommonProps<{
 }>;
 
 type TInputFormState = {
-  formHasInputErrors: boolean;
   apiResponseSuccess: string;
   apiResponseError: string;
 };
@@ -24,6 +22,8 @@ export class InputForm<
   protected helpers: {
     enumInputFieldsNames: TEnumInputFiledsNames;
   };
+
+  static readonly validationFailedError = "Form has input errors";
 
   constructor({
     enumInputFieldsNames,
@@ -57,7 +57,6 @@ export class InputForm<
     });
 
     const state = {
-      formHasInputErrors: true,
       apiResponseError: "",
       apiResponseSuccess: "",
     };
@@ -101,7 +100,6 @@ export class InputForm<
 
   // @ts-ignore '_validateForm' is declared but its value is never read
   private _validateForm(): void {
-    const oldState = deepMerge({}, this.state) as TInputFormState;
     let formHasInputErrors = false;
 
     Object.values(this.refs).forEach((inputField: InputWithValidation) => {
@@ -119,12 +117,12 @@ export class InputForm<
       }
     });
 
-    this.state.formHasInputErrors = formHasInputErrors;
-    if (this.state.formHasInputErrors) {
+    if (formHasInputErrors) {
       console.log(`Form has input errors: ${JSON.stringify(this.state)}`);
-      this.state.apiResponseError = "Form has input errors";
+      this.state.apiResponseError = InputForm.validationFailedError;
+    } else {
+      this.state.apiResponseError = "";
     }
-    this._componentDidUpdate(oldState, this.state);
   }
 
   public collectFormData(): Record<string, string> {
@@ -136,11 +134,6 @@ export class InputForm<
       {} as Record<string, string>
     );
   }
-
-  clearAPIResponseState = () => {
-    this.state.apiResponseSuccess = "";
-    this.state.apiResponseError = "";
-  };
 
   getAPIResponseError() {
     return this.state.apiResponseError;
