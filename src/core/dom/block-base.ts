@@ -183,15 +183,10 @@ export default class BlockBase {
 
   public hide(): void {
     const element = this.getElement();
-
-    if (!BlockBase.isHTMLElement(element)) {
-      throw new Error(
-        `Wrong element ${element} of type ${typeof element} to hide`
-      );
+    if (!element) {
+      return;
     }
 
-    if (!BlockBase.isHTMLElement(element)) {
-      element!.style.display = "none";
-    }
+    element.style.display = "none";
   }
 }

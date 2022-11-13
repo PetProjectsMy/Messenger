@@ -6,6 +6,9 @@
 
 @chats-page-main-section-flex: 100% - @navigation-section-flex;
 @chat-container-background-color: aliceblue;
+
+@side-menu-background-color: darken(@chat-container-background-color, 20%);
+@side-menu-width: 12vw * (@chats-page-main-section-flex / 100%);
 // ------------------------------------
 @navigation-section-header-flex: 12%;
 @chats-list-section-flex: 100% - @navigation-section-header-flex;
@@ -26,6 +29,7 @@
 );
 // ------------------------------------
 @main-section-header-flex: @navigation-section-header-flex * 0.5;
+@main-section-header-height: 100vh * (@main-section-header-flex / 100%);
 
 @message-input-section-flex: @navigation-section-header-flex;
 @message-input-section-height: 100vh * (@navigation-section-header-flex / 100%);
@@ -42,206 +46,230 @@
   &:extend(.horizontal-block);
 
   & > * {
-    &:extend(.vertical-block);
     height: 100%;
   }
-}
 
-.navigation-section {
-  flex: @navigation-section-flex;
-  background-color: @chats-list-background-color;
+  .navigation-section {
+    &:extend(.vertical-block);
+    flex: @navigation-section-flex;
+    background-color: @chats-list-background-color;
 
-  & > * {
-    width: 100%;
-  }
-
-  .navigation-section-header {
-    flex: @navigation-section-header-flex;
-    &:extend(.horizontal-block);
     & > * {
-      &:extend(.vertical-block);
-    }
-
-    border-bottom: 0.2em solid darken(@chats-list-background-color, 20%);
-
-    .search-section {
-      flex: 3;
-      width: 60%;
-      margin-top: 100vh * (@navigation-section-header-flex / 100%) * (1/3);
-      margin-bottom: $margin-top;
-
-      input {
-        width: 80%;
-        height: 100%;
-        text-align: center;
-      }
-    }
-
-    .home-button-section {
-      flex: 1;
-    }
-  }
-
-  .chats-list {
-    flex: @chats-list-section-flex;
-    overflow: auto;
-    width: 100%;
-
-    @h: @chat-list-avatar-max-size;
-
-    .chat-field {
       width: 100%;
-      &:extend(.horizontal-block);
-      height: @chat-row-height;
+    }
 
-      .mixin-field-section(@width) {
-        width: @width;
-        padding: calc(0.1 * @h) 3%;
-        height: auto;
+    .navigation-section-header {
+      flex: @navigation-section-header-flex;
+      &:extend(.horizontal-block);
+      & > * {
         &:extend(.vertical-block);
       }
-      .avatar-section {
-        .mixin-field-section(@h);
-        padding-right: 1%;
 
-        img {
-          border-radius: 50%;
-          height: calc(0.8 * @h);
-          width: calc(0.8 * @h);
-          align-self: flex-start;
-        }
-      }
+      border-bottom: 0.2em solid darken(@chats-list-background-color, 20%);
 
-      .message-section {
-        .mixin-field-section(calc(100% - @h));
-        padding-left: 1%;
+      .search-section {
+        flex: 3;
+        width: 60%;
+        margin-top: 100vh * (@navigation-section-header-flex / 100%) * (1/3);
+        margin-bottom: $margin-top;
 
-        .message {
+        input {
+          width: 80%;
           height: 100%;
-          align-self: flex-end;
-          font-size: 1rem;
+          text-align: center;
         }
       }
+
+      .home-button-section {
+        flex: 1;
+      }
     }
 
-    .chat-field:not(:last-child) {
-      .mixin-one-side-horizontal-border(@color: @chats-list-background-color, @side: ~"bottom");
-    }
-  }
-}
+    .chats-list {
+      flex: @chats-list-section-flex;
+      overflow: auto;
+      width: 100%;
 
-// ----------------------------------------------
+      @h: @chat-list-avatar-max-size;
 
-.chats-page-main-section {
-  flex: @chats-page-main-section-flex;
-  background-color: @chat-container-background-color;
-
-  & > * {
-    &:extend(.horizontal-block);
-    width: 100%;
-  }
-
-  .main-section-header {
-    flex: @main-section-header-flex;
-
-    & > *[class$="section"] {
-      flex: 1;
-      height: 100%;
-      &:extend(.vertical-block);
-    }
-
-    .chat-info-section {
-      .chat-title {
+      .chat-field {
         width: 100%;
-        font-size: 1.5em;
-        text-align: left;
-        padding-left: 100% - @chat-display-delimiter-line-width;
+        &:extend(.horizontal-block);
+        height: @chat-row-height;
+
+        .mixin-field-section(@width) {
+          width: @width;
+          padding: calc(0.1 * @h) 3%;
+          height: auto;
+          &:extend(.vertical-block);
+        }
+        .avatar-section {
+          .mixin-field-section(@h);
+          padding-right: 1%;
+
+          img {
+            border-radius: 50%;
+            height: calc(0.8 * @h);
+            width: calc(0.8 * @h);
+            align-self: flex-start;
+          }
+        }
+
+        .message-section {
+          .mixin-field-section(calc(100% - @h));
+          padding-left: 1%;
+
+          .message {
+            height: 100%;
+            align-self: flex-end;
+            font-size: 1rem;
+          }
+        }
+      }
+
+      .chat-field:not(:last-child) {
+        .mixin-one-side-horizontal-border(@color: @chats-list-background-color, @side: ~"bottom");
       }
     }
+  }
 
-    .functional-button-section {
-      align-items: flex-end;
+  // ---------------------------------------------------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------------------------------------------------
 
-      button {
+  .chats-page-main-section {
+    &:extend(.vertical-block);
+    flex: @chats-page-main-section-flex;
+    background-color: @chat-container-background-color;
+
+    & > * {
+      &:extend(.horizontal-block);
+      width: 100%;
+    }
+
+    .main-section-header {
+      flex: @main-section-header-flex;
+
+      & > *[class$="section"] {
+        flex: 1;
         height: 100%;
-        width: 100vh * (@main-section-header-flex / 100%);
-        padding-right: 100% - @chat-display-delimiter-line-width;
-        background-size: cover;
-        background-color: transparent;
+        &:extend(.vertical-block);
       }
-    }
 
-    .mixin-one-side-horizontal-border(
+      .chat-info-section {
+        .chat-title {
+          width: 100%;
+          font-size: 1.5em;
+          text-align: left;
+          padding-left: 100% - @chat-display-delimiter-line-width;
+        }
+      }
+
+      .functional-button-section {
+        align-items: flex-end;
+
+        button {
+          height: 100%;
+          width: 100vh * (@main-section-header-flex / 100%);
+          padding-right: 100% - @chat-display-delimiter-line-width;
+          background-size: cover;
+          background-color: transparent;
+        }
+      }
+
+      .mixin-one-side-horizontal-border(
       @color: @chat-display-delimiter-line-color, 
       @percent-width: @chat-display-delimiter-line-width, 
       @thickness: 0.2em, 
       @side: ~"bottom"
     );
-  }
+    }
 
-  .chat-display-section {
-    flex: @chat-display-section-flex;
+    .chat-display-section {
+      flex: @chat-display-section-flex;
 
-    .messages-display-area {
-      &:extend(.vertical-block);
-      width: 95%;
-      height: 95%;
-      border: 0.1em dashed rgba(16, 14, 14, 0.71);
+      .messages-display-area {
+        &:extend(.vertical-block);
+        width: 95%;
+        height: 95%;
+        border: 0.1em dashed rgba(16, 14, 14, 0.71);
 
-      .message-placeholder {
-        font-size: 4em;
+        .message-placeholder {
+          font-size: 4em;
+        }
       }
     }
-  }
 
-  .message-input-section {
-    flex: @message-input-section-flex;
-    .mixin-one-side-horizontal-border(
+    .message-input-section {
+      flex: @message-input-section-flex;
+      .mixin-one-side-horizontal-border(
       @color: @chat-display-delimiter-line-color,
       @percent-width: @chat-display-delimiter-line-width, 
       @thickness: 0.2em, 
       @side: ~"top"
     );
 
-    & > * {
-      &:extend(.vertical-block);
-      height: 100%;
-    }
+      & > * {
+        &:extend(.vertical-block);
+        height: 100%;
+      }
 
-    .attachment-block {
-      flex: 15%;
-      margin-left: 2%;
+      .attachment-block {
+        flex: 15%;
+        margin-left: 2%;
 
-      button {
-        height: min(0.5 * @message-input-section-height, 100px);
-        width: $height;
-        background-image: url("../../static/attachment_button.png");
-        background-size: cover;
+        button {
+          height: min(0.5 * @message-input-section-height, 100px);
+          width: $height;
+          background-image: url("../../static/attachment_button.png");
+          background-size: cover;
+        }
+      }
+
+      .input-block {
+        flex: 70%;
+
+        input {
+          margin: 0 2%;
+          height: 50%;
+          width: 100%;
+          text-align: center;
+          font-size: 1.2em;
+        }
+      }
+
+      .submit-block {
+        flex: 15%;
+        margin-right: 2%;
+
+        button {
+          height: min(0.5 * @message-input-section-height, 100px);
+          width: $height;
+          background-image: url("../../static/send_message_button.png");
+          background-size: cover;
+        }
       }
     }
 
-    .input-block {
-      flex: 70%;
+    // ---------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------------------------------------------------
+  }
 
-      input {
-        margin: 0 2%;
-        height: 50%;
-        width: 100%;
-        text-align: center;
-        font-size: 1.2em;
-      }
+  section.side-menu {
+    display: none;
+    position: absolute;
+    width: 12%;
+    right: 0;
+    background-color: @side-menu-background-color;
+
+    button {
+      height: @main-section-header-height;
+      width: 100%;
     }
 
-    .submit-block {
-      flex: 15%;
-      margin-right: 2%;
-
-      button {
-        height: min(0.5 * @message-input-section-height, 100px);
-        width: $height;
-        background-image: url("../../static/send_message_button.png");
-        background-size: cover;
-      }
+    .collapse-button {
+      background-size: 100% 100%;
     }
   }
 }

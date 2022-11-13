@@ -6,23 +6,32 @@ import {
 } from "utils/api";
 import { WithStore } from "components/hocs";
 import template from "./template";
-import { ChatsPageMainSection, ChatsPageNavigationSection } from "./components";
+import {
+  ChatsPageMainSection,
+  ChatsPageNavigationSection,
+  ChatsPageSideMenu,
+} from "./components";
 
 export class ChatsPage extends WithStore(Block) {
   constructor() {
-    super({ props: { componentName: "Chats Page" } });
+    const children = {} as TComponentChildren;
+    children.navigationSection = new ChatsPageNavigationSection();
+    children.chatSection = new ChatsPageMainSection();
+    children.sideMenu = new ChatsPageSideMenu();
+
+    super({
+      props: { componentName: "Chats Page" },
+      children,
+    });
   }
 
   protected async _afterPropsAssignHook() {
     super._afterPropsAssignHook();
 
-    this._getChats();
-    this._createChildren();
-  }
+    this.children.chatSection.children.headerSection.children.functionalButton.refs.sideMenu =
+      this.children.sideMenu;
 
-  private _createChildren() {
-    this.children.navigationSection = new ChatsPageNavigationSection();
-    this.children.chatSection = new ChatsPageMainSection();
+    // this._getChats();
   }
 
   private async _getChats() {

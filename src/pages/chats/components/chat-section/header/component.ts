@@ -18,6 +18,13 @@ export class ChatSectionHeader extends Block {
       props: {
         htmlClass: "functional-button",
         backgroundImage: functionalButtonBackgroundImage,
+        events: {
+          click: [
+            function () {
+              this.refs.sideMenu._element.style.display = "block";
+            },
+          ],
+        },
       },
     });
 
