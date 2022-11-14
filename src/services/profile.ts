@@ -1,4 +1,8 @@
 import { ProfileAPI } from "api";
+import {
+  APIResponseHasError,
+  transformProfileAPIResponseToUserData,
+} from "utils/api";
 
 class ProfileServiceClass {
   async getUserProfile(userID: number) {
@@ -6,10 +10,15 @@ class ProfileServiceClass {
     const { status, response } = request;
 
     console.log(
-      `PROFILE GET ID(${userID})REQUEST: status ${status}; response: ${JSON.stringify(
+      `PROFILE GET ID(${userID}) REQUEST: status ${status}; response: ${JSON.stringify(
         response
       )}`
     );
+
+    if (!APIResponseHasError(response)) {
+      const user = transformProfileAPIResponseToUserData(response);
+      window.store.dispatch({ user });
+    }
 
     return response;
   }

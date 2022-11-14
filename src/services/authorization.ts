@@ -1,10 +1,7 @@
 import { AuthorizationAPI } from "api";
 import { ProfileService, ChatsService } from "services";
 import { EnumAppRoutes } from "core/router";
-import {
-  APIResponseHasError,
-  transformProfileAPIResponseToUserData,
-} from "utils/api";
+import { APIResponseHasError } from "utils/api";
 
 export const enum EnumLoginAPIErrors {
   AlreadyInSystem = "User already in system",
@@ -19,10 +16,8 @@ export const afterAuthentificationHandler = async function (
     return;
   }
 
-  const user = transformProfileAPIResponseToUserData(
-    await ProfileService.getUserProfile(userResponse.id)
-  );
-  window.store.dispatch({ user });
+  await ProfileService.getUserProfile(userResponse.id);
+  await ChatsService.getChats();
 };
 
 class AuthorizationServiceClass {

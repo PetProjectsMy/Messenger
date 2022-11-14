@@ -36,21 +36,6 @@ export class ChatsPage extends WithStore(Block) {
     // @ts-ignore
     this.children.sideMenu.children.createChatButton.refs.addChatModal =
       this.children.addChatModal;
-
-    // this._getChats();
-  }
-
-  private async _getChats() {
-    const response = await ChatsService.getChats();
-
-    if (APIResponseHasError(response)) {
-      throw new Error(
-        `CHATS PAGE ERROR: get chats request: ${response.reason}`
-      );
-    }
-
-    const chatsData = transformChatsGetResponseToChatsData(response);
-    this.store.dispatch({ chats: chatsData });
   }
 
   protected render(): string {
