@@ -1,10 +1,11 @@
-import { AuthorizationAPI, ProfileAPI } from "api";
 import { Store } from "core/store";
 import { Router } from "core/router";
 import {
   APIResponseHasError,
-  transformProfileAPIResponseToUserData as transformToUserData,
+  transformProfileAPIResponseToUserData,
 } from "utils/api";
+import { AuthorizationService, ProfileService } from "services";
+import { afterAuthentificationHandler } from "services/authorization";
 
 export async function initApp() {
   try {
@@ -15,30 +16,17 @@ export async function initApp() {
     router.init();
     store.init();
 
-    const requestUser = await AuthorizationAPI.me();
-    console.log(
-      `REQUEST USER ON INIT APP: status ${
-        requestUser.status
-      }; response ${JSON.stringify(requestUser.response)}`
-    );
-    if (APIResponseHasError(requestUser.response)) {
+    console.log(`INIT APP STATRTING`);
+    const responseUser = await AuthorizationService.getUser();
+    if (APIResponseHasError(responseUser)) {
       return;
     }
 
-    const requestGetProfile = await ProfileAPI.getProfileData(
-      requestUser.response.id
-    );
-    console.log(
-      `REQUEST PROFILE DATA ON INIT APP: status ${
-        requestGetProfile.status
-      }; response ${JSON.stringify(requestGetProfile.response)}`
-    );
-
-    const userData = transformToUserData(requestGetProfile.response);
-    store.dispatch({ user: userData });
+    await afterAuthentificationHandler(responseUser.id);
   } catch (err) {
     console.error(err);
   } finally {
     window.store.dispatch({ appIsInited: true });
+    console.log(`INIT APP COMPLETED`);
   }
 }

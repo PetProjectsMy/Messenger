@@ -1,5 +1,21 @@
 import { AuthorizationAPI } from "api";
+import { ProfileService } from "services";
 import { EnumAppRoutes } from "core/router";
+import {
+  APIResponseHasError,
+  transformProfileAPIResponseToUserData,
+} from "utils/api";
+
+export const enum EnumLoginAPIErrors {
+  AlreadyInSystem = "User already in system",
+}
+
+export const afterAuthentificationHandler = async function (userID: number) {
+  const user = transformProfileAPIResponseToUserData(
+    await ProfileService.getUserProfile(userID)
+  );
+  window.store.dispatch({ user });
+};
 
 class AuthorizationServiceClass {
   async getUser() {
@@ -15,7 +31,7 @@ class AuthorizationServiceClass {
 
   async login(
     data: TLoginFormDTO,
-    afterRequestCallback?: TAfterRequestCallback
+    afterRequestCallback: TAfterRequestCallback = () => {}
   ) {
     const requestLogin = await AuthorizationAPI.login(data);
     const { status, response } = requestLogin;
@@ -23,6 +39,15 @@ class AuthorizationServiceClass {
     console.log(
       `LOGIN REQUEST: status ${status}; response ${JSON.stringify(response)}`
     );
+
+    if (
+      !APIResponseHasError(response) ||
+      response.reason === EnumLoginAPIErrors.AlreadyInSystem
+    ) {
+      const userID = (await this.getUser()).id;
+      afterAuthentificationHandler(userID);
+      window.router.go(EnumAppRoutes.Chats);
+    }
 
     if (afterRequestCallback) {
       await afterRequestCallback(response);

@@ -1,33 +1,13 @@
-import { AuthorizationService, ProfileService } from "services";
-import {
-  transformLoginFormDatatoAPI,
-  APIResponseHasError,
-  transformProfileAPIResponseToUserData,
-} from "utils/api";
-import { EnumAppRoutes } from "core/router";
+import { AuthorizationService } from "services";
+import { EnumLoginAPIErrors } from "services/authorization";
+import { transformLoginFormDatatoAPI, APIResponseHasError } from "utils/api";
 
 async function afterRequestCallback(response: any) {
-  const userAlreadyInSystemError = "User already in system";
-
   if (
     APIResponseHasError(response) &&
-    response.reason !== userAlreadyInSystemError
+    response.reason !== EnumLoginAPIErrors.AlreadyInSystem
   ) {
     this.state.apiResponseError = response.reason;
-    return;
-  }
-
-  if (
-    !APIResponseHasError(response) ||
-    response.reason === "User already in system"
-  ) {
-    const userID = (await AuthorizationService.getUser()).id;
-    const user = transformProfileAPIResponseToUserData(
-      await ProfileService.getUserProfile(userID)
-    );
-
-    window.store.dispatch({ user });
-    window.router.go(EnumAppRoutes.Chats);
   }
 }
 

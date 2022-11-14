@@ -51,6 +51,10 @@ export class ModalWindow extends Block {
     };
 
     const afterRequestCallback = function (response: any) {
+      if (!this.props.htmlClasses.includes("show-modal")) {
+        this.props.htmlClasses.push("show-modal");
+      }
+
       if (APIResponseHasError(response)) {
         this.state.apiResponseError = response.reason;
       } else {
@@ -68,7 +72,7 @@ export class ModalWindow extends Block {
               const { titleInput, modalWindow } = this.refs;
               modalWindow.clearAPIResponseStatus();
               console.log(`TITLE INPUT: ${titleInput.getValue()}`);
-              afterRequestCallback({});
+              afterRequestCallback({}); // DEBUG
               // ChatsService.createChat(
               //   { title: titleInput.getValue() },
               //   afterRequestCallback
