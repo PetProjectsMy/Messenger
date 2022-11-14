@@ -12,9 +12,9 @@ export class DataChangeButton extends Button {
     async function onClickCallback() {
       const { form } = this.refs;
 
-      if (this.state.mode === FormMode.DataSaved) {
-        form.state.apiResponseSuccess = "";
+      form.state.apiResponseSuccess = "";
 
+      if (this.state.mode === FormMode.DataSaved) {
         this.state.mode = FormMode.DataChanging;
         this.props.label = "save data";
 

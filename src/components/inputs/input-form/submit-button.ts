@@ -5,7 +5,7 @@ export async function formSubmitButtonCallback() {
   const { form } = this.refs;
 
   form._validateForm();
-  if (form.apiResponseError !== form.constructor.validationFailedError) {
+  if (form.state.apiResponseError !== form.constructor.validationFailedError) {
     await form.props.afterValidationCallback!.call(form);
   }
 }

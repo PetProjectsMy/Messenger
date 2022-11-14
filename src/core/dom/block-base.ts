@@ -62,10 +62,11 @@ export default class BlockBase {
 
   protected _componentDidUpdate(
     oldPropsOrState: TComponentProps | TComponentState,
-    newPropsOrState: TComponentProps | TComponentState
+    newPropsOrState: TComponentProps | TComponentState,
+    forceUpdate: boolean = false
   ): void {
     const response = this.componentDidUpdate(oldPropsOrState, newPropsOrState);
-    if (!response) {
+    if (!forceUpdate && !response) {
       return;
     }
 

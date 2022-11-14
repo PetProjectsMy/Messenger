@@ -94,14 +94,17 @@ export class ProfilePage extends ProfilePageBlock {
     Object.entries((this.children.profileDataForm as Block).refs).forEach(
       ([inputName, inputBlock]: [EnumInputFields, Input]) => {
         const recordName = MapInputFieldToUserDataRecord[inputName];
-        inputBlock.setProp("htmlAttributes.value", `${userData[recordName]}`);
+        inputBlock.setPropByPath(
+          "htmlAttributes.value",
+          `${userData[recordName]}`
+        );
       }
     );
   }
 
   private _updateUserAvatar() {
     const newAvatar = this.store.getUserData("avatar") as string;
-    (this.children.avatarImage as ImageComponent).setProp(
+    (this.children.avatarImage as ImageComponent).setPropByPath(
       "htmlAttributes.src",
       newAvatar
     );

@@ -1,6 +1,6 @@
 import Handlebars from "handlebars";
 import { nanoid } from "nanoid";
-import { setProp as setObjectProp } from "utils/objects-handle";
+import { setPropByPath, comparePropByPath } from "utils/objects-handle";
 import BlockBase, { BlockCommonEvents } from "./block-base";
 
 export class Block<
@@ -68,8 +68,12 @@ export class Block<
     this._afterRenderHook();
   }
 
-  public setProp(prop: string, value: unknown): void {
-    setObjectProp(this.props, prop, value);
+  public setPropByPath(propPath: string, value: unknown): void {
+    const didUpdate = !comparePropByPath(this.props, propPath, value);
+    if (didUpdate) {
+      setPropByPath(this.props, propPath, value);
+      this._componentDidUpdate("" as any, "" as any, true);
+    }
   }
 
   private _init() {
