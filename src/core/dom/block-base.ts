@@ -29,6 +29,8 @@ export default class BlockBase {
 
   protected _element: Nullable<HTMLElement> = null;
 
+  protected _unwrappedElement: Nullable<HTMLElement> = null;
+
   protected eventBus = new EventBus<
     typeof BlockCommonEvents,
     TBlockCommonEventsHandlersArgs
@@ -87,7 +89,7 @@ export default class BlockBase {
 
     events[event] ??= [];
     events[event].push(listener);
-    this._element?.addEventListener(event, listener);
+    this._unwrappedElement!.addEventListener(event, listener);
   }
 
   protected _bindEventListenersToBlock() {
@@ -102,32 +104,25 @@ export default class BlockBase {
     });
   }
 
-  private _getEventsTargetElement() {
-    let targetElement = this._element;
-    if (!targetElement) {
-      return targetElement;
+  protected _setUnwrappedElement() {
+    const element = this._element;
+    if (!element) {
+      throw new Error(
+        `BLOCK Set Unwrapped Element: wrong element ${element} of type ${typeof element}`
+      );
     }
 
     if (this.htmlWrapped) {
-      const wrappedElement = targetElement.querySelector(
+      this._unwrappedElement = element.querySelector(
         `[wrapped-id="${this.wrappedId}"]`
       ) as HTMLElement;
-
-      if (!wrappedElement) {
-        throw new Error(
-          `${this.componentName}: whereas htmlWrapper provided, no wrapped element created`
-        );
-      }
-
-      targetElement = wrappedElement;
-      wrappedElement.removeAttribute("wrapped-id");
+    } else {
+      this._unwrappedElement = element;
     }
-
-    return targetElement;
   }
 
   protected _addEventListenersToElement() {
-    const targetElement = this._getEventsTargetElement();
+    const targetElement = this._unwrappedElement;
     if (!targetElement) {
       throw new Error(
         `Incorrect element ${targetElement} of type ${typeof targetElement} to add event listeners`

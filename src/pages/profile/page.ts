@@ -35,8 +35,10 @@ export class ProfilePage extends ProfilePageBlock {
     const imageSource = storeAvatar || avatarImagePlaceholder;
     const avatarImage = new ImageComponent({
       props: {
-        src: imageSource,
-        alt: "avatar placeholder",
+        htmlAttributes: {
+          src: imageSource,
+          alt: "Profile Avatar",
+        },
         componentName: "Avatar Image",
       },
     });
@@ -92,13 +94,16 @@ export class ProfilePage extends ProfilePageBlock {
     Object.entries((this.children.profileDataForm as Block).refs).forEach(
       ([inputName, inputBlock]: [EnumInputFields, Input]) => {
         const recordName = MapInputFieldToUserDataRecord[inputName];
-        inputBlock.setProps({ value: `${userData[recordName]}` });
+        inputBlock.setProp("htmlAttributes.value", `${userData[recordName]}`);
       }
     );
   }
 
   private _updateUserAvatar() {
     const newAvatar = this.store.getUserData("avatar") as string;
-    (this.children.avatarImage as ImageComponent).setProps({ src: newAvatar });
+    (this.children.avatarImage as ImageComponent).setProp(
+      "htmlAttributes.src",
+      newAvatar
+    );
   }
 }

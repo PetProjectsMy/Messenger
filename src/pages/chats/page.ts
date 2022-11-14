@@ -29,9 +29,11 @@ export class ChatsPage extends WithStore(Block) {
   protected async _afterPropsAssignHook() {
     super._afterPropsAssignHook();
 
+    // @ts-ignore
     this.children.chatSection.children.headerSection.children.functionalButton.refs.sideMenu =
       this.children.sideMenu;
 
+    // @ts-ignore
     this.children.sideMenu.children.createChatButton.refs.addChatModal =
       this.children.addChatModal;
 

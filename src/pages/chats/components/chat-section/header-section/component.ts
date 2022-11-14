@@ -10,14 +10,16 @@ export class ChatSectionHeader extends Block {
     children.chatTitle = new TextComponent({
       props: {
         text: "Chat Title Placeholder",
-        htmlClass: "chat-title",
+        htmlClasses: ["chat-title"],
       },
     });
 
     children.functionalButton = new Button({
       props: {
-        htmlClass: "functional-button",
-        backgroundImage: functionalButtonBackgroundImage,
+        htmlClasses: ["functional-button"],
+        htmlStyle: {
+          backgroundImage: functionalButtonBackgroundImage,
+        },
         events: {
           click: [
             function () {

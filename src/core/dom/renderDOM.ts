@@ -23,34 +23,3 @@ export function renderDOM({
   if (component) root.innerHTML = "";
   root.append(element);
 }
-
-class MainPageSingleton {
-  static instance: Nullable<MainPageSingleton> = null;
-
-  public page: { component: Nullable<Block> };
-
-  constructor() {
-    this.page = { component: null };
-  }
-
-  public static getInstance() {
-    if (!MainPageSingleton.instance) {
-      MainPageSingleton.instance = new MainPageSingleton();
-    }
-
-    return MainPageSingleton.instance;
-  }
-}
-
-export const MainPage: TPageProxy = new Proxy(
-  (MainPageSingleton.getInstance() as MainPageSingleton).page,
-  {
-    set(target, prop, block: Block) {
-      if (prop === "component") {
-        target[prop] = block;
-        renderDOM({ component: block });
-      }
-      return true;
-    },
-  }
-);

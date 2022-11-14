@@ -1,40 +1,37 @@
+import { TInputWithValidationProps } from "components/inputs/input-with-validation";
 import { EnumInputFields } from "./enum-input-fields";
 import { FormValidators } from "./input-validators";
 
-export const MapInputFieldsProps = {
+export const MapInputFieldsProps: Record<
+  EnumInputFields,
+  TInputWithValidationProps
+> = {
   [EnumInputFields.FirstName]: {
-    placeholder: "First Name",
-    htmlName: "first_name",
+    htmlAttributes: { name: "first_name", placeholder: "First Name" },
     validators: FormValidators[EnumInputFields.FirstName],
   },
   [EnumInputFields.SecondName]: {
-    placeholder: "Second Name",
-    htmlName: "second_name",
+    htmlAttributes: { name: "second_name", placeholder: "Second Name" },
     validators: FormValidators[EnumInputFields.SecondName],
   },
   [EnumInputFields.Login]: {
-    placeholder: "Your Login",
-    htmlName: "login",
+    htmlAttributes: { name: "login", placeholder: "Your Login" },
     validators: FormValidators[EnumInputFields.Login],
   },
   [EnumInputFields.Password]: {
-    placeholder: "Your Password",
-    htmlName: "password",
+    htmlAttributes: { name: "password", placeholder: "Your Password" },
     validators: FormValidators[EnumInputFields.Password],
   },
   [EnumInputFields.PasswordRepeat]: {
-    placeholder: "Password (Repeat)",
-    htmlName: "password",
+    htmlAttributes: { name: "password", placeholder: "Password (Repeat)" },
     validators: FormValidators[EnumInputFields.PasswordRepeat],
   },
   [EnumInputFields.Email]: {
-    placeholder: "Your Email",
-    htmlName: "email",
+    htmlAttributes: { name: "email", placeholder: "Your Email" },
     validators: FormValidators[EnumInputFields.Email],
   },
   [EnumInputFields.Phone]: {
-    placeholder: "Phone Number",
-    htmlName: "phone",
+    htmlAttributes: { name: "phone", placeholder: "Phone Number" },
     validators: FormValidators[EnumInputFields.Phone],
   },
 };

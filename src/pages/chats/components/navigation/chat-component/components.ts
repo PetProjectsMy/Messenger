@@ -16,8 +16,10 @@ export class NavigationSectionChatComponent extends Block {
 
     children.avatarImage = new ImageComponent({
       props: {
-        src: avatarImagePlaceholder,
-        alt: "avatar placeholder",
+        htmlAttributes: {
+          src: avatarImagePlaceholder,
+          alt: "avatar placeholder",
+        },
         componentName: "Avatar Image",
       },
     });

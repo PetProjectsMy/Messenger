@@ -13,7 +13,7 @@ function getErrorPageClass(initProps: ErrorPageProps): TErrorPageClass {
   class ErrorPage extends Block<ErrorPageProps> {
     constructor() {
       const children: TComponentChildren = {};
-      children.homeButton = new HomeButton({ htmlClass: "return-link" });
+      children.homeButton = new HomeButton({ htmlClasses: ["return-link"] });
       super({ props: initProps, children });
     }
 

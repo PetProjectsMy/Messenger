@@ -7,27 +7,27 @@ export const MapInputFieldToProps: Record<
   Partial<TInputWithValidationProps>
 > = {
   [EnumInputFields.FirstName]: {
-    htmlName: "first_name",
+    htmlAttributes: { name: "first_name" },
     validators: FormValidators[EnumInputFields.FirstName],
   },
   [EnumInputFields.SecondName]: {
-    htmlName: "second_name",
+    htmlAttributes: { name: "second_name" },
     validators: FormValidators[EnumInputFields.SecondName],
   },
   [EnumInputFields.DisplayName]: {
-    htmlName: "display_name",
+    htmlAttributes: { name: "display_name" },
     validators: FormValidators[EnumInputFields.DisplayName],
   },
   [EnumInputFields.Login]: {
-    htmlName: "login",
+    htmlAttributes: { name: "login" },
     validators: FormValidators[EnumInputFields.Login],
   },
   [EnumInputFields.Email]: {
-    htmlName: "email",
+    htmlAttributes: { name: "email" },
     validators: FormValidators[EnumInputFields.Email],
   },
   [EnumInputFields.Phone]: {
-    htmlName: "phone",
+    htmlAttributes: { name: "phone" },
     validators: FormValidators[EnumInputFields.Phone],
   },
 };
@@ -46,8 +46,7 @@ Object.entries(MapInputFieldToProps).forEach(
     EnumInputFields,
     Partial<TInputWithValidationProps>
   ]) => {
-    props.disabledAttr = true;
-    props.htmlClass = "data-input";
+    props.htmlClasses = ["data-input"];
     props.htmlWrapper = {
       componentAlias: "wrappedDataInput",
       htmlWrapperTemplate: `
@@ -84,7 +83,11 @@ export const MapInputFieldToHelpers = Object.entries(
 ).reduce((acc, [fieldName, recordName]) => {
   acc[fieldName] = {
     beforePropsProxyHook() {
-      this.props.value = this.store.getUserData(recordName);
+      this.setProp("htmlAttributes.value", this.store.getUserData(recordName));
+    },
+
+    afterRenderHook() {
+      this._unwrappedElement.disabled = true;
     },
   };
 

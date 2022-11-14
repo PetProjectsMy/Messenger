@@ -14,7 +14,7 @@ export class AvatarUploadForm extends Block {
     const avatarChooseButton = new Button({
       props: {
         label: "upload avatar",
-        htmlClass: "choose-avatar",
+        htmlClasses: ["choose-avatar"],
       },
     });
     children.avatarChooseButton = avatarChooseButton;
@@ -33,9 +33,11 @@ export class AvatarUploadForm extends Block {
         }
       },
       props: {
-        accept: "image/*",
-        htmlName: "avatar",
-        htmlClass: "upload-avatar",
+        htmlAttributes: {
+          accept: "image/*",
+          name: "avatar",
+        },
+        htmlClasses: ["upload-avatar"],
       },
     });
     children.avatarFileInput = avatarFileInput;

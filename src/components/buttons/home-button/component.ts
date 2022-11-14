@@ -7,7 +7,7 @@ export class HomeButton extends WithRouter(Button) {
     super({
       props: {
         label: "Home",
-        htmlClass: "home-button",
+        htmlClasses: ["home-button"],
         events: {
           click: [
             () => {

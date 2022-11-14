@@ -8,8 +8,10 @@ export class ChatsPageSideMenu extends Block {
     const children = {} as TComponentChildren;
     children.collapseButton = new Button({
       props: {
-        backgroundImage: collapseButtonImage,
-        htmlClass: "collapse-button",
+        htmlStyle: {
+          backgroundImage: collapseButtonImage,
+        },
+        htmlClasses: ["collapse-button"],
       },
     });
 
@@ -26,7 +28,7 @@ export class ChatsPageSideMenu extends Block {
       },
     });
 
-    super({ props: { htmlStyle: "display: none;" }, children });
+    super({ props: { htmlStyle: { display: "none" } }, children });
   }
 
   protected _afterPropsAssignHook() {

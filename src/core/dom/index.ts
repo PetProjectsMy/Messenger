@@ -3,4 +3,4 @@ export {
   TBlockCommonEventsHandlersArgs,
 } from "./block-base";
 export { Block, BlockClass } from "./block";
-export { renderDOM, MainPage } from "./renderDOM";
+export { renderDOM } from "./renderDOM";

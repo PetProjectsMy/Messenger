@@ -20,7 +20,7 @@ export function makeValidator({
     }
 
     this.state.inputError = error;
-    this.props.value = value;
+    this.props.htmlAttributes.value = value;
 
     return !error;
   };

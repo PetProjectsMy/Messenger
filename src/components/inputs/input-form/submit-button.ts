@@ -15,9 +15,8 @@ export class FormSubmitButton extends Button {
     super({
       refs,
       props: {
-        type: "button",
         label: "submit",
-        htmlClass: "submit-button",
+        htmlClasses: ["submit-button"],
         events: {
           click: [formSubmitButtonCallback],
         },

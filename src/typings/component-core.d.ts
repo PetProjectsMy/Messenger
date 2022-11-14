@@ -12,26 +12,47 @@ declare global {
   export type ComponentOptionalProps = {
     componentName?: string;
     events?: Record<string, ComponentEventHandler[]>;
-  };
-
-  type HTMLElementProps = {
+    htmlClasses?: string[];
+    htmlStyle?: {
+      backgroundImage?: any;
+      display?: "none" | "block";
+    };
     htmlWrapper?: TComponentWrapper;
-    hmtlWrapped?: boolean;
-    htmlClass?: string;
-    htmlId?: string;
-    htmlName?: string;
-    htmlStyle?: string;
-    backgroundImage?: string;
   };
-  type WithHTMLProps<PropsType> = PropsType & HTMLElementProps;
 
-  export type TComponentCommonProps = WithHTMLProps<ComponentOptionalProps>;
+  type TCommonHtmlAtrributes = {
+    htmlAttributes?: {
+      name?: string;
+      id?: string;
+    };
+  };
+
+  export type WithCommonHtmlAttributes<THtmlAttrs> = TCommonHtmlAtrributes &
+    THtmlAttrs;
+
+  type THTMLElementProps = {
+    htmlAttributes?: {
+      name?: string;
+      id?: string;
+      href?: string;
+      value?: string;
+      placeholder?: string;
+      type?: string;
+      accept?: string;
+      src?: string;
+      alt?: string;
+    };
+  };
+
+  export type TComponentCommonProps = TCommonHtmlAtrributes &
+    ComponentOptionalProps;
 
   export type WithComponentCommonProps<Tprops> = Tprops & TComponentCommonProps;
 
   export type TComponentProps = {
     [prop: string]:
       | string
+      | unknown[]
       | boolean
       | Record<string, Function[] | Function>
       | TComponentRefs

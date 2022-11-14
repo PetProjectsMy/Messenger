@@ -7,7 +7,7 @@ export class LogoutButton extends WithRouter(Button) {
     super({
       props: {
         label: "Logout",
-        htmlClass: "logout-button",
+        htmlClasses: ["logout-button"],
         events: {
           click: [
             () => {

@@ -1,7 +1,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-type Indexed<T = unknown> = {
+export type Indexed<T = unknown> = {
   [key in string]: T;
 };
 

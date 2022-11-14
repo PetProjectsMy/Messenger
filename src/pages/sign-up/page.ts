@@ -15,8 +15,8 @@ export class SignUpPage extends Block {
     children.signInLink = new LinkWithRouter({
       props: {
         label: "Sign In",
-        htmlName: "Sign in",
-        htmlClass: "sign-in-link",
+        htmlAttributes: { name: "Sign in" },
+        htmlClasses: ["sign-in-link"],
         events: {
           click: [
             function () {

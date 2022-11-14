@@ -25,6 +25,7 @@ export class Store {
 
   private state: TAppState;
 
+  // @ts-ignore 'page' is declared but its value is never read
   private page: TAppPage;
 
   constructor(state: TAppState = defaultState) {

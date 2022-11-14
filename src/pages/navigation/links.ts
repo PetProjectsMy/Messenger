@@ -19,19 +19,19 @@ export const MapNavigationLinkToRoute: Record<string, EnumAppRoutes> = {
 export const MapNavigationLinkToProps: Record<string, TLinkProps> = {
   [EnumNavigationPageLinks.SignUp]: {
     label: "Sign Up",
-    htmlId: `signup_link`,
+    htmlAttributes: { id: `signup_link` },
   },
   [EnumNavigationPageLinks.Login]: {
     label: "Login",
-    htmlId: `login_link`,
+    htmlAttributes: { id: `login_link` },
   },
   [EnumNavigationPageLinks.Chats]: {
     label: "Chats",
-    htmlId: `chats_link`,
+    htmlAttributes: { id: `chats_link` },
   },
   [EnumNavigationPageLinks.Profile]: {
     label: "Profile",
-    htmlId: `pforile_link`,
+    htmlAttributes: { id: `pforile_link` },
   },
 };
 

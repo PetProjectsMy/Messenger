@@ -21,6 +21,10 @@ declare global {
     email: string;
     phone: string;
   };
+
+  export type TCreateChatDTO = {
+    title: string;
+  };
 }
 
 export {};

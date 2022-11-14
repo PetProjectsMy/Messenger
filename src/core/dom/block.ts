@@ -1,5 +1,6 @@
 import Handlebars from "handlebars";
 import { nanoid } from "nanoid";
+import { setProp as setObjectProp } from "utils/objects-handle";
 import BlockBase, { BlockCommonEvents } from "./block-base";
 
 export class Block<
@@ -38,6 +39,10 @@ export class Block<
     this._beforePropsAssignHook();
     this.props = props;
     this.props.events = this.props.events ?? {};
+    this.props.htmlAttributes ??= {};
+    this.props.htmlClasses ??= [];
+    this.props.htmlStyle ??= {};
+
     this.children = children;
     this.refs = refs;
     this.state = state as TState;
@@ -60,14 +65,11 @@ export class Block<
 
     this._beforeRenderHook();
     this.eventBus.emit(BlockCommonEvents.INIT);
+    this._afterRenderHook();
   }
 
-  public setProps(nextProps: Partial<TProps>): void {
-    if (!nextProps) {
-      return;
-    }
-
-    Object.assign(this.props, nextProps);
+  public setProp(prop: string, value: unknown): void {
+    setObjectProp(this.props, prop, value);
   }
 
   private _init() {
@@ -86,9 +88,6 @@ export class Block<
         self.eventBus.emit(BlockCommonEvents.FLOW_CDU, oldValue, value);
 
         return true;
-      },
-      deleteProperty() {
-        throw new Error("Нет доступа");
       },
     });
   }
@@ -204,6 +203,9 @@ export class Block<
     }
 
     this._element = newElement;
+
+    this._setUnwrappedElement();
+    this._setHtmlProperties();
     this._addEventListenersToElement();
   }
 
@@ -224,7 +226,7 @@ export class Block<
       ...this.props,
       ...this.state,
       ...childrenStubs,
-      wrappedId: this.htmlWrapped ? this.wrappedId : null,
+      wrappedId: this.wrappedId,
     };
 
     const htmlString = Handlebars.compile(templateString)(context);
@@ -247,12 +249,6 @@ export class Block<
   protected _beforePropsAssignHook() {}
 
   protected _afterPropsAssignHook() {
-    const { backgroundImage } = this.props;
-    if (backgroundImage) {
-      const style = this.props.htmlStyle ?? "";
-      this.props.htmlStyle = `${style}background-image: url('${backgroundImage}');`;
-    }
-
     if (this.helpers.afterPropsAssignHook) {
       (this.helpers.afterPropsAssignHook as Function).call(this);
     }
@@ -269,6 +265,42 @@ export class Block<
   protected _beforeRegisterEventsHook() {}
 
   protected _beforeRenderHook() {}
+
+  protected _afterRenderHook() {
+    if (this.helpers.afterRenderHook) {
+      (this.helpers.afterRenderHook as Function).call(this);
+    }
+  }
+
+  private _setHtmlProperties() {
+    this._setHtmlClasses();
+    this._setHtmlAttributes();
+    this._setElementStyle();
+    this._unwrappedElement!.removeAttribute("wrapped-id");
+  }
+
+  private _setHtmlAttributes() {
+    Object.entries(this.props.htmlAttributes!).forEach(([attrName, value]) => {
+      this._unwrappedElement!.setAttribute(attrName, value);
+    });
+  }
+
+  private _setHtmlClasses() {
+    if (this.props.htmlClasses!.length) {
+      this._unwrappedElement!.classList.add(...this.props.htmlClasses!);
+    }
+  }
+
+  private _setElementStyle() {
+    Object.entries(this.props.htmlStyle!).forEach(([styleProp, value]) => {
+      let propValue = value;
+      if (styleProp === "backgroundImage") {
+        propValue = `url(${value})`;
+      }
+
+      this._unwrappedElement!.style[styleProp] = propValue;
+    });
+  }
 }
 
 export type BlockClass = typeof Block;

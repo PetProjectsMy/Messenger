@@ -10,15 +10,19 @@ export class MessageInputSection extends Block {
 
     children.attachmentButton = new Button({
       props: {
-        htmlClass: "attachment-button",
-        backgroundImage: attachmentButtonBackgorundImage,
+        htmlClasses: ["attachment-button"],
+        htmlStyle: {
+          backgroundImage: attachmentButtonBackgorundImage,
+        },
       },
     });
 
     children.sendMessageButton = new Button({
       props: {
-        htmlClass: "send-message-button",
-        backgroundImage: sendMessageButtonBackgorundImage,
+        htmlClasses: ["send-message-button"],
+        htmlStyle: {
+          backgroundImage: sendMessageButtonBackgorundImage,
+        },
       },
     });
 

@@ -2,11 +2,11 @@ import { Block } from "core/dom";
 import template from "./template";
 
 export type TInputProps = WithComponentCommonProps<{
-  value?: string;
-  placeholder?: string;
-  type?: string;
-  accept?: string;
-  disabledAttr?: boolean;
+  htmlAttributes?: {
+    value?: string;
+    placeholder?: string;
+    type?: string;
+  };
 }>;
 
 export class Input extends Block<TInputProps> {
@@ -15,31 +15,20 @@ export class Input extends Block<TInputProps> {
   }
 
   public getValue() {
-    let element = this._element;
-    if (this.htmlWrapped) {
-      try {
-        element = (element as HTMLElement).querySelector("input");
-      } catch {
-        if (!(element instanceof HTMLElement)) {
-          throw new Error(
-            `${
-              this.componentName
-            }: wrong element ${element} of type ${typeof element} to validate input`
-          );
-        }
-      }
-    }
-
+    const element = this._unwrappedElement;
     return (element as HTMLInputElement).value;
   }
 
   protected _afterPropsAssignHook(): void {
     super._afterPropsAssignHook();
 
-    this.props.value ??= "";
+    this.props.htmlAttributes!.value ??= "";
+    this.props.htmlAttributes!.type ??= "text";
   }
 
   public toggleDisableState() {
-    this.props.disabledAttr = !this.props.disabledAttr;
+    const element = this._unwrappedElement as HTMLInputElement;
+    console.log(`DISABLED: ${element.disabled}`);
+    element.disabled = !element.disabled;
   }
 }
