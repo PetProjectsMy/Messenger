@@ -17,12 +17,7 @@ export async function initApp() {
     store.init();
 
     console.log(`INIT APP STATRTING`);
-    const responseUser = await AuthorizationService.getUser();
-    if (APIResponseHasError(responseUser)) {
-      return;
-    }
-
-    await afterAuthentificationHandler(responseUser.id);
+    await afterAuthentificationHandler.call(AuthorizationService);
   } catch (err) {
     console.error(err);
   } finally {

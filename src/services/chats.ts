@@ -1,4 +1,5 @@
 import { ChatsAPI } from "api";
+import { APIResponseHasError } from "utils/api";
 
 export class ChatsServiceClass {
   async getChats(afterRequestCallback: TAfterRequestCallback = () => {}) {
@@ -10,6 +11,10 @@ export class ChatsServiceClass {
         response
       )}`
     );
+
+    if (!APIResponseHasError(response)) {
+      window.store.dispatch({ chats: response });
+    }
 
     await afterRequestCallback(response);
 

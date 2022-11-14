@@ -1,5 +1,5 @@
 import { AuthorizationAPI } from "api";
-import { ProfileService } from "services";
+import { ProfileService, ChatsService } from "services";
 import { EnumAppRoutes } from "core/router";
 import {
   APIResponseHasError,
@@ -10,9 +10,17 @@ export const enum EnumLoginAPIErrors {
   AlreadyInSystem = "User already in system",
 }
 
-export const afterAuthentificationHandler = async function (userID: number) {
+export const afterAuthentificationHandler = async function (
+  authentificationFailedCallback: TAfterRequestCallback = () => {}
+) {
+  const userResponse = await this.getUser();
+  if (APIResponseHasError(userResponse)) {
+    await authentificationFailedCallback(userResponse);
+    return;
+  }
+
   const user = transformProfileAPIResponseToUserData(
-    await ProfileService.getUserProfile(userID)
+    await ProfileService.getUserProfile(userResponse.id)
   );
   window.store.dispatch({ user });
 };
@@ -44,8 +52,11 @@ class AuthorizationServiceClass {
       !APIResponseHasError(response) ||
       response.reason === EnumLoginAPIErrors.AlreadyInSystem
     ) {
-      const userID = (await this.getUser()).id;
-      afterAuthentificationHandler(userID);
+      await afterAuthentificationHandler((userResponse) => {
+        throw new Error(
+          `Unexpecter User Response After Login: ${userResponse.reason}`
+        );
+      });
       window.router.go(EnumAppRoutes.Chats);
     }
 
