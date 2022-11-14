@@ -10,6 +10,7 @@ import {
   ChatsPageMainSection,
   ChatsPageNavigationSection,
   ChatsPageSideMenu,
+  ModalWindow,
 } from "./components";
 
 export class ChatsPage extends WithStore(Block) {
@@ -18,7 +19,7 @@ export class ChatsPage extends WithStore(Block) {
     children.navigationSection = new ChatsPageNavigationSection();
     children.chatSection = new ChatsPageMainSection();
     children.sideMenu = new ChatsPageSideMenu();
-
+    children.addChatModal = new ModalWindow();
     super({
       props: { componentName: "Chats Page" },
       children,
@@ -30,6 +31,9 @@ export class ChatsPage extends WithStore(Block) {
 
     this.children.chatSection.children.headerSection.children.functionalButton.refs.sideMenu =
       this.children.sideMenu;
+
+    this.children.sideMenu.children.createChatButton.refs.addChatModal =
+      this.children.addChatModal;
 
     // this._getChats();
   }

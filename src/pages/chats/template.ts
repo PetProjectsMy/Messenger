@@ -3,4 +3,5 @@ export default `
   {{{ navigationSection }}}
   {{{ chatSection }}}
   {{{ sideMenu }}}
+  {{{ addChatModal }}}
 `;

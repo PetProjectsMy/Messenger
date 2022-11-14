@@ -40,7 +40,7 @@ export default class BlockBase {
 
   protected helpers: Record<string, unknown>;
 
-  readonly id: string = nanoid(7);
+  readonly id: string = `${this.constructor.name}-${nanoid(7)}`;
 
   protected htmlWrapped: boolean;
 

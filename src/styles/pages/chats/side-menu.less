@@ -1,0 +1,21 @@
+.side-menu-mixin(
+  @background-color, 
+  @button-height
+) {
+  section.side-menu {
+    display: none;
+    position: absolute;
+    width: 12%;
+    right: 0;
+    background-color: @background-color;
+
+    button {
+      height: @button-height;
+      width: 100%;
+    }
+
+    .collapse-button {
+      background-size: 100% 100%;
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import { Block } from "core/dom";
-import { ChatSectionHeader } from "./header";
-import { MessagesDisplayArea } from "./messages-display-area";
+import { ChatSectionHeader } from "./header-section";
+import { MessagesDisplayArea } from "./messages-display-section";
+import { MessageInputSection } from "./message-input-section";
 import template from "./template";
 
 export class ChatsPageMainSection extends Block {
@@ -8,7 +9,8 @@ export class ChatsPageMainSection extends Block {
     const children: TComponentChildren = {};
 
     children.headerSection = new ChatSectionHeader();
-    children.messagesDisplayArea = new MessagesDisplayArea();
+    children.messagesDisplaySection = new MessagesDisplayArea();
+    children.messageInputSection = new MessageInputSection();
 
     super({ children });
   }

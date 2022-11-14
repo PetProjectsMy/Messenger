@@ -14,7 +14,16 @@ export class ChatsPageSideMenu extends Block {
     });
 
     children.createChatButton = new Button({
-      props: { label: "create new chat" },
+      props: {
+        label: "create new chat",
+        events: {
+          click: [
+            function () {
+              this.refs.addChatModal.toggleModal();
+            },
+          ],
+        },
+      },
     });
 
     super({ props: { htmlStyle: "display: none;" }, children });

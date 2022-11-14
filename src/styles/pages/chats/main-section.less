@@ -1,0 +1,128 @@
+@import "../../helpers/common.less";
+@import "../../helpers/mixins-common.less";
+
+@chat-display-delimiter-line-width: 96%;
+@chat-display-delimiter-line-color: #ffffff;
+
+.main-section-mixin(
+  @flex, 
+  @header-section-flex,
+  @message-input-section-flex, 
+  @background-color
+) {
+  .main-section {
+    &:extend(.vertical-block);
+    flex: @flex;
+    background-color: @background-color;
+
+    & > * {
+      &:extend(.horizontal-block);
+      width: 100%;
+    }
+
+    .main-section-header {
+      flex: @header-section-flex;
+
+      & > *[class$="section"] {
+        flex: 1;
+        height: 100%;
+        &:extend(.vertical-block);
+      }
+
+      .chat-info-section {
+        .chat-title {
+          width: 100%;
+          font-size: 1.5em;
+          text-align: left;
+          padding-left: 100% - @chat-display-delimiter-line-width;
+        }
+      }
+
+      .functional-button-section {
+        align-items: flex-end;
+
+        button {
+          height: 100%;
+          width: 100vh * (@main-section-header-flex / 100%);
+          padding-right: 100% - @chat-display-delimiter-line-width;
+          background-size: cover;
+          background-color: transparent;
+        }
+      }
+
+      .mixin-one-side-horizontal-border(
+    @color: @chat-display-delimiter-line-color, 
+    @percent-width: @chat-display-delimiter-line-width, 
+    @thickness: 0.2em, 
+    @side: ~"bottom"
+  );
+    }
+
+    @chat-display-section-flex: 100% - @header-section-flex -
+      @message-input-section-flex;
+    .chat-display-section {
+      flex: @chat-display-section-flex;
+
+      .messages-display-section {
+        &:extend(.vertical-block);
+        width: 95%;
+        height: 95%;
+        border: 0.1em dashed rgba(16, 14, 14, 0.71);
+
+        .message-placeholder {
+          font-size: 4em;
+        }
+      }
+    }
+
+    @message-input-section-height: 100vh * (@message-input-section-flex / 100%);
+    .message-input-section {
+      flex: @message-input-section-flex;
+      .mixin-one-side-horizontal-border(
+    @color: @chat-display-delimiter-line-color,
+    @percent-width: @chat-display-delimiter-line-width, 
+    @thickness: 0.2em, 
+    @side: ~"top"
+  );
+
+      & > * {
+        &:extend(.vertical-block);
+        height: 100%;
+      }
+
+      .attachment-block {
+        flex: 15%;
+        margin-left: 2%;
+
+        button {
+          height: min(0.5 * @message-input-section-height, 100px);
+          width: $height;
+          background-size: cover;
+        }
+      }
+
+      .input-block {
+        flex: 70%;
+
+        input {
+          margin: 0 2%;
+          height: 50%;
+          width: 100%;
+          text-align: center;
+          font-size: 1.2em;
+        }
+      }
+
+      .submit-block {
+        flex: 15%;
+        margin-right: 2%;
+
+        button {
+          height: min(0.5 * @message-input-section-height, 100px);
+          width: $height;
+          background-size: cover;
+        }
+      }
+    }
+  }
+}
