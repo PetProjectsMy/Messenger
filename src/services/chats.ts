@@ -1,5 +1,8 @@
 import { ChatsAPI } from "api";
-import { APIResponseHasError } from "utils/api";
+import {
+  APIResponseHasError,
+  transformChatsGetResponseToChatsData,
+} from "utils/api";
 
 export class ChatsServiceClass {
   async getChats(afterRequestCallback: TAfterRequestCallback = () => {}) {
@@ -13,7 +16,9 @@ export class ChatsServiceClass {
     );
 
     if (!APIResponseHasError(response)) {
-      window.store.dispatch({ chats: response });
+      window.store.dispatch({
+        chats: transformChatsGetResponseToChatsData(response),
+      });
     }
 
     await afterRequestCallback(response);

@@ -1,9 +1,4 @@
 import { Block } from "core/dom";
-import { ChatsService } from "services/chats";
-import {
-  APIResponseHasError,
-  transformChatsGetResponseToChatsData,
-} from "utils/api";
 import { WithStore } from "components/hocs";
 import template from "./template";
 import {

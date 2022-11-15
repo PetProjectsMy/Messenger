@@ -1,11 +1,17 @@
 export default `
   <div class="modal">
     <div class="modal-content">
-      <section class="title-input-section">
-        {{{ chattTitleInput }}}
+      <section class="chat-data-input-section">
+        <div class="avatar-choose-section">
+          {{{ avatarInput }}}
+          {{{ avatarChooseButton }}}
+        </div>
+        <div class="title-input-section">
+          {{{ chatTitleInput }}}
+        </div>
       </section>
-
-      <section class="title-input-section">
+      
+      <section class="create-button-section">
         {{{ createChatButton }}}
       </section>
 

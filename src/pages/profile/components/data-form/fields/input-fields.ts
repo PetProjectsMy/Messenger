@@ -85,7 +85,7 @@ export const MapInputFieldToHelpers = Object.entries(
     beforePropsProxyHook() {
       this.setPropByPath(
         "htmlAttributes.value",
-        this.store.getUserData(recordName)
+        this.store.getUserDataByPath(recordName)
       );
     },
 

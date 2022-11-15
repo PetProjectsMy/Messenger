@@ -1,4 +1,4 @@
-import { Button, Input } from "components";
+import { Button, ImageInput, Input } from "components";
 import { Block } from "core/dom";
 import { ChatsService } from "services/chats";
 import { APIResponseHasError } from "utils/api";
@@ -12,27 +12,13 @@ export class ModalWindow extends Block {
     };
     const children = {} as TComponentChildren;
 
-    children.chattTitleInput = new Input({
-      props: {
-        htmlAttributes: {
-          placeholder: "Enter Chat Title",
-        },
-      },
-    });
+    children.chatTitleInput = ModalWindow._createChatTitleInput();
+    children.closeButton = ModalWindow._createCloseButton();
 
-    children.closeButton = new Button({
-      props: {
-        htmlClasses: ["close-button"],
-        label: "×",
-        events: {
-          click: [
-            function () {
-              this.refs.modalWindow.toggleModal();
-            },
-          ],
-        },
-      },
-    });
+    const { avatarChooseButton, avatarInput } =
+      ModalWindow._createAvatarChooseButton();
+    children.avatarChooseButton = avatarChooseButton;
+    children.avatarInput = avatarInput;
 
     super({ children, state });
   }
@@ -97,5 +83,44 @@ export class ModalWindow extends Block {
 
   protected render() {
     return template;
+  }
+
+  private static _createChatTitleInput() {
+    return new Input({
+      props: {
+        htmlAttributes: {
+          placeholder: "Enter Chat Title",
+        },
+      },
+    });
+  }
+
+  private static _createCloseButton() {
+    return new Button({
+      props: {
+        htmlClasses: ["close-button"],
+        label: "×",
+        events: {
+          click: [
+            function () {
+              this.refs.modalWindow.toggleModal();
+            },
+          ],
+        },
+      },
+    });
+  }
+
+  private static _createAvatarChooseButton() {
+    const avatarChooseButton = new Button({
+      props: {
+        htmlClasses: ["avatar-choose"],
+        label: "choose avatar",
+      },
+    });
+
+    const avatarInput = new ImageInput({ InputButtonRef: avatarChooseButton });
+
+    return { avatarInput, avatarChooseButton };
   }
 }

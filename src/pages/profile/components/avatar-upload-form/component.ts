@@ -1,4 +1,4 @@
-import { Button, FileInput, type ImageComponent } from "components";
+import { Button, ImageInput, type ImageComponent } from "components";
 import { Block } from "core/dom";
 import { ProfileService } from "services";
 import {
@@ -19,23 +19,27 @@ export class AvatarUploadForm extends Block {
     });
     children.avatarChooseButton = avatarChooseButton;
 
-    const avatarFileInput = new FileInput({
-      InputButtonRef: avatarChooseButton,
-      onFileChangeCallback() {
-        const fileInput = this._element;
-        const submitState = this.refs.avatarSubmitButton.state;
+    const onFileChangeCallback = function () {
+      const fileInput = this._element;
+      const submitState = this.refs.avatarSubmitButton.state;
 
-        console.log(`FILE CHANGE`, fileInput.value);
-        if (!fileInput.value) {
-          submitState.uploadingStatus = "File not selected";
-        } else {
-          submitState.uploadingStatus = "File selected";
-        }
-      },
+      console.log(`FILE CHANGE`, fileInput.value);
+      if (!fileInput.value) {
+        submitState.uploadingStatus = "File not selected";
+      } else {
+        submitState.uploadingStatus = "File selected";
+      }
+    };
+
+    const avatarFileInput = new ImageInput({
+      InputButtonRef: avatarChooseButton,
       props: {
         htmlAttributes: {
           accept: "image/*",
           name: "avatar",
+        },
+        events: {
+          change: [onFileChangeCallback],
         },
         htmlClasses: ["upload-avatar"],
       },

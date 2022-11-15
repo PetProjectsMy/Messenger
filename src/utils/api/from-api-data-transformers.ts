@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { baseURL } from "api";
 
 export function transformProfileAPIResponseToUserData(
@@ -24,10 +25,11 @@ export function transformChatsGetResponseToChatsData(
 ): TAppChatsData {
   return data.reduce((acc, chatData) => {
     const { id, title, avatar, last_message } = chatData;
+
     acc[id] = {
       title,
       avatar,
-      lastMessage: { content: last_message.content },
+      lastMessage: last_message,
     };
 
     return acc;

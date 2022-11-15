@@ -36,6 +36,8 @@ export class Block<
   } = {}) {
     super();
 
+    this.helpers = helpers;
+
     this._beforePropsAssignHook();
     this.props = props;
     this.props.events = this.props.events ?? {};
@@ -46,7 +48,6 @@ export class Block<
     this.children = children;
     this.refs = refs;
     this.state = state as TState;
-    this.helpers = helpers;
     this.componentName = (props.componentName ??
       `Not Named Block of type ${this.constructor.name}`) as string;
 
@@ -250,7 +251,11 @@ export class Block<
     return this.componentName;
   }
 
-  protected _beforePropsAssignHook() {}
+  protected _beforePropsAssignHook() {
+    if (this.helpers.beforePropsAssignHook) {
+      (this.helpers.beforePropsAssignHook as Function).call(this);
+    }
+  }
 
   protected _afterPropsAssignHook() {
     if (this.helpers.afterPropsAssignHook) {

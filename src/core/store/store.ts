@@ -2,6 +2,7 @@ import { getPageComponent } from "utils/pages";
 import { EnumAppPages } from "pages";
 import { renderDOM } from "core/dom";
 import { EnumAppRoutes } from "core/router";
+import { getPropByPath } from "utils/objects-handle";
 import { EnumStoreEvents } from "./enum-store-events";
 import { EventBus } from "../event-bus";
 import * as StateProxies from "./state-proxies";
@@ -90,13 +91,18 @@ export class Store {
     return Object.keys(chats).length > 0;
   }
 
-  public getUserData(dataType?: Keys<TAppUserData>) {
-    if (dataType) {
-      const userData = this.state.user;
-      return userData ? userData[dataType] : userData;
-    }
+  private _getStateValueByPath(pathString: string = "") {
+    return getPropByPath(this.state, pathString);
+  }
 
-    return this.state.user;
+  public getUserDataByPath(pathString: string = "") {
+    const path = `user${pathString ? "." : ""}${pathString}`;
+    return this._getStateValueByPath(path);
+  }
+
+  public getChatsDataByPath(pathString: string = "") {
+    const path = `chats${pathString ? "." : ""}${pathString}`;
+    return this._getStateValueByPath(path);
   }
 
   public getPageType(): Nullable<string> {

@@ -31,7 +31,7 @@ export class ProfilePage extends ProfilePageBlock {
   constructor() {
     const children: TComponentChildren = {};
 
-    const storeAvatar = window.store.getUserData("avatar");
+    const storeAvatar = window.store.getUserDataByPath("avatar");
     const imageSource = storeAvatar || avatarImagePlaceholder;
     const avatarImage = new ImageComponent({
       props: {
@@ -63,7 +63,7 @@ export class ProfilePage extends ProfilePageBlock {
     this.children.changeDataButton = new DataChangeButton({
       form: this.children.profileDataForm as Block,
     });
-    this.props.userID = this.store.getUserData("id") as number;
+    this.props.userID = this.store.getUserDataByPath("id") as number;
   }
 
   protected _beforeRegisterEventsHook() {
@@ -89,7 +89,7 @@ export class ProfilePage extends ProfilePageBlock {
   }
 
   private _updateUserInfo() {
-    const userData = this.store.getUserData() as TAppUserData;
+    const userData = this.store.getUserDataByPath() as TAppUserData;
 
     Object.entries((this.children.profileDataForm as Block).refs).forEach(
       ([inputName, inputBlock]: [EnumInputFields, Input]) => {
@@ -103,7 +103,7 @@ export class ProfilePage extends ProfilePageBlock {
   }
 
   private _updateUserAvatar() {
-    const newAvatar = this.store.getUserData("avatar") as string;
+    const newAvatar = this.store.getUserDataByPath("avatar") as string;
     (this.children.avatarImage as ImageComponent).setPropByPath(
       "htmlAttributes.src",
       newAvatar
