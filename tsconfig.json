@@ -1,0 +1,19 @@
+{
+  "include": ["./**/*.ts", "playground/playground.ts"],
+  "exclude": ["node_modules", "dist"],
+  "compilerOptions": {
+    "lib": ["es2022", "dom"],
+    "target": "ES2015",
+    "rootDir": "./src",
+    "baseUrl": "./src",
+    "typeRoots": ["src/typings"],
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "sourceMap": true,
+    "strictNullChecks": true
+  }
+}

@@ -1,0 +1,102 @@
+import Block from "core/block";
+import avatarImagePlaceholder from "static/avatar-placeholder-profile.png";
+import { Button, HomeButton, ImageElement, Input } from "components";
+import { dataFieldTemplate, pageTemplate } from "./template";
+
+type DataFieldProps = {
+  dataType: string;
+  inputPlaceholder: string;
+} & ComponentCommonProps;
+
+class DataField extends Block {
+  constructor(props: DataFieldProps) {
+    const children: ComponentChildren = {};
+    const { dataType, inputPlaceholder } = props;
+    children.dataInput = new Input({
+      props: {
+        value: inputPlaceholder,
+        htmlClass: "data-input",
+        disabledAttr: true,
+      },
+    });
+
+    super({ props: { dataType }, children });
+  }
+
+  protected render(): string {
+    return dataFieldTemplate;
+  }
+}
+
+export class ProfilePage extends Block {
+  constructor() {
+    const children: ComponentChildren = {};
+
+    children.avatarImage = new ImageElement({
+      props: {
+        src: avatarImagePlaceholder,
+        alt: "avatar placeholder",
+        componentName: "Avatar Image",
+      },
+    });
+
+    const changeButtonRefs: ComponentRefs = {};
+    children.profileDataFields = [];
+    [
+      ["email", "email", "email@example.com"],
+      ["login", "login", "ExampleLogin"],
+      ["first name", "first_name", "Name"],
+      ["second name", "second_name", "Surname"],
+      ["chat nickname", "display_name", "Chat Nickname"],
+      ["phone", "phone", "8 (777) 888 77 88"],
+    ].forEach(([dataType, htmlName, inputPlaceholder]) => {
+      const dataField: DataField = new DataField({
+        componentName: `${dataType} field`,
+        htmlName,
+        inputPlaceholder,
+        dataType,
+      });
+      (children.profileDataFields as DataField[]).push(dataField);
+
+      changeButtonRefs[htmlName] = dataField;
+    });
+
+    children.homeButton = new HomeButton();
+
+    children.changeDataButton = new Button({
+      state: {
+        mode: "save",
+      },
+      refs: changeButtonRefs,
+      props: {
+        componentName: "change/save data button",
+        label: "change data",
+        htmlClass: "change-data-button",
+        events: {
+          click: [
+            function changeMode() {
+              if (this.state.mode === "save") {
+                this.props.label = "save data";
+                this.state.mode = "change";
+              } else {
+                this.props.label = "change data";
+                this.state.mode = "save";
+              }
+
+              Object.values(this.refs).forEach((inputField: Input) => {
+                const inputProps = inputField.children.dataInput.props;
+                inputProps.disabledAttr = !inputProps.disabledAttr;
+              });
+            },
+          ],
+        },
+      },
+    });
+
+    super({ children });
+  }
+
+  protected render(): string {
+    return pageTemplate;
+  }
+}

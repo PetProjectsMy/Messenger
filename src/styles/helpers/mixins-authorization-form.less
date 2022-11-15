@@ -1,0 +1,84 @@
+@import "mixins-common";
+@import "variables";
+
+.mixin-form-container(@flex-form, @flex-fieldset, @fields-num, @fields-total-margin: 7%) {
+  &:extend(.centered-container);
+  &:extend(.vertical-block);
+  .mixin-width-by-device(0.9, 0.5, 500px);
+  background: #a8a8a8;
+  border: 2px solid #708090;
+  border-radius: 5%;
+
+  form {
+    &:extend(.vertical-block);
+    width: 80%;
+    flex: @flex-form;
+
+    & > * {
+      &:extend(.vertical-block);
+      width: 100%;
+    }
+
+    legend {
+      flex: 100% - @flex-fieldset;
+    }
+
+    @margin: calc(@fields-total-margin / (2 * @fields-num + 1));
+    fieldset {
+      flex: @flex-fieldset;
+      justify-content: space-evenly;
+
+      & > * {
+        width: 100%;
+        &:extend(.vertical-block);
+        flex: 1;
+        margin-top: @margin;
+      }
+
+      .form-field {
+        & > * {
+          width: 95%;
+          text-align: center;
+        }
+
+        input {
+          height: 80%;
+        }
+
+        span {
+          height: auto;
+          display: block;
+        }
+      }
+
+      .submit-button-section {
+        margin-bottom: @margin;
+
+        .submit-button {
+          height: 100%;
+          width: min(50%, 175px);
+        }
+      }
+    }
+  }
+
+  nav {
+    &:extend(.horizontal-block);
+    width: 80%;
+    flex: 100% - @flex-form;
+
+    & > * {
+      &:extend(.vertical-block);
+      flex: 1;
+      height: 80%;
+
+      .sign-up-link {
+        white-space: nowrap;
+      }
+      .home-button {
+        height: 70%;
+        width: 40%;
+      }
+    }
+  }
+}
