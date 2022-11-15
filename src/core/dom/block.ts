@@ -264,7 +264,7 @@ export class Block<
   }
 
   protected _beforePropsProxyHook() {
-    this._bindEventListenersToBlock();
+    this._bindTEventListenersToBlock();
 
     if (this.helpers.beforePropsProxyHook) {
       (this.helpers.beforePropsProxyHook as Function).call(this);
@@ -303,11 +303,11 @@ export class Block<
   private _setElementStyle() {
     Object.entries(this.props.htmlStyle!).forEach(([styleProp, value]) => {
       let propValue = value;
-      if (styleProp === "backgroundImage") {
+      if (styleProp === "background-image") {
         propValue = `url(${value})`;
       }
 
-      this._unwrappedElement!.style[styleProp] = propValue;
+      this._unwrappedElement!.style.setProperty(styleProp, propValue);
     });
   }
 }

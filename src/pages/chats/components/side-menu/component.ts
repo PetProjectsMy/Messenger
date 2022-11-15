@@ -1,4 +1,4 @@
-import { Button, ImageInput } from "components";
+import { Button } from "components";
 import { Block } from "core/dom";
 import { WithStoreButton } from "components/hocs";
 import template from "./template";
@@ -10,18 +10,13 @@ export class ChatsPageSideMenu extends Block {
 
     children.collapseButton = ChatsPageSideMenu._createCollapseButton();
     children.createChatButton = ChatsPageSideMenu._makeCreateChatButton();
-
-    const { avatarChooseButton, avatarInput } =
-      ChatsPageSideMenu._createAvatarChooseButton();
-    children.avatarChooseButton = avatarChooseButton;
-    children.avatarInput = avatarInput;
+    children.avatarChooseButton = ChatsPageSideMenu._createAvatarChooseButton();
 
     super({ props: { htmlStyle: { display: "none" } }, children });
   }
 
   protected _afterPropsAssignHook() {
     super._afterPropsAssignHook();
-
     (this.children.collapseButton as Block).dispatchEventListener(
       "click",
       function () {
@@ -38,7 +33,7 @@ export class ChatsPageSideMenu extends Block {
     return new Button({
       props: {
         htmlStyle: {
-          backgroundImage: collapseButtonImage,
+          "background-image": collapseButtonImage,
         },
         htmlClasses: ["collapse-button"],
       },
@@ -70,6 +65,9 @@ export class ChatsPageSideMenu extends Block {
     const avatarChooseButton = new WithStoreButton({
       props: {
         htmlClasses: ["avatar-choose"],
+        htmlAttributes: {
+          name: "avatar",
+        },
         label: "choose avatar",
       },
       helpers: {
@@ -77,10 +75,6 @@ export class ChatsPageSideMenu extends Block {
       },
     });
 
-    const avatarInput = new ImageInput({
-      InputButtonRef: avatarChooseButton as any as Button,
-    });
-
-    return { avatarInput, avatarChooseButton };
+    return avatarChooseButton;
   }
 }

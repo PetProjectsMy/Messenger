@@ -118,13 +118,16 @@ main.profile-page {
     background-color: beige;
     flex: @nav-section-flex;
 
-    section {
+    .data-change-section,
+    .home-button-section,
+    .avatar-change-section {
       &:extend(.vertical-block);
       flex: 1;
       height: 100%;
 
-      div {
+      & > * {
         &:extend(.vertical-block);
+        width: 100%;
         flex: 1;
       }
     }

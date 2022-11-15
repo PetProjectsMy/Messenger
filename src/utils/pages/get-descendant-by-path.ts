@@ -1,8 +1,9 @@
 import { type Block } from "core/dom";
 
 export function getDescendantByPath(block: Block, pathArray: string[]) {
-  const path = `children.${pathArray.join(".children.")}`.split(".");
-  let pathExisting = path;
+  const pathString = `children.${pathArray.join(".children.")}`;
+  const path = pathString.split(".");
+  let pathExisting = pathString;
   let result = block as any;
 
   for (let i = 0; i < path.length; i++) {

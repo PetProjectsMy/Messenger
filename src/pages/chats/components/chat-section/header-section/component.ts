@@ -23,7 +23,7 @@ export class ChatSectionHeader extends Block {
       props: {
         htmlClasses: ["functional-button"],
         htmlStyle: {
-          backgroundImage: functionalButtonBackgroundImage,
+          "background-image": functionalButtonBackgroundImage,
         },
         events: {
           click: [

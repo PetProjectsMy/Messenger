@@ -10,7 +10,7 @@ export default `
         </header>
         {{{ profileDataForm }}}
         <nav class="profile-nav-section">
-          <section class="data-change-buttons">
+          <section class="data-change-section">
             <div>
               {{{ changeDataButton }}}
             </div>
@@ -19,11 +19,12 @@ export default `
             </div>
           </section>
           <section class="home-button-section">
-            {{{ homeButton }}}
+            <div>
+              {{{ homeButton }}}
+            </div>
           </section>
-          <section class="avatar-change-section">
-            {{{ avatarUploadForm }}}
-          </section>
+          
+          {{{ avatarUploadForm }}}
         </nav>
       </main>
 `;

@@ -4,6 +4,7 @@ import { WithStoreBlock } from "components/hocs";
 import template from "./template";
 
 export class NavigationSectionChatComponent extends WithStoreBlock {
+  // @ts-ignore
   private readonly chatID: string;
 
   constructor(chatID: string) {

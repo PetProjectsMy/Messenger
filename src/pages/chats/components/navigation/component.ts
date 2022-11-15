@@ -26,10 +26,9 @@ export class ChatsPageNavigationSection extends WithStoreBlock {
 
   private _createChatsList() {
     const chats = this.store.getChatsDataByPath();
-    // const chats = this.store.getChats();
 
     const chatsList = [] as Block[];
-    Object.entries(chats!).forEach(([id, chatData]) => {
+    Object.keys(chats!).forEach((id) => {
       chatsList.push(new NavigationSectionChatComponent(id));
     });
     this.children.chatsList = chatsList;

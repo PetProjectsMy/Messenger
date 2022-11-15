@@ -85,16 +85,16 @@ export default class BlockBase {
     return this._element;
   }
 
-  public dispatchEventListener(event: string, listener: EventListener) {
-    const events = this.props.events as Record<string, EventListener[]>;
+  public dispatchEventListener(event: string, listener: TEventListener) {
+    const events = this.props.events as Record<string, TEventListener[]>;
 
     events[event] ??= [];
     events[event].push(listener);
     this._unwrappedElement!.addEventListener(event, listener);
   }
 
-  protected _bindEventListenersToBlock() {
-    const events = this.props.events as Record<string, EventListener[]>;
+  protected _bindTEventListenersToBlock() {
+    const events = this.props.events as Record<string, TEventListener[]>;
     if (!events) {
       return;
     }
@@ -130,7 +130,7 @@ export default class BlockBase {
       );
     }
 
-    const events = this.props.events as Record<string, EventListener[]>;
+    const events = this.props.events as Record<string, TEventListener[]>;
 
     Object.entries(events).forEach(([event, listeners]) => {
       listeners.forEach((listener) => {
@@ -149,7 +149,7 @@ export default class BlockBase {
       );
     }
 
-    const events = this.props.events as Record<string, EventListener[]>;
+    const events = this.props.events as Record<string, TEventListener[]>;
     Object.entries(events).forEach(([event, listeners]) => {
       listeners.forEach((listener) => {
         element!.removeEventListener(event, listener);

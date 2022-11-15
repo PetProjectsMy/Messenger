@@ -14,7 +14,7 @@ declare global {
     events?: Record<string, ComponentEventHandler[]>;
     htmlClasses?: string[];
     htmlStyle?: {
-      backgroundImage?: any;
+      "background-image"?: any;
       display?: "none" | "block";
     };
     htmlWrapper?: TComponentWrapper;
@@ -69,6 +69,8 @@ declare global {
   export type TComponentHelpers = Record<string, unknown>;
 
   export type TPageProxy = { component: Nullable<Block> };
+
+  export type TEventListener = EventListener;
 }
 
 export {};

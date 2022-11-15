@@ -35,7 +35,7 @@ export class MessageInputSection extends WithStoreBlock {
       props: {
         htmlClasses: ["attachment-button"],
         htmlStyle: {
-          backgroundImage: attachmentButtonBackgorundImage,
+          "background-image": attachmentButtonBackgorundImage,
         },
       },
     });
@@ -46,7 +46,7 @@ export class MessageInputSection extends WithStoreBlock {
       props: {
         htmlClasses: ["send-message-button"],
         htmlStyle: {
-          backgroundImage: sendMessageButtonBackgorundImage,
+          "background-image": sendMessageButtonBackgorundImage,
         },
       },
     });
