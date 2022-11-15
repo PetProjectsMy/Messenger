@@ -15,7 +15,6 @@ export class MessagesDisplayArea extends WithStoreBlock {
 
   private _setChatAbsenceWarning() {
     let warning = "";
-
     if (!this.store.userHasAnyChats()) {
       warning = EnumChatAbsenceWarnings.NoChatsCreated;
     } else if (!this.store.getCurrentChatID()) {
@@ -23,6 +22,10 @@ export class MessagesDisplayArea extends WithStoreBlock {
     }
 
     this.state.chatAbsenceWarning = warning;
+  }
+
+  public removeChatAbsenceWarning() {
+    this.state.chatAbsenceWarning = "";
   }
 
   protected render() {

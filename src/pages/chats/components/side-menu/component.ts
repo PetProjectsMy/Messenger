@@ -62,8 +62,8 @@ export class ChatsPageSideMenu extends Block {
 
   private static _createAvatarChooseButton() {
     const afterRenderHook = function () {
-      if (!this.store.currentChatID) {
-        this._toggleDisableState();
+      if (!this.store.getCurrentChatID()) {
+        this.toggleDisabledState(true);
       }
     };
 

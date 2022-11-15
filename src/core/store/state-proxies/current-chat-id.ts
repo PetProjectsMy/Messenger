@@ -1,19 +1,31 @@
 import { EnumAppPages } from "pages";
+import { isNullish } from "utils/objects-handle";
 
-export function currentChatSetter(oldValue: number, newValue: number) {
+export function currentChatSetter(
+  oldValue: Nullable<number>,
+  newValue: Nullable<number>
+) {
   const { page } = this.state;
-  const pageObject = this.page;
 
   if (page !== EnumAppPages.Chats) {
     return;
   }
-  if (!newValue) {
-    throw new Error("Current Chat ID Can't Be Nullified On Profile Page");
+  if (isNullish(newValue)) {
+    throw new Error("Current Chat ID Can't Be Nullified On Chats Page");
   }
+
+  const { refs } = this.page;
 
   if (oldValue !== newValue) {
     const title = this.getChatsDataByPath(`${newValue}.title`);
-    pageObject.refs.chatTitle.titleDidUpdate(title);
+    refs.chatTitle.titleDidUpdate(title);
+  }
+  if (isNullish(oldValue)) {
+    refs.messagesSection.removeChatAbsenceWarning();
+    refs.attachmentButton.toggleDisabledState(false);
+    refs.messageInput.toggleDisabledState(false);
+    refs.sendMessageButton.toggleDisabledState(false);
+    refs.chooseChatAvatarButton.toggleDisabledState(false);
   }
 
   localStorage.currentChatID = newValue;

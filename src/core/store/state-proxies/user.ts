@@ -1,5 +1,5 @@
 import { EnumAppPages } from "pages";
-import { isObject } from "utils/objects-handle";
+import { isNullish, isObject } from "utils/objects-handle";
 
 export function userSetter(
   oldValue: Nullable<TAppUserData>,
@@ -7,14 +7,14 @@ export function userSetter(
 ) {
   switch (this.state.page as EnumAppPages) {
     case EnumAppPages.Profile:
-      if (!newValue) {
+      if (isNullish(newValue)) {
         throw new Error("User Can't Be Nullified On Profile Page");
       }
       if (!isObject(oldValue) || !oldValue) {
         throw new Error(`Incorrect User State ${oldValue} On Profile Page`);
       }
 
-      if (oldValue.avatar !== newValue.avatar) {
+      if (oldValue.avatar !== newValue!.avatar) {
         this.page.avatarDidUpdate();
       }
       this.page.userDidUpdate();

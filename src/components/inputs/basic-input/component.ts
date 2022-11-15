@@ -26,8 +26,14 @@ export class Input extends Block<TInputProps> {
     this.props.htmlAttributes!.type ??= "text";
   }
 
-  public toggleDisableState() {
+  public toggleDisabledState(state: boolean | undefined = undefined) {
     const element = this._unwrappedElement as HTMLInputElement;
+
+    if (state !== undefined) {
+      element.disabled = state;
+      return;
+    }
+
     element.disabled = !element.disabled;
   }
 }

@@ -42,6 +42,34 @@ export class ChatsPage extends WithStoreBlock {
       "headerSection",
       "chatTitle",
     ]);
+
+    this.refs.messagesSection = getDescendantByPath(this, [
+      "chatSection",
+      "messagesDisplaySection",
+    ]);
+
+    this.refs.attachmentButton = getDescendantByPath(this, [
+      "chatSection",
+      "messageInputSection",
+      "attachmentButton",
+    ]);
+
+    this.refs.messageInput = getDescendantByPath(this, [
+      "chatSection",
+      "messageInputSection",
+      "messageInput",
+    ]);
+
+    this.refs.sendMessageButton = getDescendantByPath(this, [
+      "chatSection",
+      "messageInputSection",
+      "sendMessageButton",
+    ]);
+
+    this.refs.chooseChatAvatarButton = getDescendantByPath(this, [
+      "sideMenu",
+      "avatarChooseButton",
+    ]);
   }
 
   protected render(): string {

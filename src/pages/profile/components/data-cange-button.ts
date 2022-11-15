@@ -19,7 +19,7 @@ export class DataChangeButton extends Button {
         this.props.label = "save data";
 
         Object.values(form.refs).forEach((dataField: Input) => {
-          dataField.toggleDisableState();
+          dataField.toggleDisabledState();
         });
       } else {
         await formSubmitButtonCallback.call(this);
@@ -29,7 +29,7 @@ export class DataChangeButton extends Button {
           this.props.label = "change data";
 
           Object.values(form.refs).forEach((dataField: Input) => {
-            dataField.toggleDisableState();
+            dataField.toggleDisabledState();
           });
         }
       }

@@ -3,8 +3,8 @@ export default `
     <div class="attachment-block">
       {{{ attachmentButton }}}
     </div>
-    <div class="input-block">
-      <input type="text" name="message" placeholder="Сообщение">
+    <div class="message-input-block">
+      {{{ messageInput }}}
     </div>
     <div class="submit-block">
       {{{ sendMessageButton }}}

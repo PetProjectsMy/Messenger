@@ -90,7 +90,7 @@ export const MapInputFieldToHelpers = Object.entries(
     },
 
     afterRenderHook() {
-      this._unwrappedElement.disabled = true;
+      this.toggleDisabledState(true);
     },
   };
 
