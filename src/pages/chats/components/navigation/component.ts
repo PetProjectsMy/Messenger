@@ -1,11 +1,11 @@
-import { Block } from "core/dom";
-import { WithStore } from "components/hocs";
+import { type Block } from "core/dom";
+import { WithStoreBlock } from "components/hocs";
 import { ChatsService } from "services";
 import { NavigationSectionChatComponent } from "./chat-component";
 import { HeaderSection } from "./header-section";
 import template from "./template";
 
-export class ChatsPageNavigationSection extends WithStore(Block) {
+export class ChatsPageNavigationSection extends WithStoreBlock {
   constructor() {
     const children = {} as TComponentChildren;
 
@@ -30,7 +30,6 @@ export class ChatsPageNavigationSection extends WithStore(Block) {
 
     const chatsList = [] as Block[];
     Object.entries(chats!).forEach(([id, chatData]) => {
-      console.log(`CHAT (${id}): ${JSON.stringify(chatData)}`);
       chatsList.push(new NavigationSectionChatComponent(id));
     });
     this.children.chatsList = chatsList;

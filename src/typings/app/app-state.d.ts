@@ -34,6 +34,7 @@ declare global {
     page: Nullable<EnumAppPages>;
     user: Nullable<TAppUserData>;
     chats: Nullable<TAppChatsData>;
+    currentChatID: Nullable<number>;
   };
 }
 

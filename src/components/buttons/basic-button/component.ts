@@ -18,4 +18,10 @@ export class Button extends Block<TButtonProps> {
   protected render(): string {
     return template;
   }
+
+  //  @ts-ignore 'toggleDisableState' is declared but its value is never read
+  private _toggleDisableState() {
+    const element = this._unwrappedElement as HTMLButtonElement;
+    element.disabled = !element.disabled;
+  }
 }

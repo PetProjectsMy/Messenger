@@ -18,6 +18,10 @@ export const afterAuthentificationHandler = async function (
 
   await ProfileService.getUserProfile(userResponse.id);
   await ChatsService.getChats();
+
+  let { currentChatID } = localStorage;
+  currentChatID ??= null;
+  window.store.dispatch({ currentChatID });
 };
 
 class AuthorizationServiceClass {

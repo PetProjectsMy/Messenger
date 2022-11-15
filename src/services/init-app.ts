@@ -1,14 +1,12 @@
 import { Store } from "core/store";
 import { Router } from "core/router";
-import {
-  APIResponseHasError,
-  transformProfileAPIResponseToUserData,
-} from "utils/api";
-import { AuthorizationService, ProfileService } from "services";
+import { AuthorizationService } from "services";
 import { afterAuthentificationHandler } from "services/authorization";
 
 export async function initApp() {
   try {
+    console.log(`INIT APP STATRTING`);
+
     const store = new Store();
     const router = new Router();
     window.router = router;
@@ -16,7 +14,6 @@ export async function initApp() {
     router.init();
     store.init();
 
-    console.log(`INIT APP STATRTING`);
     await afterAuthentificationHandler.call(AuthorizationService);
   } catch (err) {
     console.error(err);

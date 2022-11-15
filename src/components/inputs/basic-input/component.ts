@@ -28,7 +28,6 @@ export class Input extends Block<TInputProps> {
 
   public toggleDisableState() {
     const element = this._unwrappedElement as HTMLInputElement;
-    console.log(`DISABLED: ${element.disabled}`);
     element.disabled = !element.disabled;
   }
 }

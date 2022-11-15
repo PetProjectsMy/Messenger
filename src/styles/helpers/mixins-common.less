@@ -40,6 +40,7 @@
 
 .mixin-one-side-horizontal-border(@color, @side, @percent-width: 90%, @thickness: 0.1em) {
   @color_: darken(@color, 12%);
+
   background-image: linear-gradient(@color_, @color_);
   background-repeat: no-repeat;
   background-size: @percent-width @thickness;

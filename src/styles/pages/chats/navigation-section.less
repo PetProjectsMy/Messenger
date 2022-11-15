@@ -63,6 +63,10 @@
       );
       @h: @chat-list-avatar-max-size;
 
+      .chat-field:hover {
+        background-color: darken(@chats-list-background-color, 3%);
+      }
+
       .chat-field {
         width: 100%;
         &:extend(.horizontal-block);
@@ -99,7 +103,7 @@
         }
       }
 
-      .chat-field:not(:last-child) {
+      .chat-field {
         .mixin-one-side-horizontal-border(@color: @chats-list-background-color, @side: ~"bottom");
       }
     }

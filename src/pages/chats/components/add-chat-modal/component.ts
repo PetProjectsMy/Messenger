@@ -1,4 +1,4 @@
-import { Button, ImageInput, Input } from "components";
+import { Button, Input } from "components";
 import { Block } from "core/dom";
 import { ChatsService } from "services/chats";
 import { APIResponseHasError } from "utils/api";
@@ -14,11 +14,6 @@ export class ModalWindow extends Block {
 
     children.chatTitleInput = ModalWindow._createChatTitleInput();
     children.closeButton = ModalWindow._createCloseButton();
-
-    const { avatarChooseButton, avatarInput } =
-      ModalWindow._createAvatarChooseButton();
-    children.avatarChooseButton = avatarChooseButton;
-    children.avatarInput = avatarInput;
 
     super({ children, state });
   }
@@ -109,18 +104,5 @@ export class ModalWindow extends Block {
         },
       },
     });
-  }
-
-  private static _createAvatarChooseButton() {
-    const avatarChooseButton = new Button({
-      props: {
-        htmlClasses: ["avatar-choose"],
-        label: "choose avatar",
-      },
-    });
-
-    const avatarInput = new ImageInput({ InputButtonRef: avatarChooseButton });
-
-    return { avatarInput, avatarChooseButton };
   }
 }

@@ -1,5 +1,5 @@
-import { Block } from "core/dom";
-import { WithStore } from "components/hocs";
+import { WithStoreBlock } from "components/hocs";
+import { getDescendantByPath } from "utils/pages";
 import template from "./template";
 import {
   ChatsPageMainSection,
@@ -8,7 +8,7 @@ import {
   ModalWindow,
 } from "./components";
 
-export class ChatsPage extends WithStore(Block) {
+export class ChatsPage extends WithStoreBlock {
   constructor() {
     const children = {} as TComponentChildren;
     children.navigationSection = new ChatsPageNavigationSection();
@@ -24,13 +24,24 @@ export class ChatsPage extends WithStore(Block) {
   protected async _afterPropsAssignHook() {
     super._afterPropsAssignHook();
 
-    // @ts-ignore
-    this.children.chatSection.children.headerSection.children.functionalButton.refs.sideMenu =
-      this.children.sideMenu;
+    const functionalButton = getDescendantByPath(this, [
+      "chatSection",
+      "headerSection",
+      "functionalButton",
+    ]);
+    functionalButton.refs.sideMenu = this.children.sideMenu;
 
-    // @ts-ignore
-    this.children.sideMenu.children.createChatButton.refs.addChatModal =
-      this.children.addChatModal;
+    const createChatButton = getDescendantByPath(this, [
+      "sideMenu",
+      "createChatButton",
+    ]);
+    createChatButton.refs.addChatModal = this.children.addChatModal;
+
+    this.refs.chatTitle = getDescendantByPath(this, [
+      "chatSection",
+      "headerSection",
+      "chatTitle",
+    ]);
   }
 
   protected render(): string {

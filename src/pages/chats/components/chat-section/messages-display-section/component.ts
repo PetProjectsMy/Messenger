@@ -1,5 +1,4 @@
-import { Block } from "core/dom";
-import { WithStore } from "components/hocs";
+import { WithStoreBlock } from "components/hocs";
 import template from "./template";
 
 const enum EnumChatAbsenceWarnings {
@@ -7,7 +6,7 @@ const enum EnumChatAbsenceWarnings {
   NoChatSelected = "NO CHAT SELECTED",
 }
 
-export class MessagesDisplayArea extends WithStore(Block) {
+export class MessagesDisplayArea extends WithStoreBlock {
   protected _afterPropsAssignHook() {
     super._afterPropsAssignHook();
 
@@ -19,7 +18,7 @@ export class MessagesDisplayArea extends WithStore(Block) {
 
     if (!this.store.userHasAnyChats()) {
       warning = EnumChatAbsenceWarnings.NoChatsCreated;
-    } else if (!localStorage.currentChat) {
+    } else if (!this.store.getCurrentChatID()) {
       warning = EnumChatAbsenceWarnings.NoChatSelected;
     }
 

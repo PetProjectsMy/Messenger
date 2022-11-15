@@ -1,20 +1,25 @@
 import { Block } from "core/dom";
-import { TextComponent, Button } from "components";
+import { Button } from "components";
 import functionalButtonBackgroundImage from "static/functional-button.png";
+import { ChatTitleComponent } from "./chat-title";
 import template from "./template";
 
 export class ChatSectionHeader extends Block {
   constructor() {
     const children = {} as TComponentChildren;
 
-    children.chatTitle = new TextComponent({
-      props: {
-        text: "Chat Title Placeholder",
-        htmlClasses: ["chat-title"],
-      },
-    });
+    children.chatTitle = new ChatTitleComponent();
+    children.functionalButton = ChatSectionHeader._createfunctionalButton();
 
-    children.functionalButton = new Button({
+    super({ children });
+  }
+
+  protected render() {
+    return template;
+  }
+
+  private static _createfunctionalButton() {
+    return new Button({
       props: {
         htmlClasses: ["functional-button"],
         htmlStyle: {
@@ -29,11 +34,5 @@ export class ChatSectionHeader extends Block {
         },
       },
     });
-
-    super({ children });
-  }
-
-  protected render() {
-    return template;
   }
 }

@@ -1,18 +1,22 @@
-import { Block } from "core/dom";
 import { TextComponent, ImageComponent } from "components";
 import avatarImagePlaceholder from "static/avatar-placeholder-chats.svg";
-import { WithStore } from "components/hocs";
+import { WithStoreBlock } from "components/hocs";
 import template from "./template";
 
-export class NavigationSectionChatComponent extends Block {
-  constructor(chadID: string) {
+export class NavigationSectionChatComponent extends WithStoreBlock {
+  private readonly chatID: string;
+
+  constructor(chatID: string) {
     const children = {} as TComponentChildren;
     children.avatarImage =
-      NavigationSectionChatComponent._createAvatarComponent(chadID);
+      NavigationSectionChatComponent._createAvatarComponent(chatID);
     children.message =
-      NavigationSectionChatComponent._createMessageComponent(chadID);
+      NavigationSectionChatComponent._createMessageComponent(chatID);
 
-    super({ children });
+    const beforePropsAssignHook = function () {
+      this.chatID = chatID;
+    };
+    super({ children, helpers: { beforePropsAssignHook } });
   }
 
   protected render() {
@@ -36,13 +40,11 @@ export class NavigationSectionChatComponent extends Block {
     return avatarImage;
   }
 
-  private static _createMessageComponent(chadID: string) {
+  private static _createMessageComponent(chatID: string) {
     const lastMessage = window.store.getChatsDataByPath(
-      `${chadID}.lastMessage`
+      `${chatID}.lastMessage`
     );
     const text = lastMessage ? lastMessage.content : "No Messages Exist Now";
-    console.log(`LAST MESSAGE: ${JSON.stringify(lastMessage)}`);
-    console.log(`TEXT: ${text}`);
 
     return new TextComponent({
       props: {
@@ -50,5 +52,15 @@ export class NavigationSectionChatComponent extends Block {
         componentName: "Chat Component Message",
       },
     });
+  }
+
+  protected _afterRenderHook(): void {
+    super._afterRenderHook();
+
+    const onclickCallback = function () {
+      this.store.dispatch({ currentChatID: this.chatID });
+    };
+
+    this.dispatchEventListener("click", onclickCallback.bind(this));
   }
 }

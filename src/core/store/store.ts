@@ -12,6 +12,7 @@ export const defaultState: TAppState = {
   page: null,
   user: null,
   chats: null,
+  currentChatID: null,
 };
 
 type TStoreEvents = typeof EnumStoreEvents;
@@ -47,9 +48,9 @@ export class Store {
         const oldValue = target[prop];
         (target as Record<string, unknown>)[prop] = newValue;
         console.log(
-          `STORE ${prop.toUpperCase()}: ${JSON.stringify(
-            oldValue
-          )} -> ${JSON.stringify(newValue)}`
+          `STORE ${prop}: ${JSON.stringify(oldValue)} -> ${JSON.stringify(
+            newValue
+          )}`
         );
 
         switch (prop) {
@@ -61,6 +62,9 @@ export class Store {
             break;
           case "user":
             StateProxies.userSetter.call(this, oldValue, newValue);
+            break;
+          case "currentChatID":
+            StateProxies.currentChatSetter.call(this, oldValue, newValue);
             break;
           default:
         }
@@ -98,6 +102,10 @@ export class Store {
   public getUserDataByPath(pathString: string = "") {
     const path = `user${pathString ? "." : ""}${pathString}`;
     return this._getStateValueByPath(path);
+  }
+
+  public getCurrentChatID() {
+    return this._getStateValueByPath("currentChatID");
   }
 
   public getChatsDataByPath(pathString: string = "") {
