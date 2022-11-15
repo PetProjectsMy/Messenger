@@ -1,4 +1,4 @@
-import { WithStore } from "components/hocs";
+import { WithStore } from "hocs";
 import { TextComponent } from "components";
 
 export class ChatTitleComponent extends WithStore(TextComponent) {

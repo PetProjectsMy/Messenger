@@ -1,5 +1,5 @@
 import { Block } from "core/dom";
-import { WithRouter } from "components/hocs";
+import { WithRouter } from "hocs";
 import { Link } from "components";
 import { LogoutButton } from "components/buttons/logout-button";
 import template from "./template";

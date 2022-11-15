@@ -1,4 +1,4 @@
-import { WithStoreBlock } from "components/hocs";
+import { WithStoreBlock } from "hocs/components";
 import { getDescendantByPath } from "utils/pages";
 import template from "./template";
 import {
@@ -69,6 +69,7 @@ export class ChatsPage extends WithStoreBlock {
     this.refs.chooseChatAvatarButton = getDescendantByPath(this, [
       "sideMenu",
       "avatarChooseButton",
+      "chooseButton",
     ]);
   }
 

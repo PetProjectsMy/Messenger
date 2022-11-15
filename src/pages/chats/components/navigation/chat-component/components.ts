@@ -1,6 +1,6 @@
 import { TextComponent, ImageComponent } from "components";
 import avatarImagePlaceholder from "static/avatar-placeholder-chats.svg";
-import { WithStoreBlock } from "components/hocs";
+import { WithStoreBlock } from "hocs/components";
 import template from "./template";
 
 export class NavigationSectionChatComponent extends WithStoreBlock {

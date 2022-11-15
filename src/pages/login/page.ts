@@ -1,6 +1,6 @@
 import { Block } from "core/dom";
 import { Link, HomeButton } from "components";
-import { WithRouter } from "components/hocs";
+import { WithRouter } from "hocs";
 import { EnumAppRoutes } from "core/router";
 import template from "./template";
 import { LoginPageForm } from "./form-component";

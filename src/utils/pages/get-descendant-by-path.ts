@@ -14,6 +14,6 @@ export function getDescendantByPath(block: Block, pathArray: string[]) {
 
     result = result[path[i]];
   }
-  console.log(`PATH '${path.join(".")}' EXISTING PART: ${pathExisting}}`);
+  // console.log(`PATH '${path.join(".")}' EXISTING PART: ${pathExisting}}`);
   return result;
 }

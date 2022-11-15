@@ -1,13 +1,11 @@
-import { InputForm, InputWithValidation } from "components";
-import { WithStore } from "components/hocs";
+import { InputForm } from "components";
+import { WithStoreValidatedInput } from "hocs/components";
 import { afterValidationCallback } from "./after-validation-callback";
 import {
   EnumInputFields,
   MapInputFieldToProps,
   MapInputFieldToHelpers,
 } from "./fields";
-
-const InputWithStore = WithStore(InputWithValidation) as any;
 
 export class ProfilePageInputForm extends InputForm {
   constructor() {
@@ -18,7 +16,7 @@ export class ProfilePageInputForm extends InputForm {
         isSubmitButtonNeeded: false,
         afterValidationCallback,
       },
-      InputClass: InputWithStore,
+      InputClass: WithStoreValidatedInput as any,
       enumInputFieldsNames: EnumInputFields,
       mapInputToProps: MapInputFieldToProps,
       mapInputToHelpers: MapInputFieldToHelpers,

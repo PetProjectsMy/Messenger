@@ -1,4 +1,4 @@
-import { WithStoreBlock } from "components/hocs";
+import { WithStoreBlock } from "hocs/components";
 import { Button, Input } from "components";
 import template from "./template";
 import attachmentButtonBackgorundImage from "./icons/attachment_button.png";

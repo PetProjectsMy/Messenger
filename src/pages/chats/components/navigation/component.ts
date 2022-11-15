@@ -1,5 +1,5 @@
 import { type Block } from "core/dom";
-import { WithStoreBlock } from "components/hocs";
+import { WithStoreBlock } from "hocs/components";
 import { ChatsService } from "services";
 import { NavigationSectionChatComponent } from "./chat-component";
 import { HeaderSection } from "./header-section";

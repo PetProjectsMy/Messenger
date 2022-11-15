@@ -1,4 +1,4 @@
-import { WithStoreBlock } from "components/hocs";
+import { WithStoreBlock } from "hocs/components";
 import template from "./template";
 
 const enum EnumChatAbsenceWarnings {

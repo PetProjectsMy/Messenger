@@ -1,7 +1,7 @@
 import { Block } from "core/dom";
 import avatarImagePlaceholder from "static/avatar-placeholder-profile.png";
 import { HomeButton, ImageComponent, Input } from "components";
-import { WithStore } from "components/hocs";
+import { WithStore } from "hocs";
 import type { EventBus } from "core/event-bus";
 import template from "./template";
 import { DataChangeButton, ProfilePageInputForm } from "./components";

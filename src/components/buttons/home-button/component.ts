@@ -1,6 +1,6 @@
 import { EnumAppRoutes } from "core/router";
 import { Button, TButtonProps } from "components/buttons";
-import { WithRouter } from "components/hocs";
+import { WithRouter } from "hocs";
 
 export class HomeButton extends WithRouter(Button) {
   constructor(props?: TButtonProps) {

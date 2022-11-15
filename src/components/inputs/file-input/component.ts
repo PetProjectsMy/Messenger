@@ -48,12 +48,14 @@ const chooseButtonDefaultProps: TchooseButtonProps = {
 export class FileInput extends Input {
   constructor({
     fileInputProps,
-    inputButtonProps = {},
+    chooseButtonProps = {},
     props = {},
+    helpers,
   }: {
     fileInputProps: TFileInputProps;
-    inputButtonProps?: TchooseButtonProps;
+    chooseButtonProps?: TchooseButtonProps;
     props?: TComponentProps;
+    helpers?: TComponentHelpers;
   }) {
     const children = {} as TComponentChildren;
 
@@ -61,11 +63,11 @@ export class FileInput extends Input {
     children.fileInput = fileInput;
 
     children.chooseButton = FileInput._createChooseButton(
-      inputButtonProps,
+      chooseButtonProps,
       fileInput
     );
 
-    super({ props, children });
+    super({ props, children, helpers });
   }
 
   protected _afterPropsAssignHook(): void {
