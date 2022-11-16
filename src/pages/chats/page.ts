@@ -7,6 +7,7 @@ import {
   ChatsPageSideMenu,
   ModalWindow,
 } from "./components";
+import { type NavigationSectionChatComponent } from "./components/navigation/chat-component";
 
 export class ChatsPage extends WithStoreBlock {
   constructor() {
@@ -21,7 +22,7 @@ export class ChatsPage extends WithStoreBlock {
     });
   }
 
-  protected async _afterPropsAssignHook() {
+  protected _afterPropsAssignHook() {
     super._afterPropsAssignHook();
 
     const functionalButton = getDescendantByPath(this, [
@@ -71,6 +72,14 @@ export class ChatsPage extends WithStoreBlock {
       "avatarChooseButton",
       "chooseButton",
     ]);
+
+    const chatsList = getDescendantByPath(this, [
+      "navigationSection",
+      "chatsList",
+    ]);
+    Object.values(chatsList).forEach((chat: NavigationSectionChatComponent) => {
+      this.refs[`chat-${chat.chatID}`] = chat;
+    });
   }
 
   protected render(): string {

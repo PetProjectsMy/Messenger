@@ -1,6 +1,8 @@
 import { ChatsAPI } from "api";
+import { type Block } from "core/dom";
 import {
   APIResponseHasError,
+  transformAvatarURL,
   transformChatsGetResponseToChatsData,
 } from "utils/api";
 
@@ -44,7 +46,15 @@ export class ChatsServiceClass {
     return response;
   }
 
-  async changeAvatar(chatID: string, avatarForm: FormData) {
+  async changeAvatar({
+    chatID,
+    avatarForm,
+    afterRequestCallback,
+  }: {
+    chatID: string;
+    avatarForm: FormData;
+    afterRequestCallback?: TAfterRequestCallback;
+  }) {
     avatarForm.append("chatId", chatID);
 
     const request = await ChatsAPI.changeAvatar(avatarForm);
@@ -56,9 +66,26 @@ export class ChatsServiceClass {
       )}`
     );
 
-    // if (!APIResponseHasError(response)) {
-    //   this.store.setState();
-    // }
+    if (APIResponseHasError(response)) {
+      return;
+    }
+
+    const avatar = transformAvatarURL(response.avatar);
+    window.store.setStateByPath({
+      pathString: `chats.${chatID}.avatar`,
+      value: avatar,
+      afterSetCallback() {
+        const chatComponent = window.store.getPageRef(`chat-${chatID}`);
+        (chatComponent.children.avatarImage as Block).setPropByPath(
+          "htmlAttributes.src",
+          avatar
+        );
+      },
+    });
+
+    if (afterRequestCallback) {
+      await afterRequestCallback(response);
+    }
   }
 }
 

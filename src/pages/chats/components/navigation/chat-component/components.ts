@@ -5,7 +5,7 @@ import template from "./template";
 
 export class NavigationSectionChatComponent extends WithStoreBlock {
   // @ts-ignore
-  private readonly chatID: string;
+  public readonly chatID: string;
 
   private chatProxy: any;
 
@@ -18,20 +18,8 @@ export class NavigationSectionChatComponent extends WithStoreBlock {
 
     const beforePropsAssignHook = function () {
       this.chatID = chatID;
-      this.chatProxy = new Proxy(this.store.state.chats[chatID], {
-        set: function (target, prop, newValue) {
-          const oldValue = target[prop];
-          target[prop] = newValue;
-          console.log(`CHAT(${chatID}) ${prop}: ${oldValue} -> ${newValue}`);
-
-          if (prop === "avatar") {
-            this.children.setPropByPath("htmlAttributes.src", newValue);
-          }
-
-          return true;
-        }.bind(this),
-      });
     };
+
     super({ children, helpers: { beforePropsAssignHook } });
   }
 

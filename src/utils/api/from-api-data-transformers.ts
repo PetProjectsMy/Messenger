@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { baseURL } from "api";
 
-function transformAvatarURL(url: Nullable<string>) {
+export function transformAvatarURL(url: Nullable<string>) {
   return url ? `${baseURL}/resources${url}` : url;
 }
 

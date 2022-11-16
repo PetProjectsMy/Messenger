@@ -2,7 +2,7 @@ import { getPageComponent } from "utils/pages";
 import { EnumAppPages } from "pages";
 import { renderDOM } from "core/dom";
 import { EnumAppRoutes } from "core/router";
-import { getPropByPath } from "utils/objects-handle";
+import { getPropByPath, setPropByPath } from "utils/objects-handle";
 import { EnumStoreEvents } from "./enum-store-events";
 import { EventBus } from "../event-bus";
 import * as StateProxies from "./state-proxies";
@@ -122,8 +122,27 @@ export class Store {
     return page.constructor.name;
   }
 
+  public getPageRef(ref: string) {
+    return this.page.refs[ref];
+  }
+
   private _setState(nextState: Partial<TAppState>) {
     Object.assign(this.state, nextState);
+  }
+
+  public setStateByPath({
+    pathString,
+    value,
+    afterSetCallback,
+  }: {
+    pathString: string;
+    value: unknown;
+    afterSetCallback?: () => void;
+  }) {
+    setPropByPath(this.state, pathString, value);
+    if (afterSetCallback) {
+      afterSetCallback();
+    }
   }
 
   dispatch(nextStateOrAction: Partial<TAppState> | Function) {
