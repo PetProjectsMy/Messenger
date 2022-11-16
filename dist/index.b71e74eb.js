@@ -554,7 +554,7 @@ async function initApp() {
         window.store = store;
         router.init();
         store.init();
-        await (0, _authorization.afterAuthentificationHandler).call((0, _services.AuthorizationService));
+        await (0, _authorization.afterAuthenticationHandler).call((0, _services.AuthorizationService));
     } catch (err) {
         console.error(err);
     } finally{
@@ -656,6 +656,9 @@ class Store {
                     case "user":
                         _stateProxies.userSetter.call(this, oldValue, newValue);
                         break;
+                    case "chats":
+                        _stateProxies.chatsSetter.call(this, oldValue, newValue);
+                        break;
                     case "currentChatID":
                         _stateProxies.currentChatSetter.call(this, oldValue, newValue);
                         break;
@@ -698,12 +701,19 @@ class Store {
         if (!page) return page;
         return page.constructor.name;
     }
-    setState(nextState) {
+    getPageRef(ref) {
+        return this.page.refs[ref];
+    }
+    _setState(nextState) {
         Object.assign(this.state, nextState);
+    }
+    setStateByPath({ pathString , value , afterSetCallback  }) {
+        (0, _objectsHandle.setPropByPath)(this.state, pathString, value);
+        if (afterSetCallback) afterSetCallback();
     }
     dispatch(nextStateOrAction) {
         if (typeof nextStateOrAction === "function") nextStateOrAction();
-        else this.setState(nextStateOrAction);
+        else this._setState(nextStateOrAction);
     }
     init() {
         this.eventBus.on((0, _enumStoreEvents.EnumStoreEvents).AppInit, ({ route , path  })=>{
@@ -880,9 +890,12 @@ class BlockBase {
         this.eventBus.emit("flow:component-did-mount");
     }
     _componentDidUpdate(oldPropsOrState, newPropsOrState, forceUpdate = false) {
+        if (forceUpdate) {
+            this.eventBus.emit("flow:render");
+            return;
+        }
         const response = this.componentDidUpdate(oldPropsOrState, newPropsOrState);
-        if (!forceUpdate && !response) return;
-        this.eventBus.emit("flow:render");
+        if (response) this.eventBus.emit("flow:render");
     }
     componentDidUpdate(oldPropsOrState, newPropsOrState) {
         const result = !(0, _objectsHandle.deepEqual)(oldPropsOrState, newPropsOrState);
@@ -1092,7 +1105,7 @@ function getPropByPath(object, pathString) {
     }
     const pathExisting = path.join(".");
     // console.log(
-    //   `PATH '${pathString}' EXISTING PART: ${pathExisting}, value: ${JSON.stringify(
+    //   `PATH '${pathString}' EXISTING PART: ${pathExisting}, value: ${value}, ${JSON.stringify(
     //     value
     //   )}`
     // );
@@ -13068,6 +13081,7 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "EnumFileUploadingStatus", ()=>EnumFileUploadingStatus);
 parcelHelpers.export(exports, "FileInput", ()=>FileInput);
+var _dom = require("core/dom");
 var _objectsHandle = require("utils/objects-handle");
 var _inputs = require("components/inputs");
 var _buttons = require("components/buttons");
@@ -13079,30 +13093,7 @@ let EnumFileUploadingStatus;
     EnumFileUploadingStatus["FileSelected"] = "File selected";
     EnumFileUploadingStatus["FileUploaded"] = "File uploaded";
 })(EnumFileUploadingStatus || (EnumFileUploadingStatus = {}));
-const FileInputDefaultProps = {
-    htmlAttributes: {
-        type: "file"
-    },
-    htmlStyle: {
-        display: "none"
-    },
-    events: {
-        change: [
-            ()=>{}
-        ]
-    }
-};
-const chooseButtonDefaultProps = {
-    events: {
-        click: [
-            function() {
-                const { fileInput  } = this.refs;
-                fileInput._unwrappedElement.click();
-            }, 
-        ]
-    }
-};
-class FileInput extends (0, _inputs.Input) {
+class FileInput extends (0, _dom.Block) {
     constructor({ fileInputProps , chooseButtonProps ={} , props ={} , helpers  }){
         const children = {};
         const fileInput = FileInput._createFileInput(fileInputProps);
@@ -13118,9 +13109,24 @@ class FileInput extends (0, _inputs.Input) {
         super._afterPropsAssignHook();
         const fileInput = this.children.fileInput;
         const chooseButton = this.children.chooseButton;
+        fileInput.refs.form = this;
         chooseButton.refs.fileInput = fileInput;
     }
     static _createFileInput(props) {
+        const FileInputDefaultProps = {
+            htmlAttributes: {
+                type: "file",
+                accept: "image/*"
+            },
+            htmlStyle: {
+                display: "none"
+            },
+            events: {
+                change: [
+                    ()=>{}
+                ]
+            }
+        };
         return new (0, _inputs.Input)({
             state: {
                 fileUploadingStatus: "File not selected"
@@ -13129,6 +13135,16 @@ class FileInput extends (0, _inputs.Input) {
         });
     }
     static _createChooseButton(props, fileInputRef) {
+        const chooseButtonDefaultProps = {
+            events: {
+                click: [
+                    function() {
+                        const { fileInput  } = this.refs;
+                        fileInput._unwrappedElement.click();
+                    }, 
+                ]
+            }
+        };
         return new (0, _buttons.Button)({
             props: (0, _objectsHandle.deepMerge)(chooseButtonDefaultProps, props),
             refs: {
@@ -13141,7 +13157,7 @@ class FileInput extends (0, _inputs.Input) {
     }
 }
 
-},{"utils/objects-handle":"kOfSo","components/inputs":"fRfcK","components/buttons":"fWrjK","./template":"frKki","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"frKki":[function(require,module,exports) {
+},{"core/dom":"3BLMu","utils/objects-handle":"kOfSo","components/inputs":"fRfcK","components/buttons":"fWrjK","./template":"frKki","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"frKki":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 exports.default = `
@@ -13734,6 +13750,14 @@ class ChatsAPIClass {
             data
         });
     }
+    changeAvatar(data) {
+        return (0, _httpTrasnportDefault.default).put("chats/avatar", {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            },
+            data
+        });
+    }
 }
 const ChatsAPI = new ChatsAPIClass();
 
@@ -13741,7 +13765,7 @@ const ChatsAPI = new ChatsAPIClass();
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "EnumLoginAPIErrors", ()=>EnumLoginAPIErrors);
-parcelHelpers.export(exports, "afterAuthentificationHandler", ()=>afterAuthentificationHandler);
+parcelHelpers.export(exports, "afterAuthenticationHandler", ()=>afterAuthenticationHandler);
 parcelHelpers.export(exports, "AuthorizationService", ()=>AuthorizationService);
 var _api = require("api");
 var _services = require("services");
@@ -13751,16 +13775,15 @@ let EnumLoginAPIErrors;
 (function(EnumLoginAPIErrors) {
     EnumLoginAPIErrors["AlreadyInSystem"] = "User already in system";
 })(EnumLoginAPIErrors || (EnumLoginAPIErrors = {}));
-const afterAuthentificationHandler = async function(authentificationFailedCallback = ()=>{}) {
+const afterAuthenticationHandler = async function(authenticationFailedCallback = ()=>{}) {
     const userResponse = await this.getUser();
     if ((0, _api1.APIResponseHasError)(userResponse)) {
-        await authentificationFailedCallback(userResponse);
+        await authenticationFailedCallback(userResponse);
         return;
     }
     await (0, _services.ProfileService).getUserProfile(userResponse.id);
     await (0, _services.ChatsService).getChats();
-    let { currentChatID  } = localStorage;
-    currentChatID ??= null;
+    const { currentChatID  } = localStorage;
     window.store.dispatch({
         currentChatID
     });
@@ -13777,7 +13800,7 @@ class AuthorizationServiceClass {
         const { status , response  } = requestLogin;
         console.log(`LOGIN REQUEST: status ${status}; response ${JSON.stringify(response)}`);
         if (!(0, _api1.APIResponseHasError)(response) || response.reason === "User already in system") {
-            await afterAuthentificationHandler((userResponse)=>{
+            await afterAuthenticationHandler.call(this, (userResponse)=>{
                 throw new Error(`Unexpecter User Response After Login: ${userResponse.reason}`);
             });
             window.router.go((0, _router.EnumAppRoutes).Chats);
@@ -13788,6 +13811,9 @@ class AuthorizationServiceClass {
         await (0, _api.AuthorizationAPI).logout();
         window.store.dispatch({
             user: null
+        });
+        window.store.dispatch({
+            currentChatID: null
         });
         window.router.go((0, _router.EnumAppRoutes).Login);
     }
@@ -13801,6 +13827,7 @@ parcelHelpers.export(exports, "APIResponseHasError", ()=>(0, _responseHasError.h
 parcelHelpers.export(exports, "transformLoginFormDatatoAPI", ()=>(0, _toApiDataTransformers.transformLoginFormDatatoAPI));
 parcelHelpers.export(exports, "transformSignUpFormDatatoAPI", ()=>(0, _toApiDataTransformers.transformSignUpFormDatatoAPI));
 parcelHelpers.export(exports, "transformProfileFormDatatoAPI", ()=>(0, _toApiDataTransformers.transformProfileFormDatatoAPI));
+parcelHelpers.export(exports, "transformAvatarURL", ()=>(0, _fromApiDataTransformers.transformAvatarURL));
 parcelHelpers.export(exports, "transformProfileAPIResponseToUserData", ()=>(0, _fromApiDataTransformers.transformProfileAPIResponseToUserData));
 parcelHelpers.export(exports, "transformChatsGetResponseToChatsData", ()=>(0, _fromApiDataTransformers.transformChatsGetResponseToChatsData));
 var _responseHasError = require("./response-has-error");
@@ -14200,7 +14227,24 @@ class ProfilePageInputForm extends (0, _components.InputForm) {
     }
 }
 
-},{"components":"dHnah","./after-validation-callback":"65o4o","./fields":"3ZzdV","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","hocs/components":"THcGa"}],"65o4o":[function(require,module,exports) {
+},{"components":"dHnah","hocs/components":"THcGa","./after-validation-callback":"65o4o","./fields":"3ZzdV","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"THcGa":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "WithStoreBlock", ()=>WithStoreBlock);
+parcelHelpers.export(exports, "WithStoreButton", ()=>WithStoreButton);
+parcelHelpers.export(exports, "WithStoreInput", ()=>WithStoreInput);
+parcelHelpers.export(exports, "WithStoreFileInput", ()=>WithStoreFileInput);
+parcelHelpers.export(exports, "WithStoreValidatedInput", ()=>WithStoreValidatedInput);
+var _dom = require("core/dom");
+var _components = require("components");
+var _withStore = require("../with-store");
+const WithStoreBlock = (0, _withStore.WithStore)((0, _dom.Block));
+const WithStoreButton = (0, _withStore.WithStore)((0, _components.Button));
+const WithStoreInput = (0, _withStore.WithStore)((0, _components.Input));
+const WithStoreFileInput = (0, _withStore.WithStore)((0, _components.FileInput));
+const WithStoreValidatedInput = (0, _withStore.WithStore)((0, _components.InputWithValidation));
+
+},{"core/dom":"3BLMu","components":"dHnah","../with-store":"jscFq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"65o4o":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "afterValidationCallback", ()=>afterValidationCallback);
@@ -14398,31 +14442,17 @@ const FormValidators = [
     return acc;
 }, {});
 
-},{"utils/form-input-validator":"4RFK4","./enum-input-fields":"eCEQ8","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"THcGa":[function(require,module,exports) {
+},{"utils/form-input-validator":"4RFK4","./enum-input-fields":"eCEQ8","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6KHu3":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "WithStoreBlock", ()=>WithStoreBlock);
-parcelHelpers.export(exports, "WithStoreButton", ()=>WithStoreButton);
-parcelHelpers.export(exports, "WithStoreInput", ()=>WithStoreInput);
-parcelHelpers.export(exports, "WithStoreFileInput", ()=>WithStoreFileInput);
-parcelHelpers.export(exports, "WithStoreValidatedInput", ()=>WithStoreValidatedInput);
-var _dom = require("core/dom");
-var _components = require("components");
-var _withStore = require("../with-store");
-const WithStoreBlock = (0, _withStore.WithStore)((0, _dom.Block));
-const WithStoreButton = (0, _withStore.WithStore)((0, _components.Button));
-const WithStoreInput = (0, _withStore.WithStore)((0, _components.Input));
-const WithStoreFileInput = (0, _withStore.WithStore)((0, _components.FileInput));
-const WithStoreValidatedInput = (0, _withStore.WithStore)((0, _components.InputWithValidation));
-
-},{"core/dom":"3BLMu","components":"dHnah","../with-store":"jscFq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6KHu3":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "transformAvatarURL", ()=>transformAvatarURL);
 parcelHelpers.export(exports, "transformProfileAPIResponseToUserData", ()=>transformProfileAPIResponseToUserData);
 parcelHelpers.export(exports, "transformChatsGetResponseToChatsData", ()=>transformChatsGetResponseToChatsData);
 /* eslint-disable @typescript-eslint/naming-convention */ var _api = require("api");
+function transformAvatarURL(url) {
+    return url ? `${0, _api.baseURL}/resources${url}` : url;
+}
 function transformProfileAPIResponseToUserData(data) {
-    const avatar = data.avatar ? `${0, _api.baseURL}/resources${data.avatar}` : data.avatar;
     return {
         id: data.id,
         firstName: data.first_name,
@@ -14431,7 +14461,7 @@ function transformProfileAPIResponseToUserData(data) {
         login: data.login,
         email: data.email,
         phone: data.phone,
-        avatar
+        avatar: transformAvatarURL(data.avatar)
     };
 }
 function transformChatsGetResponseToChatsData(data) {
@@ -14439,7 +14469,7 @@ function transformChatsGetResponseToChatsData(data) {
         const { id , title , avatar , last_message  } = chatData;
         acc[id] = {
             title,
-            avatar,
+            avatar: transformAvatarURL(avatar),
             lastMessage: last_message
         };
         return acc;
@@ -14493,18 +14523,38 @@ class ChatsServiceClass {
     async getChats(afterRequestCallback = ()=>{}) {
         const request = await (0, _api.ChatsAPI).getChats();
         const { status , response  } = request;
-        console.log(`GET CHATS REQUEST:status ${status}; response: ${JSON.stringify(response)}`);
+        console.log(`GET CHATS REQUEST: status ${status}; response ${JSON.stringify(response)}`);
         if (!(0, _api1.APIResponseHasError)(response)) window.store.dispatch({
             chats: (0, _api1.transformChatsGetResponseToChatsData)(response)
         });
         await afterRequestCallback(response);
         return response;
     }
-    async createChat(data, afterRequestCallback = ()=>{}) {
+    async createChat(data, afterRequestCallback) {
         const request = await (0, _api.ChatsAPI).createChat(data);
         const { status , response  } = request;
-        console.log(`CREATE CHAT REQUEST: status ${status}; response: ${JSON.stringify(response)}`);
-        await afterRequestCallback(response);
+        console.log(`CREATE CHAT REQUEST: status ${status}; response ${JSON.stringify(response)}`);
+        if (afterRequestCallback) await afterRequestCallback(response);
+        if (!(0, _api1.APIResponseHasError)(response)) await this.getChats();
+        return response;
+    }
+    async changeAvatar({ chatID , avatarForm , afterRequestCallback  }) {
+        avatarForm.append("chatId", chatID);
+        const request = await (0, _api.ChatsAPI).changeAvatar(avatarForm);
+        const { status , response  } = request;
+        console.log(`CHANGE CHAT(${chatID}) AVATAR REQUEST: status ${status}; response ${JSON.stringify(response)}`);
+        if (afterRequestCallback) await afterRequestCallback(response);
+        if (!(0, _api1.APIResponseHasError)(response)) {
+            const avatar = (0, _api1.transformAvatarURL)(response.avatar);
+            window.store.setStateByPath({
+                pathString: `chats.${chatID}.avatar`,
+                value: avatar,
+                afterSetCallback () {
+                    const chatComponent = window.store.getPageRef(`chat-${chatID}`);
+                    chatComponent.children.avatarImage.setPropByPath("htmlAttributes.src", avatar);
+                }
+            });
+        }
         return response;
     }
 }
@@ -14672,7 +14722,7 @@ class ChatsPage extends (0, _components.WithStoreBlock) {
             children
         });
     }
-    async _afterPropsAssignHook() {
+    _afterPropsAssignHook() {
         super._afterPropsAssignHook();
         const functionalButton = (0, _pages.getDescendantByPath)(this, [
             "chatSection",
@@ -14714,13 +14764,25 @@ class ChatsPage extends (0, _components.WithStoreBlock) {
             "avatarChooseButton",
             "chooseButton", 
         ]);
+        const chatsList = (0, _pages.getDescendantByPath)(this, [
+            "navigationSection",
+            "chatsList", 
+        ]);
+        this.refs.chatsList = chatsList;
+        const chats = (0, _pages.getDescendantByPath)(chatsList, [
+            "chats"
+        ]);
+        chats.forEach((chat)=>{
+            console.log(`CHAT REF: chat-${chat.chatID}`);
+            this.refs[`chat-${chat.chatID}`] = chat;
+        });
     }
     render() {
         return 0, _templateDefault.default;
     }
 }
 
-},{"utils/pages":"5q3PA","./template":"iSWX2","./components":"izx8G","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","hocs/components":"THcGa"}],"iSWX2":[function(require,module,exports) {
+},{"hocs/components":"THcGa","utils/pages":"5q3PA","./template":"iSWX2","./components":"izx8G","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"iSWX2":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 exports.default = `
@@ -14754,18 +14816,80 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "ChatsPageNavigationSection", ()=>ChatsPageNavigationSection);
 var _components = require("hocs/components");
-var _chatComponent = require("./chat-component");
 var _headerSection = require("./header-section");
+var _chatsList = require("./chats-list");
 var _template = require("./template");
 var _templateDefault = parcelHelpers.interopDefault(_template);
 class ChatsPageNavigationSection extends (0, _components.WithStoreBlock) {
     constructor(){
         const children = {};
         children.headerSection = new (0, _headerSection.HeaderSection)();
+        children.chatsList = new (0, _chatsList.ChatsList)();
         super({
             children
         });
     }
+    render() {
+        return 0, _templateDefault.default;
+    }
+}
+
+},{"hocs/components":"THcGa","./header-section":"ga8JD","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./chats-list":"3WUWn","./template":"4pU5T"}],"ga8JD":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "HeaderSection", ()=>(0, _component.HeaderSection));
+var _component = require("./component");
+
+},{"./component":"auCzQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"auCzQ":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "HeaderSection", ()=>HeaderSection);
+var _dom = require("core/dom");
+var _components = require("components");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+class HeaderSection extends (0, _dom.Block) {
+    constructor(){
+        const children = {};
+        children.homeButton = new (0, _components.HomeButton)();
+        super({
+            children
+        });
+    }
+    render() {
+        return 0, _templateDefault.default;
+    }
+}
+
+},{"core/dom":"3BLMu","components":"dHnah","./template":"3KCAY","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3KCAY":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+exports.default = `
+  <header class="navigation-section-header">
+    <div class="home-button-section">
+      {{{ homeButton }}}
+    </div>
+    <div class="search-section">
+      <input type="text" placeholder="Поиск">
+    </div>
+  </header>
+`;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3WUWn":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ChatsList", ()=>(0, _component.ChatsList));
+var _component = require("./component");
+
+},{"./component":"49kFn","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"49kFn":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ChatsList", ()=>ChatsList);
+var _components = require("hocs/components");
+var _chatComponent = require("../chat-component");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+class ChatsList extends (0, _components.WithStoreBlock) {
     render() {
         return 0, _templateDefault.default;
     }
@@ -14779,11 +14903,11 @@ class ChatsPageNavigationSection extends (0, _components.WithStoreBlock) {
         Object.keys(chats).forEach((id)=>{
             chatsList.push(new (0, _chatComponent.NavigationSectionChatComponent)(id));
         });
-        this.children.chatsList = chatsList;
+        this.children.chats = chatsList;
     }
 }
 
-},{"./chat-component":"5kkOV","./header-section":"ga8JD","./template":"4pU5T","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","hocs/components":"THcGa"}],"5kkOV":[function(require,module,exports) {
+},{"hocs/components":"THcGa","../chat-component":"5kkOV","./template":"8nC5u","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5kkOV":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "NavigationSectionChatComponent", ()=>(0, _components.NavigationSectionChatComponent));
@@ -14852,7 +14976,7 @@ class NavigationSectionChatComponent extends (0, _components1.WithStoreBlock) {
     }
 }
 
-},{"components":"dHnah","static/avatar-placeholder-chats.svg":"5MLUe","./template":"99P6e","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","hocs/components":"THcGa"}],"5MLUe":[function(require,module,exports) {
+},{"components":"dHnah","static/avatar-placeholder-chats.svg":"5MLUe","hocs/components":"THcGa","./template":"99P6e","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5MLUe":[function(require,module,exports) {
 module.exports = require("./helpers/bundle-url").getBundleURL("7UhFu") + "avatar-placeholder-chats.942b2146.svg" + "?" + Date.now();
 
 },{"./helpers/bundle-url":"lgJ39"}],"lgJ39":[function(require,module,exports) {
@@ -14903,45 +15027,13 @@ exports.default = `
   </li>
 `;
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ga8JD":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "HeaderSection", ()=>(0, _component.HeaderSection));
-var _component = require("./component");
-
-},{"./component":"auCzQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"auCzQ":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "HeaderSection", ()=>HeaderSection);
-var _dom = require("core/dom");
-var _components = require("components");
-var _template = require("./template");
-var _templateDefault = parcelHelpers.interopDefault(_template);
-class HeaderSection extends (0, _dom.Block) {
-    constructor(){
-        const children = {};
-        children.homeButton = new (0, _components.HomeButton)();
-        super({
-            children
-        });
-    }
-    render() {
-        return 0, _templateDefault.default;
-    }
-}
-
-},{"core/dom":"3BLMu","components":"dHnah","./template":"3KCAY","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3KCAY":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8nC5u":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 exports.default = `
-  <header class="navigation-section-header">
-    <div class="home-button-section">
-      {{{ homeButton }}}
-    </div>
-    <div class="search-section">
-      <input type="text" placeholder="Поиск">
-    </div>
-  </header>
+  <ul class="chats-list">
+    {{{ chats }}}
+  </ul>
 `;
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4pU5T":[function(require,module,exports) {
@@ -14950,9 +15042,7 @@ parcelHelpers.defineInteropFlag(exports);
 exports.default = `
   <nav class="navigation-section">
     {{{ headerSection }}}
-    <ul class="chats-list">
-      {{{ chatsList }}}
-    </ul>
+    {{{ chatsList }}}
   </nav>
 `;
 
@@ -15058,9 +15148,16 @@ class ChatTitleComponent extends (0, _hocs.WithStore)((0, _components.TextCompon
     }
     _afterPropsAssignHook() {
         super._afterPropsAssignHook();
+        if (!this.store.userHasAnyChats()) {
+            this.props.text = "No chats created";
+            return;
+        }
         const chatID = this.store.getCurrentChatID();
         if (!chatID) this.props.text = "No chat selected";
-        else this.props.text = this.store.getChatsDataByPath(`${chatID}.title`);
+        else {
+            const title = this.store.getChatsDataByPath(`${chatID}.title`);
+            this.props.text = title;
+        }
     }
     titleDidUpdate(newText) {
         this.props.text = newText;
@@ -15118,7 +15215,7 @@ class MessagesDisplayArea extends (0, _components.WithStoreBlock) {
     }
 }
 
-},{"./template":"dlB9P","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","hocs/components":"THcGa"}],"dlB9P":[function(require,module,exports) {
+},{"hocs/components":"THcGa","./template":"dlB9P","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dlB9P":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 exports.default = `
@@ -15205,7 +15302,7 @@ class MessageInputSection extends (0, _components.WithStoreBlock) {
     }
 }
 
-},{"components":"dHnah","./template":"8cMdl","./icons/attachment_button.png":"jvPcl","./icons/send-message-button.png":"ewmaY","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","hocs/components":"THcGa"}],"8cMdl":[function(require,module,exports) {
+},{"hocs/components":"THcGa","components":"dHnah","./template":"8cMdl","./icons/attachment_button.png":"jvPcl","./icons/send-message-button.png":"ewmaY","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8cMdl":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 exports.default = `
@@ -15277,18 +15374,7 @@ class ChatsPageSideMenu extends (0, _dom.Block) {
     }
 }
 
-},{"core/dom":"3BLMu","./template":"7LQL6","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./buttons":"1LasB"}],"7LQL6":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-exports.default = `
-  <section class="side-menu">
-    {{{ collapseButton }}}
-    {{{ createChatButton }}}
-    {{{ avatarChooseButton }}}
-  </section>
-`;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1LasB":[function(require,module,exports) {
+},{"core/dom":"3BLMu","./buttons":"1LasB","./template":"7LQL6","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1LasB":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "CollapseButton", ()=>(0, _collapseButton.CollapseButton));
@@ -15298,7 +15384,7 @@ var _collapseButton = require("./collapse-button");
 var _createChatButton = require("./create-chat-button");
 var _avatarChooseButton = require("./avatar-choose-button");
 
-},{"./collapse-button":"dq3PS","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./create-chat-button":"ctJSi","./avatar-choose-button":"dX49h"}],"dq3PS":[function(require,module,exports) {
+},{"./collapse-button":"dq3PS","./create-chat-button":"ctJSi","./avatar-choose-button":"dX49h","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dq3PS":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "CollapseButton", ()=>CollapseButton);
@@ -15357,15 +15443,34 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "AvatarChooseButton", ()=>AvatarChooseButton);
 var _components = require("hocs/components");
+var _services = require("services");
 class AvatarChooseButton extends (0, _components.WithStoreFileInput) {
     constructor(){
         const afterRenderHook = function() {
             if (!this.store.getCurrentChatID()) this.children.chooseButton.toggleDisabledState(true);
         };
+        const onchangeCallback = async function() {
+            const { form  } = this.refs;
+            const fileInput = this._unwrappedElement;
+            console.log(`FILE: ${fileInput.value}`);
+            if (!fileInput.value) return;
+            const avatarForm = new FormData(form._unwrappedElement);
+            for (const [name, value] of avatarForm)console.log(`NAME: ${name}, VALUE: ${value}`);
+            const chatID = window.store.getCurrentChatID();
+            await (0, _services.ChatsService).changeAvatar({
+                chatID,
+                avatarForm
+            });
+        };
         super({
             fileInputProps: {
                 htmlAttributes: {
                     name: "avatar"
+                },
+                events: {
+                    change: [
+                        onchangeCallback
+                    ]
                 }
             },
             chooseButtonProps: {
@@ -15373,7 +15478,7 @@ class AvatarChooseButton extends (0, _components.WithStoreFileInput) {
             },
             props: {
                 htmlClasses: [
-                    "choose-avatar"
+                    "choose-chat-avatar"
                 ]
             },
             helpers: {
@@ -15383,7 +15488,18 @@ class AvatarChooseButton extends (0, _components.WithStoreFileInput) {
     }
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","hocs/components":"THcGa"}],"cqDbK":[function(require,module,exports) {
+},{"hocs/components":"THcGa","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","services":"f5PO7"}],"7LQL6":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+exports.default = `
+  <section class="side-menu">
+    {{{ collapseButton }}}
+    {{{ createChatButton }}}
+    {{{ avatarChooseButton }}}
+  </section>
+`;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"cqDbK":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "ModalWindow", ()=>(0, _component.ModalWindow));
@@ -15395,6 +15511,7 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "ModalWindow", ()=>ModalWindow);
 var _components = require("components");
 var _dom = require("core/dom");
+var _chats = require("services/chats");
 var _api = require("utils/api");
 var _template = require("./template");
 var _templateDefault = parcelHelpers.interopDefault(_template);
@@ -15419,7 +15536,7 @@ class ModalWindow extends (0, _dom.Block) {
     }
     _makeCreateChatButton() {
         const refs = {
-            titleInput: this.children.chattTitleInput,
+            titleInput: this.children.chatTitleInput,
             modalWindow: this
         };
         const afterRequestCallback = (function(response) {
@@ -15437,11 +15554,10 @@ class ModalWindow extends (0, _dom.Block) {
                             const { titleInput , modalWindow  } = this.refs;
                             modalWindow.clearAPIResponseStatus();
                             console.log(`TITLE INPUT: ${titleInput.getValue()}`);
-                            afterRequestCallback({}); // DEBUG
-                        // ChatsService.createChat(
-                        //   { title: titleInput.getValue() },
-                        //   afterRequestCallback
-                        // );
+                            // afterRequestCallback({}); // DEBUG
+                            (0, _chats.ChatsService).createChat({
+                                title: titleInput.getValue()
+                            }, afterRequestCallback);
                         }, 
                     ]
                 }
@@ -15487,7 +15603,7 @@ class ModalWindow extends (0, _dom.Block) {
     }
 }
 
-},{"components":"dHnah","core/dom":"3BLMu","utils/api":"i2lTI","./template":"3xE9u","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3xE9u":[function(require,module,exports) {
+},{"components":"dHnah","core/dom":"3BLMu","utils/api":"i2lTI","./template":"3xE9u","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","services/chats":"NtgIu"}],"3xE9u":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 exports.default = `
@@ -15854,10 +15970,10 @@ class AvatarInput extends (0, _components.FileInput) {
                     "upload-avatar"
                 ]
             },
-            inputButtonProps: {
+            chooseButtonProps: {
                 label: "upload avatar",
                 htmlClasses: [
-                    "choose-avatar"
+                    "choose-profile-avatar"
                 ]
             },
             fileInputProps: {
@@ -16115,13 +16231,15 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "appIsInitedSetter", ()=>(0, _appIsInited.appIsInitedSetter));
 parcelHelpers.export(exports, "pageSetter", ()=>(0, _page.pageSetter));
 parcelHelpers.export(exports, "userSetter", ()=>(0, _user.userSetter));
+parcelHelpers.export(exports, "chatsSetter", ()=>(0, _chats.chatsSetter));
 parcelHelpers.export(exports, "currentChatSetter", ()=>(0, _currentChatId.currentChatSetter));
 var _appIsInited = require("./app-is-inited");
 var _page = require("./page");
 var _user = require("./user");
+var _chats = require("./chats");
 var _currentChatId = require("./current-chat-id");
 
-},{"./app-is-inited":"gwmwO","./page":"9VF22","./user":"7ixXa","./current-chat-id":"iUzLN","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gwmwO":[function(require,module,exports) {
+},{"./app-is-inited":"gwmwO","./page":"9VF22","./user":"7ixXa","./current-chat-id":"iUzLN","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./chats":"7wTGV"}],"gwmwO":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "appIsInitedSetter", ()=>appIsInitedSetter);
@@ -16171,6 +16289,10 @@ var _pages = require("pages");
 var _objectsHandle = require("utils/objects-handle");
 function currentChatSetter(oldValue, newValue) {
     const { page  } = this.state;
+    if (page === (0, _pages.EnumAppPages).Navigation) {
+        if ((0, _objectsHandle.isNullish)(newValue)) localStorage.removeItem("currentChatID");
+        return;
+    }
     if (page !== (0, _pages.EnumAppPages).Chats) return;
     if ((0, _objectsHandle.isNullish)(newValue)) throw new Error("Current Chat ID Can't Be Nullified On Chats Page");
     const { refs  } = this.page;
@@ -16188,6 +16310,22 @@ function currentChatSetter(oldValue, newValue) {
     localStorage.currentChatID = newValue;
 }
 
-},{"pages":"kIGWd","utils/objects-handle":"kOfSo","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["iJYvl","h7u1C"], "h7u1C", "parcelRequire8a48")
+},{"pages":"kIGWd","utils/objects-handle":"kOfSo","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"7wTGV":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "chatsSetter", ()=>chatsSetter);
+var _pages = require("pages");
+function chatsSetter(oldValue, newValue) {
+    const { page  } = this.state;
+    if (page !== (0, _pages.EnumAppPages).Chats) return;
+    const { chatsList  } = this.page.refs;
+    chatsList._createChatsList();
+    Object.values(chatsList.children.chats).forEach((chat)=>{
+        this.page.refs[`chat-${chat.chatID}`] = chat;
+    });
+    chatsList._componentDidUpdate("", "", true);
+}
+
+},{"pages":"kIGWd","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["iJYvl","h7u1C"], "h7u1C", "parcelRequire8a48")
 
 //# sourceMappingURL=index.b71e74eb.js.map
