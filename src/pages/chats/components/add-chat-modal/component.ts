@@ -27,7 +27,7 @@ export class ModalWindow extends Block {
 
   private _makeCreateChatButton() {
     const refs = {
-      titleInput: this.children.chattTitleInput as Block,
+      titleInput: this.children.chatTitleInput as Block,
       modalWindow: this,
     };
 
@@ -53,11 +53,11 @@ export class ModalWindow extends Block {
               const { titleInput, modalWindow } = this.refs;
               modalWindow.clearAPIResponseStatus();
               console.log(`TITLE INPUT: ${titleInput.getValue()}`);
-              afterRequestCallback({}); // DEBUG
-              // ChatsService.createChat(
-              //   { title: titleInput.getValue() },
-              //   afterRequestCallback
-              // );
+              // afterRequestCallback({}); // DEBUG
+              ChatsService.createChat(
+                { title: titleInput.getValue() },
+                afterRequestCallback
+              );
             },
           ],
         },

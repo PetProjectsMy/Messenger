@@ -77,6 +77,7 @@ export class ChatsPage extends WithStoreBlock {
       "navigationSection",
       "chatsList",
     ]);
+    this.refs.chatsList = chatsList;
     Object.values(chatsList).forEach((chat: NavigationSectionChatComponent) => {
       this.refs[`chat-${chat.chatID}`] = chat;
     });

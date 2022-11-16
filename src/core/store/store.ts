@@ -63,6 +63,9 @@ export class Store {
           case "user":
             StateProxies.userSetter.call(this, oldValue, newValue);
             break;
+          case "chats":
+            StateProxies.chatsSetter.call(this, oldValue, newValue);
+            break;
           case "currentChatID":
             StateProxies.currentChatSetter.call(this, oldValue, newValue);
             break;

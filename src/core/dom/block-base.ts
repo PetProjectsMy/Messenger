@@ -65,12 +65,15 @@ export default class BlockBase {
     newPropsOrState: TComponentProps | TComponentState,
     forceUpdate: boolean = false
   ): void {
-    const response = this.componentDidUpdate(oldPropsOrState, newPropsOrState);
-    if (!forceUpdate && !response) {
+    if (forceUpdate) {
+      this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
       return;
     }
 
-    this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
+    const response = this.componentDidUpdate(oldPropsOrState, newPropsOrState);
+    if (response) {
+      this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
+    }
   }
 
   protected componentDidUpdate(

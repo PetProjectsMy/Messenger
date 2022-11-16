@@ -12,7 +12,7 @@ export class ChatsServiceClass {
     const { status, response } = request;
 
     console.log(
-      `GET CHATS REQUEST:status ${status}; response: ${JSON.stringify(
+      `GET CHATS REQUEST: status ${status}; response ${JSON.stringify(
         response
       )}`
     );
@@ -30,19 +30,24 @@ export class ChatsServiceClass {
 
   async createChat(
     data: TCreateChatDTO,
-    afterRequestCallback: TAfterRequestCallback = () => {}
+    afterRequestCallback?: TAfterRequestCallback
   ) {
     const request = await ChatsAPI.createChat(data);
     const { status, response } = request;
 
     console.log(
-      `CREATE CHAT REQUEST: status ${status}; response: ${JSON.stringify(
+      `CREATE CHAT REQUEST: status ${status}; response ${JSON.stringify(
         response
       )}`
     );
 
-    await afterRequestCallback(response);
+    if (afterRequestCallback) {
+      await afterRequestCallback(response);
+    }
 
+    if (!APIResponseHasError(response)) {
+      await this.getChats();
+    }
     return response;
   }
 
@@ -61,31 +66,31 @@ export class ChatsServiceClass {
     const { status, response } = request;
 
     console.log(
-      `CHANGE CHAT(${chatID}) AVATAR REQUEST: status ${status}; response: ${JSON.stringify(
+      `CHANGE CHAT(${chatID}) AVATAR REQUEST: status ${status}; response ${JSON.stringify(
         response
       )}`
     );
 
-    if (APIResponseHasError(response)) {
-      return;
-    }
-
-    const avatar = transformAvatarURL(response.avatar);
-    window.store.setStateByPath({
-      pathString: `chats.${chatID}.avatar`,
-      value: avatar,
-      afterSetCallback() {
-        const chatComponent = window.store.getPageRef(`chat-${chatID}`);
-        (chatComponent.children.avatarImage as Block).setPropByPath(
-          "htmlAttributes.src",
-          avatar
-        );
-      },
-    });
-
     if (afterRequestCallback) {
       await afterRequestCallback(response);
     }
+
+    if (!APIResponseHasError(response)) {
+      const avatar = transformAvatarURL(response.avatar);
+      window.store.setStateByPath({
+        pathString: `chats.${chatID}.avatar`,
+        value: avatar,
+        afterSetCallback() {
+          const chatComponent = window.store.getPageRef(`chat-${chatID}`);
+          (chatComponent.children.avatarImage as Block).setPropByPath(
+            "htmlAttributes.src",
+            avatar
+          );
+        },
+      });
+    }
+
+    return response;
   }
 }
 
