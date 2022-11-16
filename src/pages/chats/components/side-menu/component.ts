@@ -3,6 +3,7 @@ import { Block } from "core/dom";
 import {
   CollapseButton,
   CreateChatButton,
+  DeleteChatButton,
   AvatarChooseButton,
 } from "./buttons";
 import template from "./template";
@@ -13,6 +14,7 @@ export class ChatsPageSideMenu extends Block {
 
     children.collapseButton = new CollapseButton();
     children.createChatButton = new CreateChatButton();
+    children.deleteChatButton = new DeleteChatButton();
     children.avatarChooseButton = new AvatarChooseButton();
 
     super({ props: { htmlStyle: { display: "none" } }, children });

@@ -15,13 +15,16 @@ const DefualtHeaders = {
     "Content-Type": "application/json",
     accept: "application/json",
   },
-  [METHODS.DELETE]: { accept: "application/json" },
+  [METHODS.DELETE]: {
+    "Content-Type": "application/json",
+    accept: "application/json",
+  },
 };
 
 type TRequestOptions = {
   method: METHODS;
   headers?: Record<string, string>;
-  data?: Record<string, string> | FormData;
+  data?: Record<string, string | number> | FormData;
   timeout?: number;
 };
 

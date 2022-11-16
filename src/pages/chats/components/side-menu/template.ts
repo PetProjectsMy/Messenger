@@ -3,5 +3,6 @@ export default `
     {{{ collapseButton }}}
     {{{ avatarChooseButton }}}
     {{{ createChatButton }}}
+    {{{ deleteChatButton }}}
   </section>
 `;

@@ -36,3 +36,7 @@ export function transformProfileFormDatatoAPI(
     phone: data[EnumProfileFormFields.Phone],
   };
 }
+
+export function transformChatIDToDeleteAPI(chatID: string) {
+  return { chatId: parseInt(chatID, 10) };
+}

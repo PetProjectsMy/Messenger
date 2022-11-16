@@ -1,10 +1,13 @@
 import { ChatsAPI } from "api";
-import { type Block } from "core/dom";
+import { type ImageComponent } from "components";
 import {
   APIResponseHasError,
   transformAvatarURL,
   transformChatsGetResponseToChatsData,
 } from "utils/api";
+import { transformChatIDToDeleteAPI } from "utils/api/to-api-data-transformers";
+import { objectWithoutKey } from "utils/objects-handle";
+import { getDescendantByPath } from "utils/pages";
 
 export class ChatsServiceClass {
   async getChats(afterRequestCallback: TAfterRequestCallback = () => {}) {
@@ -51,6 +54,32 @@ export class ChatsServiceClass {
     return response;
   }
 
+  async deleteChat(
+    chatID: string,
+    afterRequestCallback?: TAfterRequestCallback
+  ) {
+    const request = await ChatsAPI.deleteChat(
+      transformChatIDToDeleteAPI(chatID)
+    );
+    const { status, response } = request;
+
+    console.log(
+      `DELETE CHAT(${chatID}) REQUEST: status ${status}; response ${JSON.stringify(
+        response
+      )}`
+    );
+
+    if (afterRequestCallback) {
+      await afterRequestCallback(response);
+    }
+
+    if (!APIResponseHasError(response)) {
+      const currentChats = window.store.getChatsDataByPath();
+      const newChats = objectWithoutKey(currentChats, chatID) as TAppChatsData;
+      window.store.dispatch({ chats: newChats });
+    }
+  }
+
   async changeAvatar({
     chatID,
     avatarForm,
@@ -82,10 +111,10 @@ export class ChatsServiceClass {
         value: avatar,
         afterSetCallback() {
           const chatComponent = window.store.getPageRef(`chat-${chatID}`);
-          (chatComponent.children.avatarImage as Block).setPropByPath(
-            "htmlAttributes.src",
-            avatar
-          );
+          const avatarImage = getDescendantByPath(chatComponent, [
+            "avatarImage",
+          ]) as ImageComponent;
+          avatarImage.setPropByPath("htmlAttributes.src", avatar);
         },
       });
     }

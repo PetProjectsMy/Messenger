@@ -25,6 +25,10 @@ declare global {
   export type TCreateChatDTO = {
     title: string;
   };
+
+  export type TDeleteChatDTO = {
+    chatId: number;
+  };
 }
 
 export {};

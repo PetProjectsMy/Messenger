@@ -1,6 +1,8 @@
 import { type Block } from "core/dom";
 
-export function getDescendantByPath(block: Block, pathArray: string[]) {
+export function getDescendantByPath<
+  TDescendant extends TComponentChild = Block
+>(block: Block, pathArray: string[]): TDescendant {
   const pathString = `children.${pathArray.join(".children.")}`;
   const path = pathString.split(".");
   let pathExisting = pathString;
@@ -15,5 +17,5 @@ export function getDescendantByPath(block: Block, pathArray: string[]) {
     result = result[path[i]];
   }
   // console.log(`PATH '${path.join(".")}' EXISTING PART: ${pathExisting}}`);
-  return result;
+  return result as TDescendant;
 }

@@ -1,3 +1,4 @@
+import { type Block } from "core/dom";
 import { WithStoreBlock } from "hocs/components";
 import { getDescendantByPath } from "utils/pages";
 import { ModalWindow } from "./components/modals";
@@ -30,7 +31,7 @@ export class ChatsPage extends WithStoreBlock {
       "headerSection",
       "functionalButton",
     ]);
-    functionalButton.refs.sideMenu = this.children.sideMenu;
+    functionalButton.refs.sideMenu = getDescendantByPath(this, ["sideMenu"]);
 
     this.refs.chatTitle = getDescendantByPath(this, [
       "chatSection",
@@ -73,9 +74,8 @@ export class ChatsPage extends WithStoreBlock {
     ]);
     this.refs.chatsList = chatsList;
 
-    const chats = getDescendantByPath(chatsList, ["chats"]);
+    const chats = getDescendantByPath<Block[]>(chatsList, ["chats"]);
     chats.forEach((chat: any) => {
-      console.log(`CHAT REF: chat-${chat.chatID}`);
       this.refs[`chat-${chat.chatID}`] = chat;
     });
   }

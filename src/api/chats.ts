@@ -9,6 +9,10 @@ class ChatsAPIClass {
     return request.post("chats", { data });
   }
 
+  deleteChat(data: TDeleteChatDTO) {
+    return request.delete("chats", { data });
+  }
+
   changeAvatar(data: FormData) {
     return request.put("chats/avatar", {
       headers: { "Content-Type": "multipart/form-data" },

@@ -1,1 +1,0 @@
-export { AddChatModalWindow } from "./component";

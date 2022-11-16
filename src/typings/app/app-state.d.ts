@@ -27,7 +27,7 @@ declare global {
     };
   };
 
-  export type TAppChatsData = Record<number, TChatData>;
+  export type TAppChatsData = Record<string, TChatData>;
 
   export type TAppState = {
     appIsInited: boolean;

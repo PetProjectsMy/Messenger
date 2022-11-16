@@ -60,7 +60,9 @@ declare global {
       | TComponentProps;
   };
 
-  export type TComponentChildren = Record<string, Block | Block[]>;
+  export type TComponentChild = Block | Block[];
+
+  export type TComponentChildren = Record<string, TComponentChild>;
 
   export type TComponentRefs = Record<string, Block>;
 
