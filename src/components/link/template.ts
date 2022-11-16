@@ -1,4 +1,4 @@
-import getComponentTemplate from "utils/component-template-generator";
+import getComponentTemplate from "utils/components/component-template-generator";
 
 const tag = "a";
 const content = "{{ label }}";

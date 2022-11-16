@@ -1,7 +1,8 @@
-import { Button, Input } from "components";
 import { Block } from "core/dom";
+import { Button, Input } from "components";
 import { ChatsService } from "services/chats";
 import { APIResponseHasError } from "utils/api";
+import { ModalWindow } from "../modal-window";
 import template from "./template";
 
 export class AddChatModalWindow extends Block {
@@ -13,29 +14,25 @@ export class AddChatModalWindow extends Block {
     const children = {} as TComponentChildren;
 
     children.chatTitleInput = AddChatModalWindow._createChatTitleInput();
-    children.closeButton = AddChatModalWindow._createCloseButton();
 
     super({ children, state });
+
+    ModalWindow.dispatchContent(this);
   }
 
   protected _afterPropsAssignHook(): void {
     super._afterPropsAssignHook();
 
-    (this.children.closeButton as Block).refs.modalWindow = this;
     this._makeCreateChatButton();
   }
 
   private _makeCreateChatButton() {
     const refs = {
       titleInput: this.children.chatTitleInput as Block,
-      modalWindow: this,
+      modalContent: this,
     };
 
     const afterRequestCallback = function (response: any) {
-      if (!this.props.htmlClasses.includes("show-modal")) {
-        this.props.htmlClasses.push("show-modal");
-      }
-
       if (APIResponseHasError(response)) {
         this.state.apiResponseError = response.reason;
       } else {
@@ -50,10 +47,9 @@ export class AddChatModalWindow extends Block {
         events: {
           click: [
             function () {
-              const { titleInput, modalWindow } = this.refs;
-              modalWindow.clearAPIResponseStatus();
+              const { titleInput, modalContent } = this.refs;
+              modalContent.clearAPIResponseStatus();
               console.log(`TITLE INPUT: ${titleInput.getValue()}`);
-              // afterRequestCallback({}); // DEBUG
               ChatsService.createChat(
                 { title: titleInput.getValue() },
                 afterRequestCallback
@@ -65,10 +61,6 @@ export class AddChatModalWindow extends Block {
     });
 
     this.children.createChatButton = createChatButton;
-  }
-
-  toggleModal() {
-    this._element?.classList.toggle("show-modal");
   }
 
   clearAPIResponseStatus() {
@@ -85,22 +77,6 @@ export class AddChatModalWindow extends Block {
       props: {
         htmlAttributes: {
           placeholder: "Enter Chat Title",
-        },
-      },
-    });
-  }
-
-  private static _createCloseButton() {
-    return new Button({
-      props: {
-        htmlClasses: ["close-button"],
-        label: "×",
-        events: {
-          click: [
-            function () {
-              this.refs.modalWindow.toggleModal();
-            },
-          ],
         },
       },
     });

@@ -1,11 +1,11 @@
 import { WithStoreBlock } from "hocs/components";
 import { getDescendantByPath } from "utils/pages";
+import { ModalWindow } from "./components/modals";
 import template from "./template";
 import {
   ChatsPageMainSection,
   ChatsPageNavigationSection,
   ChatsPageSideMenu,
-  ModalWindow,
 } from "./components";
 
 export class ChatsPage extends WithStoreBlock {
@@ -14,7 +14,8 @@ export class ChatsPage extends WithStoreBlock {
     children.navigationSection = new ChatsPageNavigationSection();
     children.chatSection = new ChatsPageMainSection();
     children.sideMenu = new ChatsPageSideMenu();
-    children.addChatModal = new ModalWindow();
+    children.modalWindow = ModalWindow;
+
     super({
       props: { componentName: "Chats Page" },
       children,
@@ -30,12 +31,6 @@ export class ChatsPage extends WithStoreBlock {
       "functionalButton",
     ]);
     functionalButton.refs.sideMenu = this.children.sideMenu;
-
-    const createChatButton = getDescendantByPath(this, [
-      "sideMenu",
-      "createChatButton",
-    ]);
-    createChatButton.refs.addChatModal = this.children.addChatModal;
 
     this.refs.chatTitle = getDescendantByPath(this, [
       "chatSection",

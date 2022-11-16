@@ -1,4 +1,4 @@
-import getComponentTemplate from "utils/component-template-generator";
+import getComponentTemplate from "utils/components/component-template-generator";
 
 export default function getInputFormTemplate(
   enumFormFieldsNames: Record<string, string>

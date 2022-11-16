@@ -244,7 +244,7 @@ export class Block<
   }
 
   protected render(): string {
-    return "";
+    return "<div></div>";
   }
 
   getComponentName() {
