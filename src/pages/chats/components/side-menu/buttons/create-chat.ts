@@ -1,7 +1,7 @@
 import { Button } from "components";
 import {
   ModalWindow,
-  AddChatModalWindow,
+  CreateChatModalWindow,
   EnumModalWindows,
 } from "pages/chats/components/modals";
 
@@ -14,10 +14,14 @@ export class CreateChatButton extends Button {
           click: [
             function () {
               const contentType = ModalWindow.getContentType();
-              if (contentType !== EnumModalWindows.AddChat) {
-                ModalWindow.dispatchContent(new AddChatModalWindow());
-                console.log(`MODAL CONTENT: ${contentType}`);
+              const componentName = EnumModalWindows.CreateChat;
+
+              if (contentType !== componentName) {
+                ModalWindow.dispatchContent(
+                  new CreateChatModalWindow(componentName)
+                );
               }
+
               ModalWindow.toggleVisibility("on");
             },
           ],

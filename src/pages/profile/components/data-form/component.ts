@@ -11,7 +11,6 @@ export class ProfilePageInputForm extends InputForm {
   constructor() {
     super({
       props: {
-        componentName: "User Profile Form",
         htmlClasses: ["profile-data-form"],
         isSubmitButtonNeeded: false,
         afterValidationCallback,

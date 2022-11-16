@@ -3,6 +3,8 @@ import { Block } from "core/dom";
 import template from "./template";
 
 export class ModalWindow extends Block {
+  private contentType: string;
+
   constructor() {
     const children = {} as TComponentChildren;
 
@@ -22,6 +24,7 @@ export class ModalWindow extends Block {
     children.content = new Block();
 
     super({ children });
+    this.contentType = "";
   }
 
   protected render(): string {
@@ -34,9 +37,23 @@ export class ModalWindow extends Block {
     (this.children.closeButton as Block).refs.modalWindow = this;
 
     this.children = new Proxy(this.children, {
-      set: function (target, childName: string, element) {
-        target[childName] = element;
-        this._componentDidUpdate("", "", true);
+      set: function (
+        target: TComponentChildren,
+        childName: string,
+        component: Block
+      ) {
+        if (childName === "content") {
+          const oldContentType = this.contentType;
+
+          target[childName] = component;
+          this._componentDidUpdate("", "", true);
+
+          this.contentType = component.componentName;
+          console.log(
+            `MODAL CONTENT: ${oldContentType} -> ${this.contentType}`
+          );
+        }
+
         return true;
       }.bind(this),
     });
@@ -70,6 +87,6 @@ export class ModalWindow extends Block {
   }
 
   public getContentType() {
-    return this.children.content.constructor.name;
+    return this.contentType;
   }
 }

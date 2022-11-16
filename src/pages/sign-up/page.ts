@@ -30,7 +30,7 @@ export class SignUpPage extends Block {
     children.signupForm = new SignUpPageForm();
     children.homeButton = new HomeButton();
 
-    super({ children, props: { componentName: "SignUp Page" }, refs });
+    super({ componentName: "SignUp Page", children, refs });
   }
 
   render() {

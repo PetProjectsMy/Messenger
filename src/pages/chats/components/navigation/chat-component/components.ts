@@ -37,7 +37,6 @@ export class NavigationSectionChatComponent extends WithStoreBlock {
           src: avatarSrc,
           alt: "avatar placeholder",
         },
-        componentName: "Avatar Image",
       },
     });
 
@@ -53,7 +52,6 @@ export class NavigationSectionChatComponent extends WithStoreBlock {
     return new TextComponent({
       props: {
         text,
-        componentName: "Chat Component Message",
       },
     });
   }

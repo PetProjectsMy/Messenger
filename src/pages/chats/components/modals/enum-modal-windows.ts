@@ -1,3 +1,4 @@
 export const enum EnumModalWindows {
-  AddChat = "AddChatModalWindow",
+  CreateChat = "CreateChatModalWindow",
+  AddUsers = "AddChatUsersModalWindow",
 }

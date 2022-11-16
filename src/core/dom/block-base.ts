@@ -36,7 +36,7 @@ export default class BlockBase {
     TBlockCommonEventsHandlersArgs
   >();
 
-  protected componentName: string;
+  public componentName: string;
 
   protected props: TComponentProps = {};
 

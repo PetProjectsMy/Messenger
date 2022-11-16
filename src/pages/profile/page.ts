@@ -39,7 +39,6 @@ export class ProfilePage extends ProfilePageBlock {
           src: imageSource,
           alt: "Profile Avatar",
         },
-        componentName: "Avatar Image",
       },
     });
     children.avatarImage = avatarImage;

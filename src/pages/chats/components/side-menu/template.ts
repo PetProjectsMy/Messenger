@@ -1,8 +1,9 @@
 export default `
   <section class="side-menu">
     {{{ collapseButton }}}
-    {{{ avatarChooseButton }}}
     {{{ createChatButton }}}
+    {{{ addChatUsersButton }}}
+    {{{ avatarChooseButton }}}
     {{{ deleteChatButton }}}
   </section>
 `;

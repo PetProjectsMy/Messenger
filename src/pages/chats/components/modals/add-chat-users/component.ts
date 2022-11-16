@@ -1,23 +1,37 @@
 import { Block } from "core/dom";
 import { Button, Input } from "components";
-import { ChatsService } from "services/chats";
 import { APIResponseHasError } from "utils/api";
+import { ChatsService } from "services";
 import template from "./template";
 
-export class CreateChatModalWindow extends Block {
-  constructor(componentName: string) {
+export class AddChatUsersModalWindow extends Block {
+  readonly chatID: string;
+
+  constructor({
+    chatID,
+    componentName,
+  }: {
+    chatID: string;
+    componentName: string;
+  }) {
     const state = {
       apiResponseSuccess: "",
       apiResponseError: "",
     };
-    const children = {} as TComponentChildren;
 
-    children.chatTitleInput = CreateChatModalWindow._createChatTitleInput();
+    const children = {} as TComponentChildren;
+    children.usersIdenifiersInput =
+      AddChatUsersModalWindow._createUsersIdenifiersInput();
+
+    const beforePropsAssignHook = function () {
+      this.chatID = chatID;
+    };
 
     super({
       children,
       state,
       componentName,
+      helpers: { beforePropsAssignHook },
     });
   }
 
@@ -29,7 +43,7 @@ export class CreateChatModalWindow extends Block {
 
   private _createSubmitButton() {
     const refs = {
-      titleInput: this.children.chatTitleInput as Block,
+      usersInput: this.children.usersIdenifiersInput as Block,
       modalWindow: this,
     };
 
@@ -37,25 +51,29 @@ export class CreateChatModalWindow extends Block {
       if (APIResponseHasError(response)) {
         this.state.apiResponseError = response.reason;
       } else {
-        this.state.apiResponseSuccess = "Chat created successfully";
-        this.children.chatTitleInput.setValue("");
+        this.state.apiResponseSuccess = "Uses added successfully";
+        this.children.usersIdenifiersInput.setValue("");
       }
     }.bind(this);
 
     const submitButton = new Button({
       refs,
       props: {
-        label: "Create",
+        label: "add users",
         events: {
           click: [
             function () {
-              const { titleInput, modalWindow } = this.refs;
+              const { usersInput, modalWindow } = this.refs;
               modalWindow.clearAPIResponseStatus();
-              console.log(`TITLE INPUT: ${titleInput.getValue()}`);
-              ChatsService.createChat(
-                { title: titleInput.getValue() },
-                afterRequestCallback
-              );
+
+              const { chatID } = modalWindow;
+              console.log(`USERS INPUT: ${usersInput.getValue()}`);
+              console.log(`CHAT ID: ${chatID}`);
+
+              // ChatsService.createChat(
+              //   { title: usersInput.getValue() },
+              //   afterRequestCallback
+              // );
             },
           ],
         },
@@ -74,11 +92,11 @@ export class CreateChatModalWindow extends Block {
     return template;
   }
 
-  private static _createChatTitleInput() {
+  private static _createUsersIdenifiersInput() {
     return new Input({
       props: {
         htmlAttributes: {
-          placeholder: "Enter Chat Title",
+          placeholder: "Enter Users ID Numbers",
         },
       },
     });

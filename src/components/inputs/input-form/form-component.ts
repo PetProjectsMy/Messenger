@@ -45,10 +45,8 @@ export class InputForm<
 
     Object.values(enumInputFieldsNames).forEach((fieldName) => {
       const inputField = new InputClass({
-        props: {
-          componentName: `${fieldName} input with validation`,
-          ...(mapInputToProps![fieldName] ?? {}),
-        },
+        componentName: `${fieldName} input with validation`,
+        props: mapInputToProps![fieldName] ?? {},
         helpers: mapInputToHelpers[fieldName] ?? {},
       });
 

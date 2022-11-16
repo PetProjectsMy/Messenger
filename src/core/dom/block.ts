@@ -10,8 +10,6 @@ export class Block<
 > extends BlockBase {
   protected children: TComponentChildren;
 
-  public componentName: string = "Unnamed Block";
-
   protected helpers: TComponentHelpers;
 
   protected props: TProps;
@@ -23,12 +21,14 @@ export class Block<
   private wasRendered: Boolean = false;
 
   constructor({
+    componentName,
     props = {} as TProps,
     children = {},
     refs = {},
     state = {},
     helpers = {},
   }: {
+    componentName?: string;
     props?: TProps;
     children?: TComponentChildren;
     refs?: TComponentRefs;
@@ -40,6 +40,9 @@ export class Block<
     this.helpers = helpers;
 
     this._beforePropsAssignHook();
+    this.componentName =
+      componentName ?? `Not Named Block of type ${this.constructor.name}`;
+
     this.props = props;
     this.props.events = this.props.events ?? {};
     this.props.htmlAttributes ??= {};
@@ -49,8 +52,6 @@ export class Block<
     this.children = children;
     this.refs = refs;
     this.state = state as TState;
-    this.componentName = (props.componentName ??
-      `Not Named Block of type ${this.constructor.name}`) as string;
 
     this._afterPropsAssignHook();
     this.htmlWrapped = !!this.props.htmlWrapper;

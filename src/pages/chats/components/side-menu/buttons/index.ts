@@ -1,4 +1,5 @@
-export { CollapseButton } from "./collapse-button";
-export { CreateChatButton } from "./create-chat-button";
-export { DeleteChatButton } from "./delete-chat-button";
-export { AvatarChooseButton } from "./avatar-choose-button";
+export { CollapseButton } from "./collapse";
+export { CreateChatButton } from "./create-chat";
+export { DeleteChatButton } from "./delete-chat";
+export { AddChatUsersButton } from "./add-chat-users";
+export { AvatarChooseButton } from "./avatar-choose";

@@ -37,7 +37,7 @@ export class NavigationPage extends Block {
 
     super({
       children,
-      props: { componentName: "Navigation Page" },
+      componentName: "Navigation Page",
     });
   }
 

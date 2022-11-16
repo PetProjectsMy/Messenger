@@ -1,21 +1,16 @@
 import { Block } from "core/dom";
-
-import {
-  CollapseButton,
-  CreateChatButton,
-  DeleteChatButton,
-  AvatarChooseButton,
-} from "./buttons";
+import * as Buttons from "./buttons";
 import template from "./template";
 
 export class ChatsPageSideMenu extends Block {
   constructor() {
     const children = {} as TComponentChildren;
 
-    children.collapseButton = new CollapseButton();
-    children.createChatButton = new CreateChatButton();
-    children.deleteChatButton = new DeleteChatButton();
-    children.avatarChooseButton = new AvatarChooseButton();
+    children.collapseButton = new Buttons.CollapseButton();
+    children.createChatButton = new Buttons.CreateChatButton();
+    children.deleteChatButton = new Buttons.DeleteChatButton();
+    children.addChatUsersButton = new Buttons.AddChatUsersButton();
+    children.avatarChooseButton = new Buttons.AvatarChooseButton();
 
     super({ props: { htmlStyle: { display: "none" } }, children });
   }

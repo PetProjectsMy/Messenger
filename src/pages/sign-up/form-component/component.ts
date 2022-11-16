@@ -10,7 +10,6 @@ export class SignUpPageForm extends InputForm {
       props: {
         afterValidationCallback,
         formTitle: "Sign Up",
-        componentName: "SignUp Form Component",
       },
     });
   }

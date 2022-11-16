@@ -41,7 +41,6 @@ export class DataChangeButton extends Button {
       },
       refs,
       props: {
-        componentName: "change/save data button",
         label: "change data",
         htmlClasses: ["change-data-button"],
         events: {

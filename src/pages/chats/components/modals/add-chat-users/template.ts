@@ -1,8 +1,8 @@
 export default `
     <div class="modal-content">
-      <section class="chat-data-input-section">
-        <div class="title-input-section">
-          {{{ chatTitleInput }}}
+      <section class="users-data-input-section">
+        <div class="idenrifierss-input-section">
+          {{{ usersIdenifiersInput }}}
         </div>
       </section>
       

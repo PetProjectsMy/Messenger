@@ -19,7 +19,7 @@ export class ChatsPage extends WithStoreBlock {
     children.modalWindow = ModalWindow;
 
     super({
-      props: { componentName: "Chats Page" },
+      componentName: "Chats Page",
       children,
     });
   }
@@ -67,6 +67,11 @@ export class ChatsPage extends WithStoreBlock {
       "sideMenu",
       "avatarChooseButton",
       "chooseButton",
+    ]);
+
+    this.refs.addChatUsersButton = getDescendantByPath(this, [
+      "sideMenu",
+      "addChatUsersButton",
     ]);
 
     this.refs.deleteChatButton = getDescendantByPath(this, [

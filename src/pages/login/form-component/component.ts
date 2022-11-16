@@ -11,7 +11,6 @@ export class LoginPageForm extends InputForm {
       props: {
         afterValidationCallback,
         formTitle: "Login",
-        componentName: "Login Form Component",
       },
     });
   }

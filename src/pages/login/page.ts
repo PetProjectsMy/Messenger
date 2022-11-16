@@ -30,8 +30,8 @@ export class LoginPage extends Block {
     children.homeButton = new HomeButton();
 
     super({
+      componentName: "Login Page",
       children,
-      props: { componentName: "Login Page" },
       refs,
     });
   }

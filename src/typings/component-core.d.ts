@@ -10,7 +10,6 @@ declare global {
   };
 
   export type ComponentOptionalProps = {
-    componentName?: string;
     events?: Record<string, ComponentEventHandler[]>;
     htmlClasses?: string[];
     htmlStyle?: {
