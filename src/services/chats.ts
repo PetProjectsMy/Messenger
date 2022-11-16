@@ -5,6 +5,7 @@ import {
   transformAvatarURL,
   transformChatsGetResponseToChatsData,
 } from "utils/api";
+import { transformChatUsersGetResponseToChatsUsersData } from "utils/api/from-api-data-transformers";
 import { transformChatIDToDeleteAPI } from "utils/api/to-api-data-transformers";
 import { objectWithoutKey } from "utils/objects-handle";
 import { getDescendantByPath } from "utils/pages";
@@ -51,6 +52,7 @@ export class ChatsServiceClass {
     if (!APIResponseHasError(response)) {
       await this.getChats();
     }
+
     return response;
   }
 
@@ -79,21 +81,75 @@ export class ChatsServiceClass {
       window.store.dispatch({ chats: newChats });
       window.store.dispatch({ currentChatID: null });
     }
+
+    return response;
   }
 
-  async changeAvatar({
-    chatID,
-    avatarForm,
-    afterRequestCallback,
-  }: {
-    chatID: string;
-    avatarForm: FormData;
-    afterRequestCallback?: TAfterRequestCallback;
-  }) {
-    avatarForm.append("chatId", chatID);
-
-    const request = await ChatsAPI.changeAvatar(avatarForm);
+  async getChatUsers(
+    chatID: string,
+    afterRequestCallback?: TAfterRequestCallback
+  ) {
+    const request = await ChatsAPI.getChatUsers(chatID);
     const { status, response } = request;
+
+    console.log(
+      `GET CHAT(${chatID}) USERS REQUEST: status ${status}; response ${JSON.stringify(
+        response
+      )}`
+    );
+
+    if (afterRequestCallback) {
+      await afterRequestCallback(response);
+    }
+
+    return response;
+  }
+
+  async addUsersToChat(
+    data: TAddChatUsersDTO,
+    afterRequestCallback?: TAfterRequestCallback
+  ) {
+    const request = await ChatsAPI.addUsersToChat(data);
+    const { status, response } = request;
+    const chatID = data.chatId;
+    const usersList = data.users;
+
+    console.log(
+      `ADD USERS TO CHAT(${chatID}) REQUEST: status ${status}; response ${JSON.stringify(
+        response
+      )}`
+    );
+
+    if (afterRequestCallback) {
+      await afterRequestCallback(response);
+    }
+
+    if (!APIResponseHasError(response)) {
+      const responseChatUsers = (await this.getChatUsers(
+        chatID.toString()
+      )) as TChatGetUsersAPIResponse;
+
+      const usersData =
+        transformChatUsersGetResponseToChatsUsersData(responseChatUsers);
+
+      usersList.forEach((userID) => {
+        window.store.setStateByPath({
+          pathString: `chatsUsers.${userID}`,
+          value: usersData[userID],
+        });
+      });
+    }
+
+    return response;
+  }
+
+  async changeAvatar(
+    avatarPutForm: FormData,
+    afterRequestCallback?: TAfterRequestCallback
+  ) {
+    const request = await ChatsAPI.changeAvatar(avatarPutForm);
+    const { status, response } = request;
+    const chatID = avatarPutForm.get("chatId");
 
     console.log(
       `CHANGE CHAT(${chatID}) AVATAR REQUEST: status ${status}; response ${JSON.stringify(

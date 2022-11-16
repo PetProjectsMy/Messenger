@@ -1,10 +1,6 @@
 import Handlebars from "handlebars";
 import { nanoid } from "nanoid";
-import {
-  setPropByPath,
-  comparePropByPath,
-  isNullish,
-} from "utils/objects-handle";
+import { setPropByPath, comparePropByPath } from "utils/objects-handle";
 import { toggleHtmlClassToList } from "utils/components";
 import BlockBase, { BlockCommonEvents } from "./block-base";
 
@@ -94,9 +90,6 @@ export class Block<
       state
     );
 
-    console.log(
-      `CLASS TOGGLE: before ${this.props.htmlClasses}, after ${classList}`
-    );
     this.props.htmlClasses = classList;
   }
 

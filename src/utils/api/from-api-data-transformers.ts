@@ -6,24 +6,24 @@ export function transformAvatarURL(url: Nullable<string>) {
 }
 
 export function transformProfileAPIResponseToUserData(
-  data: TProfileAPIResponse
+  response: TProfileAPIResponse
 ): TAppUserData {
   return {
-    id: data.id,
-    firstName: data.first_name,
-    secondName: data.second_name,
-    displayName: data.display_name ? data.display_name : "",
-    login: data.login,
-    email: data.email,
-    phone: data.phone,
-    avatar: transformAvatarURL(data.avatar),
+    id: response.id,
+    firstName: response.first_name,
+    secondName: response.second_name,
+    displayName: response.display_name ? response.display_name : "",
+    login: response.login,
+    email: response.email,
+    phone: response.phone,
+    avatar: transformAvatarURL(response.avatar),
   };
 }
 
 export function transformChatsGetResponseToChatsData(
-  data: TChatsGetAPIResponse
+  response: TChatsGetAPIResponse
 ): TAppChatsData {
-  return data.reduce((acc, chatData) => {
+  return response.reduce((acc, chatData) => {
     const { id, title, avatar, last_message } = chatData;
 
     acc[id] = {
@@ -34,4 +34,16 @@ export function transformChatsGetResponseToChatsData(
 
     return acc;
   }, {} as TAppChatsData);
+}
+
+export function transformChatUsersGetResponseToChatsUsersData(
+  response: TChatGetUsersAPIResponse
+): TAppChatUsersData {
+  return response.reduce((acc, userData) => {
+    acc[userData.id.toString()] = {
+      displayName: userData.display_name,
+    };
+
+    return acc;
+  }, {} as TAppChatUsersData);
 }

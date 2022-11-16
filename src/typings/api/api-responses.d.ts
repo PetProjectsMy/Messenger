@@ -3,7 +3,7 @@ declare global {
     reason: string;
   };
 
-  export type TUserGetAPIResponse = {
+  export type TUserAPIObject = {
     id: number;
     login: string;
     first_name: string;
@@ -14,31 +14,29 @@ declare global {
     avatar: string;
   };
 
-  export type TProfileAPIResponse = {
-    id: number;
-    login: string;
-    first_name: string;
-    second_name: string;
-    display_name: string;
-    phone: string;
-    email: string;
-    avatar: string;
+  type TUserGetAPIResponse = TUserAPIObject;
+
+  export type TProfileAPIResponse = TUserAPIObject & {
     status: null;
   };
 
-  export type TChatAPIObject = {
+  type TChatAPIObject = {
     id: number;
     title: string;
     avatar: string;
     unread_count: number;
     last_message: {
-      user: Omit<TUserGetAPIResponse, "display_name">;
+      user: Omit<TUserAPIObject, "display_name">;
       time: string;
       content: string;
     };
   };
 
   export type TChatsGetAPIResponse = TChatAPIObject[];
+
+  export type TChatGetUsersAPIResponse = (TUserAPIObject & {
+    role: string;
+  })[];
 }
 
 export {};

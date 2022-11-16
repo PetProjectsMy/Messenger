@@ -69,6 +69,11 @@ export class ChatsPage extends WithStoreBlock {
       "chooseButton",
     ]);
 
+    this.refs.deleteChatButton = getDescendantByPath(this, [
+      "sideMenu",
+      "deleteChatButton",
+    ]);
+
     const chatsList = getDescendantByPath(this, [
       "navigationSection",
       "chatsList",

@@ -1,6 +1,5 @@
 import { Button } from "components/buttons";
 import { Block } from "core/dom";
-import { toggleHtmlClass } from "utils/components";
 import template from "./template";
 
 export class ModalWindow extends Block {

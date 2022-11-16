@@ -13,6 +13,14 @@ class ChatsAPIClass {
     return request.delete("chats", { data });
   }
 
+  getChatUsers(chatID: string) {
+    return request.get(`chats/${chatID}/users`);
+  }
+
+  addUsersToChat(data: TAddChatUsersDTO) {
+    return request.put("chats/users", { data });
+  }
+
   changeAvatar(data: FormData) {
     return request.put("chats/avatar", {
       headers: { "Content-Type": "multipart/form-data" },

@@ -12,6 +12,7 @@ export const defaultState: TAppState = {
   page: null,
   user: null,
   chats: null,
+  chatsUsers: null,
   currentChatID: null,
 };
 

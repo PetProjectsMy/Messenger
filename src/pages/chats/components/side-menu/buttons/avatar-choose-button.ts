@@ -13,17 +13,14 @@ export class AvatarChooseButton extends WithStoreFileInput {
       const { form } = this.refs;
       const fileInput = this._unwrappedElement;
 
-      console.log(`FILE: ${fileInput.value}`);
       if (!fileInput.value) {
         return;
       }
       const avatarForm = new FormData(form._unwrappedElement);
-      for (const [name, value] of avatarForm) {
-        console.log(`NAME: ${name}, VALUE: ${value}`);
-      }
-
       const chatID = window.store.getCurrentChatID();
-      await ChatsService.changeAvatar({ chatID, avatarForm });
+      avatarForm.append("chatId", chatID);
+
+      await ChatsService.changeAvatar(avatarForm);
     };
 
     super({

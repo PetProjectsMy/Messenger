@@ -1,6 +1,6 @@
 import { EnumAppPages } from "pages";
 
-export function chatsSetter(oldValue: any, newValue: any) {
+export function chatsSetter() {
   const { page } = this.state;
 
   if (page !== EnumAppPages.Chats) {

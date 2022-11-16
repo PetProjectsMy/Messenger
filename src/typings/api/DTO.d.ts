@@ -29,6 +29,11 @@ declare global {
   export type TDeleteChatDTO = {
     chatId: number;
   };
+
+  export type TAddChatUsersDTO = {
+    chatId: number;
+    users: number[];
+  };
 }
 
 export {};
