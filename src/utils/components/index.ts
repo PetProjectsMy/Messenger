@@ -1,1 +1,1 @@
-export { toggleHtmlClass } from "./html-class-toggle";
+export { toggleHtmlClassToList } from "./html-class-toggle";

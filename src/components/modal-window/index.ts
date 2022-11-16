@@ -1,1 +1,1 @@
-export { ModalWindow, EnumVisibleState } from "./component";
+export { ModalWindow } from "./component";

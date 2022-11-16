@@ -10,13 +10,15 @@ export default `
         {{{ createChatButton }}}
       </section>
 
-      {{#if apiResponseSuccess}}
-        <span class="api-success"> {{apiResponseSuccess}} </span>
-      {{/if}}
-      {{#if apiResponseError}}
-        <span class="api-error"> {{apiResponseError}} </span>
-      {{/if}}
-
+      <section claas="api-response-status">
+        {{#if apiResponseSuccess}}
+          <span class="api-success"> {{apiResponseSuccess}} </span>
+        {{/if}}
+        {{#if apiResponseError}}
+          <span class="api-error"> {{apiResponseError}} </span>
+        {{/if}}
+      </section>
+      
       {{{ closeButton }}}
     </div>
 `;

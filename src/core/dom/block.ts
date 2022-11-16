@@ -1,6 +1,11 @@
 import Handlebars from "handlebars";
 import { nanoid } from "nanoid";
-import { setPropByPath, comparePropByPath } from "utils/objects-handle";
+import {
+  setPropByPath,
+  comparePropByPath,
+  isNullish,
+} from "utils/objects-handle";
+import { toggleHtmlClassToList } from "utils/components";
 import BlockBase, { BlockCommonEvents } from "./block-base";
 
 export class Block<
@@ -69,12 +74,30 @@ export class Block<
     this._afterRenderHook();
   }
 
-  public setPropByPath(propPath: string, value: unknown): void {
-    const didUpdate = !comparePropByPath(this.props, propPath, value);
+  public setPropByPath(
+    propPath: string,
+    value: unknown,
+    forceUpdate: boolean = false
+  ): void {
+    const didUpdate =
+      forceUpdate || !comparePropByPath(this.props, propPath, value);
     if (didUpdate) {
       setPropByPath(this.props, propPath, value);
       this._componentDidUpdate("" as any, "" as any, true);
     }
+  }
+
+  public toggleHtmlClass(className: string, state: Nullable<"on" | "off">) {
+    const classList = toggleHtmlClassToList(
+      this.props.htmlClasses!,
+      className,
+      state
+    );
+
+    console.log(
+      `CLASS TOGGLE: before ${this.props.htmlClasses}, after ${classList}`
+    );
+    this.props.htmlClasses = classList;
   }
 
   private _init() {

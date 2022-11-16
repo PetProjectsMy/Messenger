@@ -4,7 +4,6 @@ import {
   AddChatModalWindow,
   EnumModalWindows,
 } from "pages/chats/components/modals";
-import { EnumVisibleState } from "components/modal-window";
 
 export class CreateChatButton extends Button {
   constructor() {
@@ -19,7 +18,7 @@ export class CreateChatButton extends Button {
                 ModalWindow.dispatchContent(new AddChatModalWindow());
                 console.log(`MODAL CONTENT: ${contentType}`);
               }
-              ModalWindow.toggleVisibility(EnumVisibleState.show);
+              ModalWindow.toggleVisibility("on");
             },
           ],
         },

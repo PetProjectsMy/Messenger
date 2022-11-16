@@ -3,11 +3,6 @@ import { Block } from "core/dom";
 import { toggleHtmlClass } from "utils/components";
 import template from "./template";
 
-export const enum EnumVisibleState {
-  show = "show",
-  hide = "hide",
-}
-
 export class ModalWindow extends Block {
   constructor() {
     const children = {} as TComponentChildren;
@@ -19,7 +14,7 @@ export class ModalWindow extends Block {
         events: {
           click: [
             function () {
-              this.refs.modalWindow.toggleVisibility(EnumVisibleState.hide);
+              this.refs.modalWindow.toggleVisibility("off");
             },
           ],
         },
@@ -67,25 +62,8 @@ export class ModalWindow extends Block {
     });
   }
 
-  toggleVisibility(state?: EnumVisibleState) {
-    if (state === undefined) {
-      toggleHtmlClass(this.props.htmlClasses!, "show-modal");
-      return;
-    }
-
-    const classesList = this.props.htmlClasses as string[];
-    const classesSet = new Set(this.props.htmlClasses as string[]);
-    const oldSize = classesSet.size;
-    if (state === EnumVisibleState.show) {
-      classesSet.add("show-modal");
-      if (classesSet.size > oldSize) {
-        this.props.htmlClasses = [...classesList, "show-modal"];
-      }
-    } else if (state === EnumVisibleState.hide) {
-      if (classesSet.delete("show-modal")) {
-        this.props.htmlClasses = Array.from(classesSet);
-      }
-    }
+  toggleVisibility(state?: Nullable<"on" | "off">) {
+    this.toggleHtmlClass("show-modal", state);
   }
 
   public dispatchContent(component: Block) {

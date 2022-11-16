@@ -1,6 +1,7 @@
 import { type Block } from "core/dom";
 import { WithStoreBlock } from "hocs/components";
 import { getDescendantByPath } from "utils/pages";
+import { isNullish } from "utils/objects-handle";
 import { ModalWindow } from "./components/modals";
 import template from "./template";
 import {
@@ -78,6 +79,11 @@ export class ChatsPage extends WithStoreBlock {
     chats.forEach((chat: any) => {
       this.refs[`chat-${chat.chatID}`] = chat;
     });
+
+    const currentChatID = this.store.getCurrentChatID();
+    if (!isNullish(currentChatID)) {
+      this.refs[`chat-${currentChatID}`].toggleHtmlClass("current-chat", "on");
+    }
   }
 
   protected render(): string {

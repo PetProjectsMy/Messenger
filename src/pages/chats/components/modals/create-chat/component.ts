@@ -37,6 +37,7 @@ export class AddChatModalWindow extends Block {
         this.state.apiResponseError = response.reason;
       } else {
         this.state.apiResponseSuccess = "Chat created successfully";
+        this.children.chatTitleInput.setValue("");
       }
     }.bind(this);
 

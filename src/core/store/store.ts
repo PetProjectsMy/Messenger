@@ -2,7 +2,7 @@ import { getPageComponent } from "utils/pages";
 import { EnumAppPages } from "pages";
 import { renderDOM } from "core/dom";
 import { EnumAppRoutes } from "core/router";
-import { getPropByPath, setPropByPath } from "utils/objects-handle";
+import { deepEqual, getPropByPath, setPropByPath } from "utils/objects-handle";
 import { EnumStoreEvents } from "./enum-store-events";
 import { EventBus } from "../event-bus";
 import * as StateProxies from "./state-proxies";
@@ -46,6 +46,10 @@ export class Store {
         newValue: unknown
       ) {
         const oldValue = target[prop];
+        if (deepEqual(oldValue, newValue)) {
+          return true;
+        }
+
         (target as Record<string, unknown>)[prop] = newValue;
         console.log(
           `STORE ${prop}: ${JSON.stringify(oldValue)} -> ${JSON.stringify(

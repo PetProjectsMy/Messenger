@@ -36,4 +36,9 @@ export class Input extends Block<TInputProps> {
 
     element.disabled = !element.disabled;
   }
+
+  public setValue(value: string) {
+    const element = this._unwrappedElement! as HTMLInputElement;
+    element.value = value;
+  }
 }
