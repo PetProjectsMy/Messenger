@@ -7,7 +7,6 @@ import {
   ChatsPageSideMenu,
   ModalWindow,
 } from "./components";
-import { type NavigationSectionChatComponent } from "./components/navigation/chat-component";
 
 export class ChatsPage extends WithStoreBlock {
   constructor() {
@@ -78,7 +77,10 @@ export class ChatsPage extends WithStoreBlock {
       "chatsList",
     ]);
     this.refs.chatsList = chatsList;
-    Object.values(chatsList).forEach((chat: NavigationSectionChatComponent) => {
+
+    const chats = getDescendantByPath(chatsList, ["chats"]);
+    chats.forEach((chat: any) => {
+      console.log(`CHAT REF: chat-${chat.chatID}`);
       this.refs[`chat-${chat.chatID}`] = chat;
     });
   }

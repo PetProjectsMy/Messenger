@@ -1,5 +1,5 @@
 export default `
   <ul class="chats-list">
-    {{{ chatsList }}}
+    {{{ chats }}}
   </ul>
 `;
