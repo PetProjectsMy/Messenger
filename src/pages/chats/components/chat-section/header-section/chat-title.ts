@@ -12,22 +12,21 @@ export class ChatTitleComponent extends WithStore(TextComponent) {
 
   protected _afterPropsAssignHook() {
     super._afterPropsAssignHook();
+    this.setCurrentChatTitle();
+  }
 
+  public setCurrentChatTitle() {
     if (!this.store.userHasAnyChats()) {
       this.props.text = "No chats created";
       return;
     }
 
+    let title = "No chat selected";
     const chatID = this.store.getCurrentChatID();
-    if (!chatID) {
-      this.props.text = "No chat selected";
-    } else {
-      const title = this.store.getChatsDataByPath(`${chatID}.title`);
-      this.props.text = title;
+    if (chatID) {
+      title = this.store.getChatsDataByPath(`${chatID}.title`);
     }
-  }
 
-  public titleDidUpdate(newText: string) {
-    this.props.text = newText;
+    this.props.text = title;
   }
 }

@@ -6,36 +6,23 @@ export function currentChatSetter(
   newValue: Nullable<number>
 ) {
   const { page } = this.state;
+  const newValueIsNull = isNullish(newValue);
 
-  if (page === EnumAppPages.Navigation) {
-    if (isNullish(newValue)) {
-      localStorage.removeItem("currentChatID");
-    }
-
-    return;
+  if (newValueIsNull) {
+    localStorage.removeItem("currentChatID");
+  } else {
+    localStorage.currentChatID = newValue;
   }
 
-  if (page !== EnumAppPages.Chats) {
+  if (oldValue === newValue || page !== EnumAppPages.Chats) {
     return;
-  }
-
-  if (isNullish(newValue)) {
-    throw new Error("Current Chat ID Can't Be Nullified On Chats Page");
   }
 
   const { refs } = this.page;
-
-  if (oldValue !== newValue) {
-    const title = this.getChatsDataByPath(`${newValue}.title`);
-    refs.chatTitle.titleDidUpdate(title);
-  }
-  if (isNullish(oldValue)) {
-    refs.messagesSection.removeChatAbsenceWarning();
-    refs.attachmentButton.toggleDisabledState(false);
-    refs.messageInput.toggleDisabledState(false);
-    refs.sendMessageButton.toggleDisabledState(false);
-    refs.chooseChatAvatarButton.toggleDisabledState(false);
-  }
-
-  localStorage.currentChatID = newValue;
+  refs.chatTitle.setCurrentChatTitle();
+  refs.messagesSection.setChatAbsenceWarning();
+  refs.attachmentButton.toggleDisabledState(newValueIsNull);
+  refs.messageInput.toggleDisabledState(newValueIsNull);
+  refs.sendMessageButton.toggleDisabledState(newValueIsNull);
+  refs.chooseChatAvatarButton.toggleDisabledState(newValueIsNull);
 }

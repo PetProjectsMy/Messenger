@@ -10,10 +10,10 @@ export class MessagesDisplayArea extends WithStoreBlock {
   protected _afterPropsAssignHook() {
     super._afterPropsAssignHook();
 
-    this._setChatAbsenceWarning();
+    this.setChatAbsenceWarning();
   }
 
-  private _setChatAbsenceWarning() {
+  public setChatAbsenceWarning() {
     let warning = "";
     if (!this.store.userHasAnyChats()) {
       warning = EnumChatAbsenceWarnings.NoChatsCreated;
@@ -22,10 +22,6 @@ export class MessagesDisplayArea extends WithStoreBlock {
     }
 
     this.state.chatAbsenceWarning = warning;
-  }
-
-  public removeChatAbsenceWarning() {
-    this.state.chatAbsenceWarning = "";
   }
 
   protected render() {

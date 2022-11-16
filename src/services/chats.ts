@@ -77,6 +77,7 @@ export class ChatsServiceClass {
       const currentChats = window.store.getChatsDataByPath();
       const newChats = objectWithoutKey(currentChats, chatID) as TAppChatsData;
       window.store.dispatch({ chats: newChats });
+      window.store.dispatch({ currentChatID: null });
     }
   }
 
