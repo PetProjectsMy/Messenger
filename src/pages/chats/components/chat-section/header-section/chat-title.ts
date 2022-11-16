@@ -13,11 +13,17 @@ export class ChatTitleComponent extends WithStore(TextComponent) {
   protected _afterPropsAssignHook() {
     super._afterPropsAssignHook();
 
+    if (!this.store.userHasAnyChats()) {
+      this.props.text = "No chats created";
+      return;
+    }
+
     const chatID = this.store.getCurrentChatID();
     if (!chatID) {
       this.props.text = "No chat selected";
     } else {
-      this.props.text = this.store.getChatsDataByPath(`${chatID}.title`);
+      const title = this.store.getChatsDataByPath(`${chatID}.title`);
+      this.props.text = title;
     }
   }
 

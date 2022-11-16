@@ -17,9 +17,9 @@ export class AvatarInput extends FileInput {
 
     super({
       props: { htmlClasses: ["upload-avatar"] },
-      inputButtonProps: {
+      chooseButtonProps: {
         label: "upload avatar",
-        htmlClasses: ["choose-avatar"],
+        htmlClasses: ["choose-profile-avatar"],
       },
       fileInputProps: {
         htmlAttributes: {

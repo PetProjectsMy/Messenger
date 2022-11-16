@@ -9,6 +9,7 @@ export function WithRouter<
 
     protected _beforePropsAssignHook() {
       this.router = window.router;
+
       super._beforePropsAssignHook();
     }
   };

@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { baseURL } from "api";
 
+function transformAvatarURL(url: Nullable<string>) {
+  return url ? `${baseURL}/resources${url}` : url;
+}
+
 export function transformProfileAPIResponseToUserData(
   data: TProfileAPIResponse
 ): TAppUserData {
-  const avatar = data.avatar
-    ? `${baseURL}/resources${data.avatar}`
-    : data.avatar;
-
   return {
     id: data.id,
     firstName: data.first_name,
@@ -16,7 +16,7 @@ export function transformProfileAPIResponseToUserData(
     login: data.login,
     email: data.email,
     phone: data.phone,
-    avatar,
+    avatar: transformAvatarURL(data.avatar),
   };
 }
 
@@ -28,7 +28,7 @@ export function transformChatsGetResponseToChatsData(
 
     acc[id] = {
       title,
-      avatar,
+      avatar: transformAvatarURL(avatar),
       lastMessage: last_message,
     };
 

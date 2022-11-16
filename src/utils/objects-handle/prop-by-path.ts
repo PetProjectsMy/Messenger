@@ -85,7 +85,7 @@ export function getPropByPath(
 
   const pathExisting = path.join(".");
   // console.log(
-  //   `PATH '${pathString}' EXISTING PART: ${pathExisting}, value: ${JSON.stringify(
+  //   `PATH '${pathString}' EXISTING PART: ${pathExisting}, value: ${value}, ${JSON.stringify(
   //     value
   //   )}`
   // );

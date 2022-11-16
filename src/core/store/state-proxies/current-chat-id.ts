@@ -7,9 +7,18 @@ export function currentChatSetter(
 ) {
   const { page } = this.state;
 
+  if (page === EnumAppPages.Navigation) {
+    if (isNullish(newValue)) {
+      localStorage.removeItem("currentChatID");
+    }
+
+    return;
+  }
+
   if (page !== EnumAppPages.Chats) {
     return;
   }
+
   if (isNullish(newValue)) {
     throw new Error("Current Chat ID Can't Be Nullified On Chats Page");
   }

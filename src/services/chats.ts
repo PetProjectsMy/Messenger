@@ -43,6 +43,23 @@ export class ChatsServiceClass {
 
     return response;
   }
+
+  async changeAvatar(chatID: string, avatarForm: FormData) {
+    avatarForm.append("chatId", chatID);
+
+    const request = await ChatsAPI.changeAvatar(avatarForm);
+    const { status, response } = request;
+
+    console.log(
+      `CHANGE CHAT(${chatID}) AVATAR REQUEST: status ${status}; response: ${JSON.stringify(
+        response
+      )}`
+    );
+
+    // if (!APIResponseHasError(response)) {
+    //   this.store.setState();
+    // }
+  }
 }
 
 export const ChatsService = new ChatsServiceClass();

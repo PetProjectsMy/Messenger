@@ -1,4 +1,4 @@
-import { type Block } from "core/dom";
+import { Block } from "core/dom";
 import { deepMerge } from "utils/objects-handle";
 import { Input } from "components/inputs";
 import { Button, TButtonProps } from "components/buttons";
@@ -24,28 +24,7 @@ type TchooseButtonProps = TButtonProps & {
   };
 };
 
-const FileInputDefaultProps = {
-  htmlAttributes: { type: "file" },
-  htmlStyle: {
-    display: "none",
-  },
-  events: {
-    change: [() => {}],
-  },
-};
-
-const chooseButtonDefaultProps: TchooseButtonProps = {
-  events: {
-    click: [
-      function () {
-        const { fileInput } = this.refs;
-        fileInput._unwrappedElement.click();
-      },
-    ],
-  },
-};
-
-export class FileInput extends Input {
+export class FileInput extends Block {
   constructor({
     fileInputProps,
     chooseButtonProps = {},
@@ -75,10 +54,22 @@ export class FileInput extends Input {
 
     const fileInput = this.children.fileInput as Block;
     const chooseButton = this.children.chooseButton as Block;
+
+    fileInput.refs.form = this;
     chooseButton.refs.fileInput = fileInput;
   }
 
   private static _createFileInput(props: TFileInputProps) {
+    const FileInputDefaultProps = {
+      htmlAttributes: { type: "file", accept: "image/*" },
+      htmlStyle: {
+        display: "none",
+      },
+      events: {
+        change: [() => {}],
+      },
+    };
+
     return new Input({
       state: { fileUploadingStatus: EnumFileUploadingStatus.FileNotSelected },
       props: deepMerge(FileInputDefaultProps, props),
@@ -89,6 +80,17 @@ export class FileInput extends Input {
     props: TchooseButtonProps,
     fileInputRef: Input
   ) {
+    const chooseButtonDefaultProps: TchooseButtonProps = {
+      events: {
+        click: [
+          function () {
+            const { fileInput } = this.refs;
+            fileInput._unwrappedElement.click();
+          },
+        ],
+      },
+    };
+
     return new Button({
       props: deepMerge(chooseButtonDefaultProps, props),
       refs: { fileInput: fileInputRef },

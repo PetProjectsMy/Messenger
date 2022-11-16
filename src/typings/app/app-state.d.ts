@@ -16,12 +16,12 @@ declare global {
     login: string;
     email: string;
     phone: string;
-    avatar: string; // path to avatar
+    avatar: Nullable<string>; // path to avatar
   };
 
   type TChatData = {
     title: string;
-    avatar: string;
+    avatar: Nullable<string>;
     lastMessage: {
       content: string;
     };

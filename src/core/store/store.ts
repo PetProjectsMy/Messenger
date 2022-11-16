@@ -122,7 +122,7 @@ export class Store {
     return page.constructor.name;
   }
 
-  private setState(nextState: Partial<TAppState>) {
+  private _setState(nextState: Partial<TAppState>) {
     Object.assign(this.state, nextState);
   }
 
@@ -130,7 +130,7 @@ export class Store {
     if (typeof nextStateOrAction === "function") {
       nextStateOrAction();
     } else {
-      this.setState(nextStateOrAction);
+      this._setState(nextStateOrAction);
     }
   }
 

@@ -68,8 +68,6 @@ declare global {
 
   export type TComponentHelpers = Record<string, unknown>;
 
-  export type TPageProxy = { component: Nullable<Block> };
-
   export type TEventListener = EventListener;
 }
 

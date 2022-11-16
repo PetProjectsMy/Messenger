@@ -7,20 +7,19 @@ export const enum EnumLoginAPIErrors {
   AlreadyInSystem = "User already in system",
 }
 
-export const afterAuthentificationHandler = async function (
-  authentificationFailedCallback: TAfterRequestCallback = () => {}
+export const afterAuthenticationHandler = async function (
+  authenticationFailedCallback: TAfterRequestCallback = () => {}
 ) {
   const userResponse = await this.getUser();
   if (APIResponseHasError(userResponse)) {
-    await authentificationFailedCallback(userResponse);
+    await authenticationFailedCallback(userResponse);
     return;
   }
 
   await ProfileService.getUserProfile(userResponse.id);
   await ChatsService.getChats();
 
-  let { currentChatID } = localStorage;
-  currentChatID ??= null;
+  const { currentChatID } = localStorage;
   window.store.dispatch({ currentChatID });
 };
 
@@ -51,7 +50,7 @@ class AuthorizationServiceClass {
       !APIResponseHasError(response) ||
       response.reason === EnumLoginAPIErrors.AlreadyInSystem
     ) {
-      await afterAuthentificationHandler((userResponse) => {
+      await afterAuthenticationHandler.call(this, (userResponse) => {
         throw new Error(
           `Unexpecter User Response After Login: ${userResponse.reason}`
         );
@@ -67,6 +66,7 @@ class AuthorizationServiceClass {
   async logout() {
     await AuthorizationAPI.logout();
     window.store.dispatch({ user: null });
+    window.store.dispatch({ currentChatID: null });
     window.router.go(EnumAppRoutes.Login);
   }
 }

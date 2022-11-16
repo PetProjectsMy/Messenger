@@ -9,6 +9,7 @@ export function WithStore<
 
     protected _beforePropsAssignHook() {
       this.store = window.store;
+
       super._beforePropsAssignHook();
     }
   }
