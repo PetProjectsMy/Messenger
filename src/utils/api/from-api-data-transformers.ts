@@ -47,3 +47,9 @@ export function transformChatUsersGetResponseToChatsUsersData(
     return acc;
   }, {} as TAppChatUsersData);
 }
+
+export function transformChatGetTokenResponseToToken(
+  response: TChatGetTokenResponse
+): string {
+  return response.token;
+}

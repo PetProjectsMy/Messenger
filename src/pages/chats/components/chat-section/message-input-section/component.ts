@@ -1,16 +1,17 @@
 import { WithStoreBlock } from "hocs/components";
-import { Button, Input } from "components";
+import { type Button, Input } from "components";
+import { MessageSendButton } from "./message-send-button";
+import { AttachmentButton } from "./attachment-button";
 import template from "./template";
-import attachmentButtonBackgorundImage from "./icons/attachment_button.png";
-import sendMessageButtonBackgorundImage from "./icons/send-message-button.png";
 
 export class MessageInputSection extends WithStoreBlock {
   constructor() {
     const children = {} as TComponentChildren;
 
-    children.attachmentButton = MessageInputSection._createAttachmentButton();
-    children.sendMessageButton = MessageInputSection._createSendMessageButton();
-    children.messageInput = MessageInputSection._createMessageInput();
+    children.attachmentButton = new AttachmentButton();
+    const messageInput = MessageInputSection._createMessageInput();
+    children.messageInput = messageInput;
+    children.sendMessageButton = new MessageSendButton(messageInput);
 
     super({ children });
   }
@@ -28,28 +29,6 @@ export class MessageInputSection extends WithStoreBlock {
         child.toggleDisabledState();
       });
     }
-  }
-
-  private static _createAttachmentButton() {
-    return new Button({
-      props: {
-        htmlClasses: ["attachment-button"],
-        htmlStyle: {
-          "background-image": attachmentButtonBackgorundImage,
-        },
-      },
-    });
-  }
-
-  private static _createSendMessageButton() {
-    return new Button({
-      props: {
-        htmlClasses: ["send-message-button"],
-        htmlStyle: {
-          "background-image": sendMessageButtonBackgorundImage,
-        },
-      },
-    });
   }
 
   private static _createMessageInput() {

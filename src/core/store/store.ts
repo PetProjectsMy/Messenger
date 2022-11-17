@@ -13,6 +13,7 @@ export const defaultState: TAppState = {
   user: null,
   chats: null,
   chatsUsers: null,
+  chatsSockets: null,
   currentChatID: null,
 };
 
@@ -37,10 +38,6 @@ export class Store {
 
   protected _makeStateProxy(state: TAppState) {
     return new Proxy(state, {
-      get(target, prop: Keys<TAppState>) {
-        return target[prop];
-      },
-
       set: function (
         target: TAppState,
         prop: Keys<TAppState>,
@@ -79,10 +76,6 @@ export class Store {
 
         return true;
       }.bind(this),
-
-      deleteProperty() {
-        throw new Error("Нет доступа");
-      },
     });
   }
 
@@ -110,6 +103,10 @@ export class Store {
   public getUserDataByPath(pathString: string = "") {
     const path = `user${pathString ? "." : ""}${pathString}`;
     return this._getStateValueByPath(path);
+  }
+
+  public getUserID() {
+    return this._getStateValueByPath("user.id");
   }
 
   public getCurrentChatID() {

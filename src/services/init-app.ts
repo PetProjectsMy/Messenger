@@ -1,7 +1,7 @@
 import { Store } from "core/store";
 import { Router } from "core/router";
 import { AuthorizationService } from "services";
-import { afterAuthenticationHandler } from "services/authorization";
+import { afterAuthorizationHandler } from "services/authorization";
 
 export async function initApp() {
   try {
@@ -14,7 +14,7 @@ export async function initApp() {
     router.init();
     store.init();
 
-    await afterAuthenticationHandler.call(AuthorizationService);
+    await afterAuthorizationHandler.call(AuthorizationService);
   } catch (err) {
     console.error(err);
   } finally {

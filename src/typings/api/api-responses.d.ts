@@ -37,6 +37,8 @@ declare global {
   export type TChatGetUsersAPIResponse = (TUserAPIObject & {
     role: string;
   })[];
+
+  export type TChatGetTokenResponse = { token: string };
 }
 
 export {};

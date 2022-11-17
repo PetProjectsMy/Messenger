@@ -5,10 +5,14 @@ import {
   transformAvatarURL,
   transformChatsGetResponseToChatsData,
 } from "utils/api";
-import { transformChatUsersGetResponseToChatsUsersData } from "utils/api/from-api-data-transformers";
+import {
+  transformChatGetTokenResponseToToken,
+  transformChatUsersGetResponseToChatsUsersData,
+} from "utils/api/from-api-data-transformers";
 import { transformChatIDToDeleteAPI } from "utils/api/to-api-data-transformers";
 import { objectWithoutKey } from "utils/objects-handle";
 import { getDescendantByPath } from "utils/pages";
+import { ChatWebSocket } from "./socket";
 
 export class ChatsServiceClass {
   async getChats(afterRequestCallback: TAfterRequestCallback = () => {}) {
@@ -103,6 +107,46 @@ export class ChatsServiceClass {
     }
 
     return response;
+  }
+
+  async getChatToken(
+    chatID: string,
+    afterRequestCallback?: TAfterRequestCallback
+  ) {
+    const request = await ChatsAPI.getChatToken(chatID);
+    const { status, response } = request;
+
+    console.log(
+      `GET CHAT(${chatID}) TOKEN REQUEST: status ${status}; response ${JSON.stringify(
+        response
+      )}`
+    );
+
+    if (afterRequestCallback) {
+      await afterRequestCallback(response);
+    }
+
+    return response;
+  }
+
+  async createChatsSockets() {
+    const { store } = window;
+    const userID = store.getUserID();
+
+    const chatsSockets = Object.keys(store.getChatsDataByPath()).reduce(
+      async function (acc: TAppChatsSockets, chatID: string) {
+        const chatTokenResponse = await this.getChatToken(chatID);
+        const chatToken =
+          transformChatGetTokenResponseToToken(chatTokenResponse);
+        const socket = new ChatWebSocket({ userID, chatID, chatToken });
+
+        acc![chatID] = socket;
+        return acc;
+      }.bind(this),
+      {} as TAppChatsSockets
+    );
+
+    window.store.dispatch({ chatsSockets });
   }
 
   async addUsersToChat(

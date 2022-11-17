@@ -1,6 +1,7 @@
 import { EnumAppPages } from "pages";
-import { Store } from "core/store";
-import { CoreRouter, EnumAppRoutes } from "core/router";
+import { type Store } from "core/store";
+import { type CoreRouter, EnumAppRoutes } from "core/router";
+import { type ChatWebSocket } from "services/socket";
 
 declare global {
   interface Window {
@@ -35,12 +36,15 @@ declare global {
 
   export type TAppChatUsersData = Record<string, TAppChatUserData>;
 
+  export type TAppChatsSockets = Nullable<Record<string, ChatWebSocket>>;
+
   export type TAppState = {
     appIsInited: boolean;
     page: Nullable<EnumAppPages>;
     user: Nullable<TAppUserData>;
     chats: Nullable<TAppChatsData>;
     chatsUsers: Nullable<Record<string, TAppChatUsersData>>;
+    chatsSockets: TAppChatsSockets;
     currentChatID: Nullable<number>;
   };
 }

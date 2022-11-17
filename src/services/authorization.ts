@@ -7,20 +7,21 @@ export const enum EnumLoginAPIErrors {
   AlreadyInSystem = "User already in system",
 }
 
-export const afterAuthenticationHandler = async function (
-  authenticationFailedCallback: TAfterRequestCallback = () => {}
+export const afterAuthorizationHandler = async function (
+  authorizationFailedCallback: TAfterRequestCallback = () => {}
 ) {
   const userResponse = await this.getUser();
   if (APIResponseHasError(userResponse)) {
-    await authenticationFailedCallback(userResponse);
+    await authorizationFailedCallback(userResponse);
     return;
   }
 
   await ProfileService.getUserProfile(userResponse.id);
   await ChatsService.getChats();
-
   const { currentChatID } = localStorage;
   window.store.dispatch({ currentChatID });
+
+  // await ChatsService.createChatsSockets();
 };
 
 class AuthorizationServiceClass {
@@ -50,7 +51,7 @@ class AuthorizationServiceClass {
       !APIResponseHasError(response) ||
       response.reason === EnumLoginAPIErrors.AlreadyInSystem
     ) {
-      await afterAuthenticationHandler.call(this, (userResponse) => {
+      await afterAuthorizationHandler.call(this, (userResponse) => {
         throw new Error(
           `Unexpecter User Response After Login: ${userResponse.reason}`
         );

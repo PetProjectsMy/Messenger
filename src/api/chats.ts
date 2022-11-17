@@ -17,6 +17,10 @@ class ChatsAPIClass {
     return request.get(`chats/${chatID}/users`);
   }
 
+  getChatToken(chatID: string) {
+    return request.post(`chats/token/${chatID}`);
+  }
+
   addUsersToChat(data: TAddChatUsersDTO) {
     return request.put("chats/users", { data });
   }

@@ -8,4 +8,5 @@ export {
   transformAvatarURL,
   transformProfileAPIResponseToUserData,
   transformChatsGetResponseToChatsData,
+  transformChatGetTokenResponseToToken,
 } from "./from-api-data-transformers";
