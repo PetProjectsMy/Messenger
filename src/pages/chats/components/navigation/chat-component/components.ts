@@ -1,6 +1,6 @@
-import { TextComponent, ImageComponent } from "components";
-import avatarImagePlaceholder from "static/avatar-placeholder-chats.svg";
+import { ImageComponent, TextComponent } from "components";
 import { WithStoreBlock } from "hocs/components";
+import avatarPlaceholder from "./avatar-placeholder.svg";
 import template from "./template";
 
 export class ChatComponent extends WithStoreBlock {
@@ -10,7 +10,7 @@ export class ChatComponent extends WithStoreBlock {
   constructor(chatID: string) {
     const children = {} as TComponentChildren;
     children.avatarImage = ChatComponent._createAvatarComponent(chatID);
-    children.message = ChatComponent._createMessageComponent(chatID);
+    children.chatTitle = ChatComponent._createChatTitle(chatID);
 
     const beforePropsAssignHook = function () {
       this.chatID = chatID;
@@ -25,7 +25,7 @@ export class ChatComponent extends WithStoreBlock {
 
   private static _createAvatarComponent(chatID: string) {
     let avatarSrc = window.store.getChatsDataByPath(`${chatID}.avatar`);
-    avatarSrc ??= avatarImagePlaceholder;
+    avatarSrc ??= avatarPlaceholder;
 
     const avatarImage = new ImageComponent({
       props: {
@@ -39,17 +39,17 @@ export class ChatComponent extends WithStoreBlock {
     return avatarImage;
   }
 
-  private static _createMessageComponent(chatID: string) {
-    const lastMessage = window.store.getChatsDataByPath(
-      `${chatID}.lastMessage`
-    );
-    const text = lastMessage ? lastMessage.content : "No Messages Exist Now";
+  private static _createChatTitle(chatID: string) {
+    const title = window.store.getChatsDataByPath(`${chatID}.title`);
 
-    return new TextComponent({
+    const chatTitle = new TextComponent({
       props: {
-        text,
+        htmlClasses: ["chat-title"],
+        text: title,
       },
     });
+
+    return chatTitle;
   }
 
   protected _afterRenderHook(): void {

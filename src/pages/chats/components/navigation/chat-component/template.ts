@@ -3,8 +3,8 @@ export default `
     <div class="avatar-section">
       {{{ avatarImage }}}
     </div>
-    <div class="message-section">
-      {{{ message }}}
+    <div class="chat-title-section">
+      {{{ chatTitle }}}
     </div>
   </li>
 `;

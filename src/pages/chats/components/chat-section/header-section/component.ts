@@ -1,14 +1,13 @@
 import { Block } from "core/dom";
 import { Button } from "components";
 import functionalButtonBackgroundImage from "static/functional-button.png";
-import { ChatTitleComponent } from "./chat-title";
+import { ChatTitleComponent } from "../../navigation/chat-component/chat-title";
 import template from "./template";
 
 export class ChatSectionHeader extends Block {
   constructor() {
     const children = {} as TComponentChildren;
 
-    children.chatTitle = new ChatTitleComponent();
     children.functionalButton = ChatSectionHeader._createfunctionalButton();
 
     super({ children });

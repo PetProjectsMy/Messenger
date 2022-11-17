@@ -36,12 +36,6 @@ export class ChatsPage extends WithStoreBlock {
 
     this.refs.chatSection = this.children.chatSection as Block;
 
-    this.refs.chatTitle = getDescendantByPath(this, [
-      "chatSection",
-      "headerSection",
-      "chatTitle",
-    ]);
-
     this.refs.messagesSection = getDescendantByPath(this, [
       "chatSection",
       "messagesDisplaySection",
