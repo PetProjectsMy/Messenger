@@ -1,4 +1,4 @@
-import { EnumStoreEvents } from "../enum-store-events";
+import { EnumStoreEvents } from "store";
 
 export function appIsInitedSetter(oldValue: boolean, newValue: boolean) {
   if (!oldValue && newValue) {

@@ -9,6 +9,7 @@ import { transformChatUsersGetResponseToChatsUsersData } from "utils/api/from-ap
 import { transformChatIDToDeleteAPI } from "utils/api/to-api-data-transformers";
 import { objectWithoutKey } from "utils/objects-handle";
 import { getDescendantByPath } from "utils/pages";
+import { SocketsCreator } from "services";
 
 export class ChatsServiceClass {
   async getChats(afterRequestCallback: TAfterRequestCallback = () => {}) {
@@ -51,6 +52,10 @@ export class ChatsServiceClass {
 
     if (!APIResponseHasError(response)) {
       await this.getChats();
+
+      const chatID = (response as TChatCreateAPIResponse).id.toString();
+      const socket = SocketsCreator.createChatSocket({ chatID });
+      window.store.setStateByPath(`chatsSockets.${chatID}.socket`, value);
     }
 
     return response;
@@ -133,10 +138,7 @@ export class ChatsServiceClass {
         transformChatUsersGetResponseToChatsUsersData(responseChatUsers);
 
       usersList.forEach((userID) => {
-        window.store.setStateByPath({
-          pathString: `chatsUsers.${userID}`,
-          value: usersData[userID],
-        });
+        window.store.setStateByPath(`chatsUsers.${userID}`, usersData[userID]);
       });
     }
 
@@ -163,16 +165,12 @@ export class ChatsServiceClass {
 
     if (!APIResponseHasError(response)) {
       const avatar = transformAvatarURL(response.avatar);
-      window.store.setStateByPath({
-        pathString: `chats.${chatID}.avatar`,
-        value: avatar,
-        afterSetCallback() {
-          const chatComponent = window.store.getPageRef(`chat-${chatID}`);
-          const avatarImage = getDescendantByPath(chatComponent, [
-            "avatarImage",
-          ]) as ImageComponent;
-          avatarImage.setPropByPath("htmlAttributes.src", avatar);
-        },
+      window.store.setStateByPath(`chats.${chatID}.avatar`, avatar, () => {
+        const chatComponent = window.store.getPageRef(`chat-${chatID}`);
+        const avatarImage = getDescendantByPath(chatComponent, [
+          "avatarImage",
+        ]) as ImageComponent;
+        avatarImage.setPropByPath("htmlAttributes.src", avatar);
       });
     }
 

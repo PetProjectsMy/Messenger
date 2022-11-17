@@ -15,8 +15,10 @@
     "core": "./src/core",
     "hocs": "./src/hocs",
     "pages": "./src/pages",
+    "router": "./src/core/router",
     "services": "./src/services",
     "static": "./src/static",
+    "store": "./src/core/store",
     "utils": "./src/utils"
   },
   "devDependencies": {

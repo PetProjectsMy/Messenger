@@ -38,6 +38,8 @@ declare global {
     role: string;
   })[];
 
+  export type TChatCreateAPIResponse = { id: number };
+
   export type TChatGetTokenResponse = { token: string };
 }
 
