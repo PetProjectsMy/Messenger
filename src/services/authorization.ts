@@ -1,5 +1,5 @@
 import { AuthorizationAPI } from "api";
-import { ProfileService, ChatsService } from "services";
+import { ProfileService, ChatsService, SocketsCreator } from "services";
 import { EnumAppRoutes } from "core/router";
 import { APIResponseHasError } from "utils/api";
 
@@ -22,7 +22,7 @@ export const afterAuthorizationHandler = async function (
   const { currentChatID } = localStorage;
   window.store.dispatch({ currentChatID });
 
-  await ChatsService.createChatsSockets();
+  await SocketsCreator.createAllChatsSockets();
 };
 
 class AuthorizationServiceClass {

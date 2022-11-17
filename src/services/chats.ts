@@ -5,14 +5,10 @@ import {
   transformAvatarURL,
   transformChatsGetResponseToChatsData,
 } from "utils/api";
-import {
-  transformChatGetTokenResponseToToken,
-  transformChatUsersGetResponseToChatsUsersData,
-} from "utils/api/from-api-data-transformers";
+import { transformChatUsersGetResponseToChatsUsersData } from "utils/api/from-api-data-transformers";
 import { transformChatIDToDeleteAPI } from "utils/api/to-api-data-transformers";
 import { objectWithoutKey } from "utils/objects-handle";
 import { getDescendantByPath } from "utils/pages";
-import { ChatWebSocket } from "./socket";
 
 export class ChatsServiceClass {
   async getChats(afterRequestCallback: TAfterRequestCallback = () => {}) {
@@ -107,48 +103,6 @@ export class ChatsServiceClass {
     }
 
     return response;
-  }
-
-  async getChatToken(
-    chatID: string,
-    afterRequestCallback?: TAfterRequestCallback
-  ) {
-    const request = await ChatsAPI.getChatToken(chatID);
-    const { status, response } = request;
-
-    console.log(
-      `GET CHAT(${chatID}) TOKEN REQUEST: status ${status}; response ${JSON.stringify(
-        response
-      )}`
-    );
-
-    if (afterRequestCallback) {
-      await afterRequestCallback(response);
-    }
-
-    return response;
-  }
-
-  async createChatsSockets() {
-    const { store } = window;
-    const userID = store.getUserID();
-
-    const chatsSockets = (
-      await Promise.all(
-        Object.keys(store.getChatsDataByPath()).map(async (chatID) => {
-          const chatTokenResponse = await this.getChatToken(chatID);
-          const chatToken =
-            transformChatGetTokenResponseToToken(chatTokenResponse);
-          return [chatID, new ChatWebSocket({ userID, chatID, chatToken })];
-        })
-      )
-    ).reduce((acc, [chatID, socket]: [string, ChatWebSocket]) => {
-      acc![chatID] = socket;
-      return acc;
-    }, {} as TAppChatsSockets);
-
-    console.log(`SOCKETS: ${JSON.stringify(chatsSockets)}`);
-    window.store.dispatch({ chatsSockets });
   }
 
   async addUsersToChat(

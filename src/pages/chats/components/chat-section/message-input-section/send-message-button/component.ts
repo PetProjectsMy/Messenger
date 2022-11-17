@@ -4,13 +4,16 @@ import { isNullish } from "utils/objects-handle";
 import backgorundImage from "./icon.png";
 
 export class SendMessageButton extends WithStoreButton {
-  constructor() {
+  constructor(messageInputRef: Input) {
     super({
       props: {
         htmlClasses: ["send-message-button"],
         htmlStyle: {
           "background-image": backgorundImage,
         },
+      },
+      refs: {
+        messageInput: messageInputRef,
       },
     });
   }
