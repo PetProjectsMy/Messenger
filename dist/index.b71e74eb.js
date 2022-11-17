@@ -554,7 +554,7 @@ async function initApp() {
         window.store = store;
         router.init();
         store.init();
-        await (0, _authorization.afterAuthenticationHandler).call((0, _services.AuthorizationService));
+        await (0, _authorization.afterAuthorizationHandler).call((0, _services.AuthorizationService));
     } catch (err) {
         console.error(err);
     } finally{
@@ -624,12 +624,14 @@ var _dom = require("core/dom");
 var _objectsHandle = require("utils/objects-handle");
 var _enumStoreEvents = require("./enum-store-events");
 var _eventBus = require("../event-bus");
-var _stateProxies = require("./state-proxies");
+var _mainStatesProxies = require("./state-proxies/main-states-proxies");
 const defaultState = {
     appIsInited: false,
     page: null,
     user: null,
     chats: null,
+    chatsUsers: null,
+    chatsSockets: null,
     currentChatID: null
 };
 class Store {
@@ -637,50 +639,9 @@ class Store {
     constructor(state = defaultState){
         this.state = this._makeStateProxy(state);
     }
-    _makeStateProxy(state) {
-        return new Proxy(state, {
-            get (target, prop) {
-                return target[prop];
-            },
-            set: (function(target, prop, newValue) {
-                const oldValue = target[prop];
-                target[prop] = newValue;
-                console.log(`STORE ${prop}: ${JSON.stringify(oldValue)} -> ${JSON.stringify(newValue)}`);
-                switch(prop){
-                    case "appIsInited":
-                        _stateProxies.appIsInitedSetter.call(this, oldValue, newValue);
-                        break;
-                    case "page":
-                        _stateProxies.pageSetter.call(this, oldValue, newValue);
-                        break;
-                    case "user":
-                        _stateProxies.userSetter.call(this, oldValue, newValue);
-                        break;
-                    case "chats":
-                        _stateProxies.chatsSetter.call(this, oldValue, newValue);
-                        break;
-                    case "currentChatID":
-                        _stateProxies.currentChatSetter.call(this, oldValue, newValue);
-                        break;
-                    default:
-                }
-                return true;
-            }).bind(this),
-            deleteProperty () {
-                throw new Error("Нет доступа");
-            }
-        });
-    }
-    isPageSet() {
-        return Boolean(this.state.page);
-    }
-    isUserAthorized() {
-        return Boolean(this.state.user);
-    }
-    userHasAnyChats() {
-        const { chats  } = this.state;
-        if (!chats) return false;
-        return Object.keys(chats).length > 0;
+    dispatch(nextStateOrAction) {
+        if (typeof nextStateOrAction === "function") nextStateOrAction();
+        else this._setState(nextStateOrAction);
     }
     _getStateValueByPath(pathString = "") {
         return (0, _objectsHandle.getPropByPath)(this.state, pathString);
@@ -689,31 +650,26 @@ class Store {
         const path = `user${pathString ? "." : ""}${pathString}`;
         return this._getStateValueByPath(path);
     }
-    getCurrentChatID() {
-        return this._getStateValueByPath("currentChatID");
+    getUserID() {
+        return this._getStateValueByPath("user.id");
     }
     getChatsDataByPath(pathString = "") {
         const path = `chats${pathString ? "." : ""}${pathString}`;
         return this._getStateValueByPath(path);
+    }
+    getCurrentChatID() {
+        return this._getStateValueByPath("currentChatID");
+    }
+    getPageRef(ref) {
+        return this.page.refs[ref];
     }
     getPageType() {
         const { page  } = this.state;
         if (!page) return page;
         return page.constructor.name;
     }
-    getPageRef(ref) {
-        return this.page.refs[ref];
-    }
-    _setState(nextState) {
-        Object.assign(this.state, nextState);
-    }
-    setStateByPath({ pathString , value , afterSetCallback  }) {
-        (0, _objectsHandle.setPropByPath)(this.state, pathString, value);
-        if (afterSetCallback) afterSetCallback();
-    }
-    dispatch(nextStateOrAction) {
-        if (typeof nextStateOrAction === "function") nextStateOrAction();
-        else this._setState(nextStateOrAction);
+    getSocketByChatID(chatID) {
+        return this._getStateValueByPath(`chatsSockets.${chatID}`);
     }
     init() {
         this.eventBus.on((0, _enumStoreEvents.EnumStoreEvents).AppInit, ({ route , path  })=>{
@@ -731,289 +687,73 @@ class Store {
             console.log(`Store event '${(0, _enumStoreEvents.EnumStoreEvents).PageChanged}' emitted`);
         }).bind(this));
     }
-}
-
-},{"utils/pages":"5q3PA","core/dom":"3BLMu","utils/objects-handle":"kOfSo","./enum-store-events":"ioWNT","../event-bus":"eVSQQ","./state-proxies":"f8dJ8","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5q3PA":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "getPageComponent", ()=>(0, _getPageComponent.getPageComponent));
-parcelHelpers.export(exports, "getDescendantByPath", ()=>(0, _getDescendantByPath.getDescendantByPath));
-var _getPageComponent = require("./get-page-component");
-var _getDescendantByPath = require("./get-descendant-by-path");
-
-},{"./get-page-component":"bNBxj","./get-descendant-by-path":"8y9HY","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bNBxj":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "getPageComponent", ()=>getPageComponent);
-var _pages = require("pages");
-const map = {
-    [(0, _pages.EnumAppPages).Navigation]: _pages.NavigationPage,
-    [(0, _pages.EnumAppPages).SignUp]: _pages.SignUpPage,
-    [(0, _pages.EnumAppPages).Login]: _pages.LoginPage,
-    [(0, _pages.EnumAppPages).Chats]: _pages.ChatsPage,
-    [(0, _pages.EnumAppPages).Profile]: _pages.ProfilePage,
-    [(0, _pages.EnumAppPages).NotFound]: _pages.NotFoundErrorPage,
-    [(0, _pages.EnumAppPages).Forbidden]: _pages.AuthorizationRequiredErrorPage
-};
-const getPageComponent = (page)=>{
-    return map[page];
-};
-
-},{"pages":"kIGWd","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kIGWd":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "EnumAppPages", ()=>(0, _enumAppPages.EnumAppPages));
-parcelHelpers.export(exports, "LoginPage", ()=>(0, _page.LoginPage));
-parcelHelpers.export(exports, "SignUpPage", ()=>(0, _page1.SignUpPage));
-parcelHelpers.export(exports, "ChatsPage", ()=>(0, _page2.ChatsPage));
-parcelHelpers.export(exports, "ProfilePage", ()=>(0, _page3.ProfilePage));
-parcelHelpers.export(exports, "NavigationPage", ()=>(0, _page4.NavigationPage));
-parcelHelpers.export(exports, "NotFoundErrorPage", ()=>(0, _pages.NotFoundErrorPage));
-parcelHelpers.export(exports, "AuthorizationRequiredErrorPage", ()=>(0, _pages.AuthorizationRequiredErrorPage));
-parcelHelpers.export(exports, "TErrorPage", ()=>(0, _pages.TErrorPage));
-parcelHelpers.export(exports, "TErrorPageClass", ()=>(0, _pages.TErrorPageClass));
-var _enumAppPages = require("./enum-app-pages");
-var _page = require("./login/page");
-var _page1 = require("./sign-up/page");
-var _page2 = require("./chats/page");
-var _page3 = require("./profile/page");
-var _page4 = require("./navigation/page");
-var _pages = require("./errors/pages");
-
-},{"./enum-app-pages":"2a7dE","./login/page":"fqTxR","./sign-up/page":"35s0o","./chats/page":"4muSN","./profile/page":"dAQha","./navigation/page":"2TCMP","./errors/pages":"a1Xr3","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2a7dE":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "EnumAppPages", ()=>EnumAppPages);
-let EnumAppPages;
-(function(EnumAppPages) {
-    EnumAppPages["Navigation"] = "navigation_page";
-    EnumAppPages["SignUp"] = "signup_page";
-    EnumAppPages["Login"] = "login_page";
-    EnumAppPages["Chats"] = "chats_page";
-    EnumAppPages["Profile"] = "profile_page";
-    EnumAppPages["NotFound"] = "not_found_page";
-    EnumAppPages["Forbidden"] = "access_denied_error_page";
-})(EnumAppPages || (EnumAppPages = {}));
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"fqTxR":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "LoginPage", ()=>LoginPage);
-var _dom = require("core/dom");
-var _components = require("components");
-var _hocs = require("hocs");
-var _router = require("core/router");
-var _template = require("./template");
-var _templateDefault = parcelHelpers.interopDefault(_template);
-var _formComponent = require("./form-component");
-const LinkWithRouter = (0, _hocs.WithRouter)((0, _components.Link));
-class LoginPage extends (0, _dom.Block) {
-    constructor(){
-        const children = {};
-        const refs = {};
-        children.loginForm = new (0, _formComponent.LoginPageForm)();
-        children.signUpLink = new LinkWithRouter({
-            props: {
-                label: "Register Account",
-                htmlAttributes: {
-                    name: "Sign up"
-                },
-                htmlClasses: [
-                    "sign-up-link"
-                ],
-                events: {
-                    click: [
-                        function() {
-                            this.router.go((0, _router.EnumAppRoutes).SignUp);
-                        }, 
-                    ]
+    isPageSet() {
+        return Boolean(this.state.page);
+    }
+    isUserAthorized() {
+        return Boolean(this.state.user);
+    }
+    _makeStateProxy(state) {
+        return new Proxy(state, {
+            set: (function(target, prop, newValue) {
+                const oldValue = target[prop];
+                if ((0, _objectsHandle.deepEqual)(oldValue, newValue)) return true;
+                target[prop] = newValue;
+                console.log(`STORE ${prop}: ${JSON.stringify(oldValue)} -> ${JSON.stringify(newValue)}`);
+                switch(prop){
+                    case "appIsInited":
+                        _mainStatesProxies.appIsInitedSetter.call(this, oldValue, newValue);
+                        break;
+                    case "page":
+                        _mainStatesProxies.pageSetter.call(this, oldValue, newValue);
+                        break;
+                    case "user":
+                        _mainStatesProxies.userSetter.call(this, oldValue, newValue);
+                        break;
+                    case "chats":
+                        _mainStatesProxies.chatsSetter.call(this, oldValue, newValue);
+                        break;
+                    case "currentChatID":
+                        _mainStatesProxies.currentChatSetter.call(this, oldValue, newValue);
+                        break;
+                    default:
                 }
-            }
-        });
-        children.homeButton = new (0, _components.HomeButton)();
-        super({
-            children,
-            props: {
-                componentName: "Login Page"
-            },
-            refs
+                return true;
+            }).bind(this)
         });
     }
-    render() {
-        return 0, _templateDefault.default;
+    _setState(nextState) {
+        Object.assign(this.state, nextState);
+    }
+    setStateByPath(pathString, value, afterSetCallback) {
+        (0, _objectsHandle.setPropByPath)(this.state, pathString, value);
+        if (afterSetCallback) afterSetCallback();
+    }
+    userHasAnyChats() {
+        const { chats  } = this.state;
+        if (!chats) return false;
+        return Object.keys(chats).length > 0;
     }
 }
 
-},{"core/dom":"3BLMu","components":"dHnah","hocs":"8D4Xk","core/router":"6PhbH","./template":"gtofV","./form-component":"3Zx9f","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3BLMu":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "BlockCommonEvents", ()=>(0, _blockBase.BlockCommonEvents));
-parcelHelpers.export(exports, "TBlockCommonEventsHandlersArgs", ()=>(0, _blockBase.TBlockCommonEventsHandlersArgs));
-parcelHelpers.export(exports, "Block", ()=>(0, _block.Block));
-parcelHelpers.export(exports, "BlockClass", ()=>(0, _block.BlockClass));
-parcelHelpers.export(exports, "renderDOM", ()=>(0, _renderDOM.renderDOM));
-var _blockBase = require("./block-base");
-var _block = require("./block");
-var _renderDOM = require("./renderDOM");
-
-},{"./block-base":"2WyXa","./block":"eyBDz","./renderDOM":"clc6l","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2WyXa":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "BlockCommonEvents", ()=>BlockCommonEvents);
-var _nanoid = require("nanoid");
-var _objectsHandle = require("utils/objects-handle");
-var _eventBus = require("core/event-bus");
-let BlockCommonEvents;
-(function(BlockCommonEvents) {
-    BlockCommonEvents["INIT"] = "init";
-    BlockCommonEvents["FLOW_CDM"] = "flow:component-did-mount";
-    BlockCommonEvents["FLOW_CDU"] = "flow:component-did-update";
-    BlockCommonEvents["FLOW_RENDER"] = "flow:render";
-})(BlockCommonEvents || (BlockCommonEvents = {}));
-class BlockBase {
-    static EVENTS = {
-        INIT: "init",
-        FLOW_CDM: "flow:component-did-mount",
-        FLOW_CDU: "flow:component-did-update",
-        FLOW_RENDER: "flow:render"
-    };
-    _element = null;
-    _unwrappedElement = null;
-    eventBus = new (0, _eventBus.EventBus)();
-    props = {};
-    id = `${this.constructor.name}-${(0, _nanoid.nanoid)(7)}`;
-    _componentDidMount() {
-        this.componentDidMount();
-    }
-    componentDidMount() {}
-    dispatchComponentDidMount() {
-        this.eventBus.emit("flow:component-did-mount");
-    }
-    _componentDidUpdate(oldPropsOrState, newPropsOrState, forceUpdate = false) {
-        if (forceUpdate) {
-            this.eventBus.emit("flow:render");
-            return;
-        }
-        const response = this.componentDidUpdate(oldPropsOrState, newPropsOrState);
-        if (response) this.eventBus.emit("flow:render");
-    }
-    componentDidUpdate(oldPropsOrState, newPropsOrState) {
-        const result = !(0, _objectsHandle.deepEqual)(oldPropsOrState, newPropsOrState);
-        return result;
-    }
-    getElement() {
-        return this._element;
-    }
-    dispatchEventListener(event, listener) {
-        const events = this.props.events;
-        events[event] ??= [];
-        events[event].push(listener);
-        this._unwrappedElement.addEventListener(event, listener);
-    }
-    _bindTEventListenersToBlock() {
-        const events = this.props.events;
-        if (!events) return;
-        Object.keys(events).forEach((event)=>{
-            const listeners = events[event];
-            events[event] = listeners.map((listener)=>listener.bind(this));
-        });
-    }
-    _setUnwrappedElement() {
-        const element = this._element;
-        if (!element) throw new Error(`BLOCK Set Unwrapped Element: wrong element ${element} of type ${typeof element}`);
-        if (this.htmlWrapped) this._unwrappedElement = element.querySelector(`[wrapped-id="${this.wrappedId}"]`);
-        else this._unwrappedElement = element;
-    }
-    _addEventListenersToElement() {
-        const targetElement = this._unwrappedElement;
-        if (!targetElement) throw new Error(`Incorrect element ${targetElement} of type ${typeof targetElement} to add event listeners`);
-        const events = this.props.events;
-        Object.entries(events).forEach(([event, listeners])=>{
-            listeners.forEach((listener)=>{
-                targetElement.addEventListener(event, listener);
-            });
-        });
-    }
-    _removeEvents(targetElement = null) {
-        const element = targetElement ?? this.getElement();
-        if (!BlockBase.isHTMLElement(element)) throw new Error(`${this.componentName}: wrong element ${element} of type ${typeof element} to remove event listeners`);
-        const events = this.props.events;
-        Object.entries(events).forEach(([event, listeners])=>{
-            listeners.forEach((listener)=>{
-                element.removeEventListener(event, listener);
-            });
-        });
-    }
-    static _createDocumentElement(tagName) {
-        return document.createElement(tagName);
-    }
-    static isHTMLElement(element) {
-        return element instanceof HTMLElement;
-    }
-    show() {
-        const element = this.getElement();
-        if (!BlockBase.isHTMLElement(element)) throw new Error(`Wrong element ${element} of type ${typeof element} to show`);
-        element.style.display = "block";
-    }
-    hide() {
-        const element = this.getElement();
-        if (!element) return;
-        element.style.display = "none";
-    }
-}
-exports.default = BlockBase;
-
-},{"nanoid":"2ifus","utils/objects-handle":"kOfSo","core/event-bus":"eVSQQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2ifus":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "urlAlphabet", ()=>(0, _indexJs.urlAlphabet));
-parcelHelpers.export(exports, "random", ()=>random);
-parcelHelpers.export(exports, "customRandom", ()=>customRandom);
-parcelHelpers.export(exports, "customAlphabet", ()=>customAlphabet);
-parcelHelpers.export(exports, "nanoid", ()=>nanoid);
-var _indexJs = require("./url-alphabet/index.js");
-let random = (bytes)=>crypto.getRandomValues(new Uint8Array(bytes));
-let customRandom = (alphabet, defaultSize, getRandom)=>{
-    let mask = (2 << Math.log(alphabet.length - 1) / Math.LN2) - 1;
-    let step = -~(1.6 * mask * defaultSize / alphabet.length);
-    return (size = defaultSize)=>{
-        let id = "";
-        while(true){
-            let bytes = getRandom(step);
-            let j = step;
-            while(j--){
-                id += alphabet[bytes[j] & mask] || "";
-                if (id.length === size) return id;
-            }
-        }
-    };
-};
-let customAlphabet = (alphabet, size = 21)=>customRandom(alphabet, size, random);
-let nanoid = (size = 21)=>crypto.getRandomValues(new Uint8Array(size)).reduce((id, byte)=>{
-        byte &= 63;
-        if (byte < 36) id += byte.toString(36);
-        else if (byte < 62) id += (byte - 26).toString(36).toUpperCase();
-        else if (byte > 62) id += "-";
-        else id += "_";
-        return id;
-    }, "");
-
-},{"./url-alphabet/index.js":false,"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kOfSo":[function(require,module,exports) {
+},{"utils/objects-handle":"kOfSo","../event-bus":"eVSQQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","utils/pages":"5q3PA","core/dom":"3BLMu","./enum-store-events":"ioWNT","./state-proxies/main-states-proxies":"4fFtk"}],"kOfSo":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "isObject", ()=>(0, _isObject.isObject));
 parcelHelpers.export(exports, "isNullish", ()=>(0, _isObject.isNullish));
+parcelHelpers.export(exports, "objectWithoutKey", ()=>(0, _objectWithoutKey.objectWithoutKey));
 parcelHelpers.export(exports, "deepEqual", ()=>(0, _objectsCompare.deepEqual));
 parcelHelpers.export(exports, "deepMerge", ()=>(0, _objectsMerge.deepMerge));
 parcelHelpers.export(exports, "setPropByPath", ()=>(0, _propByPath.setPropByPath));
 parcelHelpers.export(exports, "comparePropByPath", ()=>(0, _propByPath.comparePropByPath));
 parcelHelpers.export(exports, "getPropByPath", ()=>(0, _propByPath.getPropByPath));
 var _isObject = require("./is-object");
+var _objectWithoutKey = require("./object-without-key");
 var _objectsCompare = require("./objects-compare");
 var _objectsMerge = require("./objects-merge");
 var _propByPath = require("./prop-by-path");
 
-},{"./is-object":"azcyt","./objects-compare":"hLCsT","./objects-merge":"5G3Tt","./prop-by-path":"iANYm","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"azcyt":[function(require,module,exports) {
+},{"./is-object":"azcyt","./object-without-key":"9CDza","./objects-compare":"hLCsT","./objects-merge":"5G3Tt","./prop-by-path":"iANYm","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"azcyt":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "isObject", ()=>isObject);
@@ -1023,6 +763,16 @@ function isObject(object) {
 }
 function isNullish(object) {
     return object === null || object === undefined;
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"9CDza":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "objectWithoutKey", ()=>objectWithoutKey);
+function objectWithoutKey(object, key) {
+    // eslint-disable-next-line no-unused-vars
+    const { [key]: deletedValue , ...otherKeys } = object;
+    return otherKeys;
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"hLCsT":[function(require,module,exports) {
@@ -1135,7 +885,278 @@ class EventBus {
     }
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"eyBDz":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5q3PA":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "getPageComponent", ()=>(0, _getPageComponent.getPageComponent));
+parcelHelpers.export(exports, "getDescendantByPath", ()=>(0, _getDescendantByPath.getDescendantByPath));
+var _getPageComponent = require("./get-page-component");
+var _getDescendantByPath = require("./get-descendant-by-path");
+
+},{"./get-page-component":"bNBxj","./get-descendant-by-path":"8y9HY","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bNBxj":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "getPageComponent", ()=>getPageComponent);
+var _pages = require("pages");
+const map = {
+    [(0, _pages.EnumAppPages).Navigation]: _pages.NavigationPage,
+    [(0, _pages.EnumAppPages).SignUp]: _pages.SignUpPage,
+    [(0, _pages.EnumAppPages).Login]: _pages.LoginPage,
+    [(0, _pages.EnumAppPages).Chats]: _pages.ChatsPage,
+    [(0, _pages.EnumAppPages).Profile]: _pages.ProfilePage,
+    [(0, _pages.EnumAppPages).NotFound]: _pages.NotFoundErrorPage,
+    [(0, _pages.EnumAppPages).Forbidden]: _pages.AuthorizationRequiredErrorPage
+};
+const getPageComponent = (page)=>{
+    return map[page];
+};
+
+},{"pages":"kIGWd","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kIGWd":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "EnumAppPages", ()=>(0, _enumAppPages.EnumAppPages));
+parcelHelpers.export(exports, "LoginPage", ()=>(0, _page.LoginPage));
+parcelHelpers.export(exports, "SignUpPage", ()=>(0, _page1.SignUpPage));
+parcelHelpers.export(exports, "ChatsPage", ()=>(0, _page2.ChatsPage));
+parcelHelpers.export(exports, "ProfilePage", ()=>(0, _page3.ProfilePage));
+parcelHelpers.export(exports, "NavigationPage", ()=>(0, _page4.NavigationPage));
+parcelHelpers.export(exports, "NotFoundErrorPage", ()=>(0, _pages.NotFoundErrorPage));
+parcelHelpers.export(exports, "AuthorizationRequiredErrorPage", ()=>(0, _pages.AuthorizationRequiredErrorPage));
+parcelHelpers.export(exports, "TErrorPage", ()=>(0, _pages.TErrorPage));
+parcelHelpers.export(exports, "TErrorPageClass", ()=>(0, _pages.TErrorPageClass));
+var _enumAppPages = require("./enum-app-pages");
+var _page = require("./login/page");
+var _page1 = require("./sign-up/page");
+var _page2 = require("./chats/page");
+var _page3 = require("./profile/page");
+var _page4 = require("./navigation/page");
+var _pages = require("./errors/pages");
+
+},{"./enum-app-pages":"2a7dE","./login/page":"fqTxR","./sign-up/page":"35s0o","./chats/page":"4muSN","./profile/page":"dAQha","./navigation/page":"2TCMP","./errors/pages":"a1Xr3","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2a7dE":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "EnumAppPages", ()=>EnumAppPages);
+let EnumAppPages;
+(function(EnumAppPages) {
+    EnumAppPages["Navigation"] = "navigation_page";
+    EnumAppPages["SignUp"] = "signup_page";
+    EnumAppPages["Login"] = "login_page";
+    EnumAppPages["Chats"] = "chats_page";
+    EnumAppPages["Profile"] = "profile_page";
+    EnumAppPages["NotFound"] = "not_found_page";
+    EnumAppPages["Forbidden"] = "access_denied_error_page";
+})(EnumAppPages || (EnumAppPages = {}));
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"fqTxR":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "LoginPage", ()=>LoginPage);
+var _dom = require("core/dom");
+var _components = require("components");
+var _hocs = require("hocs");
+var _router = require("core/router");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+var _formComponent = require("./form-component");
+const LinkWithRouter = (0, _hocs.WithRouter)((0, _components.Link));
+class LoginPage extends (0, _dom.Block) {
+    constructor(){
+        const children = {};
+        const refs = {};
+        children.loginForm = new (0, _formComponent.LoginPageForm)();
+        children.signUpLink = new LinkWithRouter({
+            props: {
+                label: "Register Account",
+                htmlAttributes: {
+                    name: "Sign up"
+                },
+                htmlClasses: [
+                    "sign-up-link"
+                ],
+                events: {
+                    click: [
+                        function() {
+                            this.router.go((0, _router.EnumAppRoutes).SignUp);
+                        }, 
+                    ]
+                }
+            }
+        });
+        children.homeButton = new (0, _components.HomeButton)();
+        super({
+            componentName: "Login Page",
+            children,
+            refs
+        });
+    }
+    render() {
+        return 0, _templateDefault.default;
+    }
+}
+
+},{"core/dom":"3BLMu","components":"dHnah","hocs":"8D4Xk","core/router":"6PhbH","./template":"gtofV","./form-component":"3Zx9f","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3BLMu":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "BlockCommonEvents", ()=>(0, _blockBase.BlockCommonEvents));
+parcelHelpers.export(exports, "TBlockCommonEventsHandlersArgs", ()=>(0, _blockBase.TBlockCommonEventsHandlersArgs));
+parcelHelpers.export(exports, "Block", ()=>(0, _block.Block));
+parcelHelpers.export(exports, "BlockClass", ()=>(0, _block.BlockClass));
+parcelHelpers.export(exports, "renderDOM", ()=>(0, _renderDOM.renderDOM));
+var _blockBase = require("./block-base");
+var _block = require("./block");
+var _renderDOM = require("./renderDOM");
+
+},{"./block-base":"2WyXa","./block":"eyBDz","./renderDOM":"clc6l","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2WyXa":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "BlockCommonEvents", ()=>BlockCommonEvents);
+var _nanoid = require("nanoid");
+var _objectsHandle = require("utils/objects-handle");
+var _eventBus = require("core/event-bus");
+var _components = require("utils/components");
+let BlockCommonEvents;
+(function(BlockCommonEvents) {
+    BlockCommonEvents["INIT"] = "init";
+    BlockCommonEvents["FLOW_CDU"] = "flow:component-did-update";
+    BlockCommonEvents["FLOW_RENDER"] = "flow:render";
+})(BlockCommonEvents || (BlockCommonEvents = {}));
+class BlockBase {
+    static EVENTS = {
+        INIT: "init",
+        FLOW_CDU: "flow:component-did-update",
+        FLOW_RENDER: "flow:render"
+    };
+    _element = null;
+    _unwrappedElement = null;
+    eventBus = new (0, _eventBus.EventBus)();
+    id = `${this.constructor.name}-${(0, _nanoid.nanoid)(7)}`;
+    _componentDidUpdate(oldPropsOrState, newPropsOrState, forceUpdate = false) {
+        if (forceUpdate || this.componentDidUpdate(oldPropsOrState, newPropsOrState)) this.eventBus.emit("flow:render");
+    }
+    componentDidUpdate(oldPropsOrState, newPropsOrState) {
+        const result = !(0, _objectsHandle.deepEqual)(oldPropsOrState, newPropsOrState);
+        return result;
+    }
+    _addEventListenersToElement() {
+        const targetElement = this._unwrappedElement;
+        if (!targetElement) throw new Error(`Incorrect element ${targetElement} of type ${typeof targetElement} to add event listeners`);
+        const events = this.props.events;
+        Object.entries(events).forEach(([event, listeners])=>{
+            listeners.forEach((listener)=>{
+                targetElement.addEventListener(event, listener);
+            });
+        });
+    }
+    _bindEventListenersToBlock() {
+        const events = this.props.events;
+        Object.keys(events).forEach((event)=>{
+            const listeners = events[event];
+            events[event] = listeners.map((listener)=>listener.bind(this));
+        });
+    }
+    dispatchEventListener(event, listener) {
+        const events = this.props.events;
+        events[event] ??= [];
+        events[event].push(listener);
+        this._unwrappedElement.addEventListener(event, listener);
+    }
+    getElement() {
+        return this._element;
+    }
+    getStateByPath(pathString = "") {
+        return (0, _objectsHandle.getPropByPath)(this.state, pathString);
+    }
+    hide() {
+        const element = this.getElement();
+        if (!element) return;
+        element.style.display = "none";
+    }
+    show() {
+        const element = this.getElement();
+        element.style.display = "block";
+    }
+    render() {
+        return "<div></div>";
+    }
+    setPropByPath(propPath, value, forceUpdate = false) {
+        const didUpdate = forceUpdate || !(0, _objectsHandle.comparePropByPath)(this.props, propPath, value);
+        if (didUpdate) {
+            (0, _objectsHandle.setPropByPath)(this.props, propPath, value);
+            this._componentDidUpdate("", "", true);
+        }
+    }
+    toggleHtmlClass(className, state) {
+        const classList = (0, _components.toggleHtmlClassToList)(this.props.htmlClasses, className, state);
+        this.props.htmlClasses = classList;
+    }
+}
+exports.default = BlockBase;
+
+},{"nanoid":"2ifus","utils/objects-handle":"kOfSo","core/event-bus":"eVSQQ","utils/components":"34IuU","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2ifus":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "urlAlphabet", ()=>(0, _indexJs.urlAlphabet));
+parcelHelpers.export(exports, "random", ()=>random);
+parcelHelpers.export(exports, "customRandom", ()=>customRandom);
+parcelHelpers.export(exports, "customAlphabet", ()=>customAlphabet);
+parcelHelpers.export(exports, "nanoid", ()=>nanoid);
+var _indexJs = require("./url-alphabet/index.js");
+let random = (bytes)=>crypto.getRandomValues(new Uint8Array(bytes));
+let customRandom = (alphabet, defaultSize, getRandom)=>{
+    let mask = (2 << Math.log(alphabet.length - 1) / Math.LN2) - 1;
+    let step = -~(1.6 * mask * defaultSize / alphabet.length);
+    return (size = defaultSize)=>{
+        let id = "";
+        while(true){
+            let bytes = getRandom(step);
+            let j = step;
+            while(j--){
+                id += alphabet[bytes[j] & mask] || "";
+                if (id.length === size) return id;
+            }
+        }
+    };
+};
+let customAlphabet = (alphabet, size = 21)=>customRandom(alphabet, size, random);
+let nanoid = (size = 21)=>crypto.getRandomValues(new Uint8Array(size)).reduce((id, byte)=>{
+        byte &= 63;
+        if (byte < 36) id += byte.toString(36);
+        else if (byte < 62) id += (byte - 26).toString(36).toUpperCase();
+        else if (byte > 62) id += "-";
+        else id += "_";
+        return id;
+    }, "");
+
+},{"./url-alphabet/index.js":false,"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"34IuU":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "toggleHtmlClassToList", ()=>(0, _htmlClassToggle.toggleHtmlClassToList));
+var _htmlClassToggle = require("./html-class-toggle");
+
+},{"./html-class-toggle":"7dvWk","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"7dvWk":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "toggleHtmlClassToList", ()=>toggleHtmlClassToList);
+var _objectsHandle = require("utils/objects-handle");
+function toggleHtmlClassToList(classesList, className, state) {
+    if ((0, _objectsHandle.isNullish)(state)) {
+        if (classesList.includes(className)) classesList = classesList.filter((item)=>item !== className);
+        else classesList = [
+            ...classesList,
+            className
+        ];
+        return classesList;
+    }
+    const classesSet = new Set(classesList);
+    if (state === "on" && !classesSet.has(className)) classesList = [
+        ...classesList,
+        className
+    ];
+    else if (state === "off" && classesSet.has(className)) classesList = classesList.filter((item)=>item !== className);
+    return classesList;
+}
+
+},{"utils/objects-handle":"kOfSo","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"eyBDz":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Block", ()=>Block);
@@ -1146,13 +1167,13 @@ var _objectsHandle = require("utils/objects-handle");
 var _blockBase = require("./block-base");
 var _blockBaseDefault = parcelHelpers.interopDefault(_blockBase);
 class Block extends (0, _blockBaseDefault.default) {
-    componentName = "Unnamed Block";
     wasRendered = false;
-    constructor({ props ={} , children ={} , refs ={} , state ={} , helpers ={}  } = {}){
+    constructor({ componentName , props ={} , children ={} , refs ={} , state ={} , helpers ={}  } = {}){
         super();
         this.helpers = helpers;
         this._beforePropsAssignHook();
-        this.props = props;
+        this.componentName = componentName ?? `Not Named Block of type ${this.constructor.name}`;
+        this.props = (0, _objectsHandle.deepMerge)({}, props);
         this.props.events = this.props.events ?? {};
         this.props.htmlAttributes ??= {};
         this.props.htmlClasses ??= [];
@@ -1160,7 +1181,6 @@ class Block extends (0, _blockBaseDefault.default) {
         this.children = children;
         this.refs = refs;
         this.state = state;
-        this.componentName = props.componentName ?? `Not Named Block of type ${this.constructor.name}`;
         this._afterPropsAssignHook();
         this.htmlWrapped = !!this.props.htmlWrapper;
         if (this.htmlWrapped) this.wrappedId = (0, _nanoid.nanoid)(5);
@@ -1172,13 +1192,6 @@ class Block extends (0, _blockBaseDefault.default) {
         this._beforeRenderHook();
         this.eventBus.emit((0, _blockBase.BlockCommonEvents).INIT);
         this._afterRenderHook();
-    }
-    setPropByPath(propPath, value) {
-        const didUpdate = !(0, _objectsHandle.comparePropByPath)(this.props, propPath, value);
-        if (didUpdate) {
-            (0, _objectsHandle.setPropByPath)(this.props, propPath, value);
-            this._componentDidUpdate("", "", true);
-        }
     }
     _init() {
         this.eventBus.emit((0, _blockBase.BlockCommonEvents).FLOW_RENDER);
@@ -1195,18 +1208,6 @@ class Block extends (0, _blockBaseDefault.default) {
             }
         });
     }
-    _assertChildrenArray(children) {
-        children.forEach((child)=>{
-            if (!(child instanceof Block)) throw new Error(`${this.componentName}, making stubs: children array wrong element ${child} of type ${typeof child}`);
-        });
-    }
-    _registerEvents() {
-        const { eventBus  } = this;
-        eventBus.on((0, _blockBase.BlockCommonEvents).INIT, this._init.bind(this));
-        eventBus.on((0, _blockBase.BlockCommonEvents).FLOW_CDM, this._componentDidMount.bind(this));
-        eventBus.on((0, _blockBase.BlockCommonEvents).FLOW_CDU, this._componentDidUpdate.bind(this));
-        eventBus.on((0, _blockBase.BlockCommonEvents).FLOW_RENDER, this._render.bind(this));
-    }
     _makeStubs() {
         const stubs = {};
         Object.entries(this.children).forEach(([name, child])=>{
@@ -1215,33 +1216,13 @@ class Block extends (0, _blockBaseDefault.default) {
         });
         return stubs;
     }
-    _replaceStub(fragment, stubID, element) {
-        const stub = fragment.content.querySelector(`[data-id="${stubID}"]`);
-        if (!stub) throw new Error(`${this.componentName}: No stub with id "${stubID}" to replace with element ${element}`);
-        stub.replaceWith(element);
-    }
-    _replaceStubs(fragment) {
-        Object.keys(this.children).forEach((key)=>{
-            const child = this.children[key];
-            if (Array.isArray(child)) {
-                this._assertChildrenArray(child);
-                child.forEach((ch)=>{
-                    const childElement = ch.getElement();
-                    if (!childElement) throw new Error(`${this.componentName}: replacing stub with id ${ch.id} to wrong element ${childElement} of type ${typeof childElement}`);
-                    this._replaceStub(fragment, ch.id, childElement);
-                });
-            } else {
-                const childElement = child.getElement();
-                if (!childElement) throw new Error(`${this.componentName}: replacing stub with id ${child.id} to wrong element ${childElement} of type ${typeof childElement}`);
-                this._replaceStub(fragment, child.id, childElement);
-            }
-        });
+    _registerEvents() {
+        const { eventBus  } = this;
+        eventBus.on((0, _blockBase.BlockCommonEvents).INIT, this._init.bind(this));
+        eventBus.on((0, _blockBase.BlockCommonEvents).FLOW_CDU, this._componentDidUpdate.bind(this));
+        eventBus.on((0, _blockBase.BlockCommonEvents).FLOW_RENDER, this._render.bind(this));
     }
     _render() {
-        if (!Block.isHTMLElement(this._element)) {
-            if (!(this._element === null && !this.wasRendered)) throw new Error(`${this.componentName}: wrong element ${this._element} of type ${typeof this._element} to first render`);
-            else if (this.wasRendered) throw new Error(`${this.componentName}: wrong element ${this._element} of type ${typeof this._element} to rerender`);
-        }
         const fragment = this._compile();
         const newElement = fragment.firstElementChild;
         if (this.wasRendered) this._element.replaceWith(newElement);
@@ -1250,6 +1231,21 @@ class Block extends (0, _blockBaseDefault.default) {
         this._setHtmlProperties();
         this._addEventListenersToElement();
     }
+    _afterPropsAssignHook() {
+        if (this.helpers.afterPropsAssignHook) this.helpers.afterPropsAssignHook.call(this);
+    }
+    _afterRenderHook() {
+        if (this.helpers.afterRenderHook) this.helpers.afterRenderHook.call(this);
+    }
+    _beforePropsAssignHook() {
+        if (this.helpers.beforePropsAssignHook) this.helpers.beforePropsAssignHook.call(this);
+    }
+    _beforePropsProxyHook() {
+        this._bindEventListenersToBlock();
+        if (this.helpers.beforePropsProxyHook) this.helpers.beforePropsProxyHook.call(this);
+    }
+    _beforeRegisterEventsHook() {}
+    _beforeRenderHook() {}
     _compile() {
         const fragment = document.createElement("template");
         const childrenStubs = this._makeStubs();
@@ -1271,40 +1267,30 @@ class Block extends (0, _blockBaseDefault.default) {
         this._replaceStubs(fragment);
         return fragment.content;
     }
-    render() {
-        return "";
+    _replaceStub(fragment, stubID, element) {
+        const stub = fragment.content.querySelector(`[data-id="${stubID}"]`);
+        if (!stub) throw new Error(`${this.componentName}: No stub with id "${stubID}" to replace with element ${element}`);
+        stub.replaceWith(element);
     }
-    getComponentName() {
-        return this.componentName;
-    }
-    _beforePropsAssignHook() {
-        if (this.helpers.beforePropsAssignHook) this.helpers.beforePropsAssignHook.call(this);
-    }
-    _afterPropsAssignHook() {
-        if (this.helpers.afterPropsAssignHook) this.helpers.afterPropsAssignHook.call(this);
-    }
-    _beforePropsProxyHook() {
-        this._bindTEventListenersToBlock();
-        if (this.helpers.beforePropsProxyHook) this.helpers.beforePropsProxyHook.call(this);
-    }
-    _beforeRegisterEventsHook() {}
-    _beforeRenderHook() {}
-    _afterRenderHook() {
-        if (this.helpers.afterRenderHook) this.helpers.afterRenderHook.call(this);
-    }
-    _setHtmlProperties() {
-        this._setHtmlClasses();
-        this._setHtmlAttributes();
-        this._setElementStyle();
-        this._unwrappedElement.removeAttribute("wrapped-id");
+    _replaceStubs(fragment) {
+        Object.keys(this.children).forEach((key)=>{
+            const child = this.children[key];
+            if (Array.isArray(child)) child.forEach((ch)=>{
+                const childElement = ch.getElement();
+                if (!childElement) throw new Error(`${this.componentName}: replacing stub with id ${ch.id} to wrong element ${childElement} of type ${typeof childElement}`);
+                this._replaceStub(fragment, ch.id, childElement);
+            });
+            else {
+                const childElement = child.getElement();
+                if (!childElement) throw new Error(`${this.componentName}: replacing stub with id ${child.id} to wrong element ${childElement} of type ${typeof childElement}`);
+                this._replaceStub(fragment, child.id, childElement);
+            }
+        });
     }
     _setHtmlAttributes() {
         Object.entries(this.props.htmlAttributes).forEach(([attrName, value])=>{
             this._unwrappedElement.setAttribute(attrName, value);
         });
-    }
-    _setHtmlClasses() {
-        if (this.props.htmlClasses.length) this._unwrappedElement.classList.add(...this.props.htmlClasses);
     }
     _setElementStyle() {
         Object.entries(this.props.htmlStyle).forEach(([styleProp, value])=>{
@@ -1312,6 +1298,21 @@ class Block extends (0, _blockBaseDefault.default) {
             if (styleProp === "background-image") propValue = `url(${value})`;
             this._unwrappedElement.style.setProperty(styleProp, propValue);
         });
+    }
+    _setHtmlProperties() {
+        this._setHtmlClasses();
+        this._setHtmlAttributes();
+        this._setElementStyle();
+        this._unwrappedElement.removeAttribute("wrapped-id");
+    }
+    _setHtmlClasses() {
+        if (this.props.htmlClasses.length) this._unwrappedElement.classList.add(...this.props.htmlClasses);
+    }
+    _setUnwrappedElement() {
+        const element = this._element;
+        if (!element) throw new Error(`BLOCK Set Unwrapped Element: wrong element ${element} of type ${typeof element}`);
+        if (this.htmlWrapped) this._unwrappedElement = element.querySelector(`[wrapped-id="${this.wrappedId}"]`);
+        else this._unwrappedElement = element;
     }
 }
 
@@ -12659,13 +12660,15 @@ parcelHelpers.export(exports, "FileInput", ()=>(0, _inputs.FileInput));
 parcelHelpers.export(exports, "InputForm", ()=>(0, _inputs.InputForm));
 parcelHelpers.export(exports, "TextComponent", ()=>(0, _textComponent.TextComponent));
 parcelHelpers.export(exports, "ImageComponent", ()=>(0, _image.ImageComponent));
+parcelHelpers.export(exports, "ModalWindow", ()=>(0, _modalWindow.ModalWindow));
 var _buttons = require("./buttons");
 var _link = require("./link");
 var _inputs = require("./inputs");
 var _textComponent = require("./text-component");
 var _image = require("./image");
+var _modalWindow = require("./modal-window");
 
-},{"./buttons":"fWrjK","./link":"hjADv","./inputs":"fRfcK","./text-component":"79bbv","./image":"8UAPc","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"fWrjK":[function(require,module,exports) {
+},{"./buttons":"fWrjK","./link":"hjADv","./inputs":"fRfcK","./text-component":"79bbv","./image":"8UAPc","./modal-window":"3Ptyh","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"fWrjK":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "TButtonProps", ()=>(0, _basicButton.TButtonProps));
@@ -12709,7 +12712,7 @@ class Button extends (0, _dom.Block) {
 },{"core/dom":"3BLMu","./template":"dEjtq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dEjtq":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-var _componentTemplateGenerator = require("utils/component-template-generator");
+var _componentTemplateGenerator = require("utils/components/component-template-generator");
 var _componentTemplateGeneratorDefault = parcelHelpers.interopDefault(_componentTemplateGenerator);
 const tag = "button";
 const content = `
@@ -12722,7 +12725,7 @@ exports.default = (0, _componentTemplateGeneratorDefault.default)({
     content
 });
 
-},{"utils/component-template-generator":"8dIyM","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8dIyM":[function(require,module,exports) {
+},{"utils/components/component-template-generator":"g9YwQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"g9YwQ":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 function getComponentTemplate({ tag , content =null , isSelfClosingTag =false  }) {
@@ -12964,13 +12967,13 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "WithStore", ()=>WithStore);
 function WithStore(ComponentClass) {
-    class WrappedComponentClass extends ComponentClass {
+    class WithStoreComponent extends ComponentClass {
         _beforePropsAssignHook() {
             this.store = window.store;
             super._beforePropsAssignHook();
         }
     }
-    return WrappedComponentClass;
+    return WithStoreComponent;
 }
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"hjADv":[function(require,module,exports) {
@@ -13001,7 +13004,7 @@ class Link extends (0, _dom.Block) {
 },{"core/dom":"3BLMu","./template":"eTM71","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"eTM71":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-var _componentTemplateGenerator = require("utils/component-template-generator");
+var _componentTemplateGenerator = require("utils/components/component-template-generator");
 var _componentTemplateGeneratorDefault = parcelHelpers.interopDefault(_componentTemplateGenerator);
 const tag = "a";
 const content = "{{ label }}";
@@ -13010,7 +13013,7 @@ exports.default = (0, _componentTemplateGeneratorDefault.default)({
     content
 });
 
-},{"utils/component-template-generator":"8dIyM","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"fRfcK":[function(require,module,exports) {
+},{"utils/components/component-template-generator":"g9YwQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"fRfcK":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Input", ()=>(0, _basicInput.Input));
@@ -13057,19 +13060,23 @@ class Input extends (0, _dom.Block) {
         }
         element.disabled = !element.disabled;
     }
+    setValue(value) {
+        const element = this._unwrappedElement;
+        element.value = value;
+    }
 }
 
 },{"core/dom":"3BLMu","./template":"5YOYP","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5YOYP":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-var _componentTemplateGenerator = require("utils/component-template-generator");
+var _componentTemplateGenerator = require("utils/components/component-template-generator");
 var _componentTemplateGeneratorDefault = parcelHelpers.interopDefault(_componentTemplateGenerator);
 const tag = "input";
 exports.default = (0, _componentTemplateGeneratorDefault.default)({
     tag
 });
 
-},{"utils/component-template-generator":"8dIyM","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"iitgW":[function(require,module,exports) {
+},{"utils/components/component-template-generator":"g9YwQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"iitgW":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "FileInput", ()=>(0, _component.FileInput));
@@ -13203,7 +13210,6 @@ class InputWithValidation extends InputExtended {
         this._bindValidators();
     }
     _bindValidators() {
-        if (this.props.validators === undefined) throw new Error("validators prop is undefined");
         const bindedValidators = {};
         Object.entries(this.props.validators).forEach(([event, validators])=>{
             const events = this.props.events;
@@ -13246,10 +13252,8 @@ class InputForm extends (0, _dom.Block) {
         const refs = {};
         Object.values(enumInputFieldsNames).forEach((fieldName)=>{
             const inputField = new InputClass({
-                props: {
-                    componentName: `${fieldName} input with validation`,
-                    ...mapInputToProps[fieldName] ?? {}
-                },
+                componentName: `${fieldName} input with validation`,
+                props: mapInputToProps[fieldName] ?? {},
                 helpers: mapInputToHelpers[fieldName] ?? {}
             });
             children[`${fieldName}_child`] = inputField;
@@ -13353,7 +13357,7 @@ class FormSubmitButton extends (0, _components.Button) {
 },{"components":"dHnah","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lB7ea":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-var _componentTemplateGenerator = require("utils/component-template-generator");
+var _componentTemplateGenerator = require("utils/components/component-template-generator");
 var _componentTemplateGeneratorDefault = parcelHelpers.interopDefault(_componentTemplateGenerator);
 function getInputFormTemplate(enumFormFieldsNames) {
     const tag = "form";
@@ -13393,7 +13397,7 @@ function getInputFormTemplate(enumFormFieldsNames) {
 }
 exports.default = getInputFormTemplate;
 
-},{"utils/component-template-generator":"8dIyM","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"79bbv":[function(require,module,exports) {
+},{"utils/components/component-template-generator":"g9YwQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"79bbv":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "TextComponent", ()=>(0, _component.TextComponent));
@@ -13419,7 +13423,7 @@ class TextComponent extends (0, _dom.Block) {
 },{"core/dom":"3BLMu","./template":"4jZMB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4jZMB":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-var _componentTemplateGenerator = require("utils/component-template-generator");
+var _componentTemplateGenerator = require("utils/components/component-template-generator");
 var _componentTemplateGeneratorDefault = parcelHelpers.interopDefault(_componentTemplateGenerator);
 const content = `
 {{#if text}}
@@ -13433,7 +13437,7 @@ exports.default = (tag)=>(0, _componentTemplateGeneratorDefault.default)({
         content
     });
 
-},{"utils/component-template-generator":"8dIyM","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8UAPc":[function(require,module,exports) {
+},{"utils/components/component-template-generator":"g9YwQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8UAPc":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "TImageProps", ()=>(0, _component.TImageProps));
@@ -13456,7 +13460,7 @@ class ImageComponent extends (0, _dom.Block) {
 },{"core/dom":"3BLMu","./template":"lxdE4","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lxdE4":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-var _componentTemplateGenerator = require("utils/component-template-generator");
+var _componentTemplateGenerator = require("utils/components/component-template-generator");
 var _componentTemplateGeneratorDefault = parcelHelpers.interopDefault(_componentTemplateGenerator);
 const tag = "img";
 exports.default = (0, _componentTemplateGeneratorDefault.default)({
@@ -13464,7 +13468,107 @@ exports.default = (0, _componentTemplateGeneratorDefault.default)({
     isSelfClosingTag: true
 });
 
-},{"utils/component-template-generator":"8dIyM","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gtofV":[function(require,module,exports) {
+},{"utils/components/component-template-generator":"g9YwQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3Ptyh":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ModalWindow", ()=>(0, _component.ModalWindow));
+var _component = require("./component");
+
+},{"./component":"l0BAo","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"l0BAo":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ModalWindow", ()=>ModalWindow);
+var _buttons = require("components/buttons");
+var _dom = require("core/dom");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+class ModalWindow extends (0, _dom.Block) {
+    constructor(){
+        const children = {};
+        children.closeButton = new (0, _buttons.Button)({
+            props: {
+                htmlClasses: [
+                    "close-button"
+                ],
+                label: "\xd7",
+                events: {
+                    click: [
+                        function() {
+                            this.refs.modalWindow.toggleVisibility("off");
+                        }, 
+                    ]
+                }
+            }
+        });
+        children.content = new (0, _dom.Block)();
+        super({
+            children
+        });
+        this.contentType = "";
+    }
+    render() {
+        return 0, _templateDefault.default;
+    }
+    _afterPropsAssignHook() {
+        super._afterPropsAssignHook();
+        this.children.closeButton.refs.modalWindow = this;
+        this.children = new Proxy(this.children, {
+            set: (function(target, childName, component) {
+                if (childName === "content") {
+                    const oldContentType = this.contentType;
+                    target[childName] = component;
+                    this._componentDidUpdate("", "", true);
+                    this.contentType = component.componentName;
+                    console.log(`MODAL CONTENT: ${oldContentType} -> ${this.contentType}`);
+                }
+                return true;
+            }).bind(this)
+        });
+    }
+    _createCloseButton() {
+        return new (0, _buttons.Button)({
+            refs: {
+                ModalWindow: this
+            },
+            props: {
+                htmlClasses: [
+                    "close-button"
+                ],
+                label: "\xd7",
+                events: {
+                    click: [
+                        function() {
+                            this.refs.modalWindow.toggleModal();
+                        }, 
+                    ]
+                }
+            }
+        });
+    }
+    toggleVisibility(state) {
+        this.toggleHtmlClass("show-modal", state);
+    }
+    dispatchContent(component) {
+        this.children.content = component;
+    }
+    getContentType() {
+        return this.contentType;
+    }
+}
+
+},{"components/buttons":"fWrjK","core/dom":"3BLMu","./template":"cD2GJ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"cD2GJ":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+exports.default = `
+  <div class="modal">
+    <div class="modal-content">
+      {{{ content }}}
+      {{{ closeButton }}}
+    </div>
+  </div>;
+`;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gtofV":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 exports.default = `
@@ -13503,8 +13607,7 @@ class LoginPageForm extends (0, _components.InputForm) {
             mapInputToProps: (0, _fields.MapInputFieldsProps),
             props: {
                 afterValidationCallback: (0, _afterValidationCallback.afterValidationCallback),
-                formTitle: "Login",
-                componentName: "Login Form Component"
+                formTitle: "Login"
             }
         });
     }
@@ -13534,12 +13637,14 @@ parcelHelpers.export(exports, "SignUpService", ()=>(0, _signup.SignUpService));
 parcelHelpers.export(exports, "AuthorizationService", ()=>(0, _authorization.AuthorizationService));
 parcelHelpers.export(exports, "ProfileService", ()=>(0, _profile.ProfileService));
 parcelHelpers.export(exports, "ChatsService", ()=>(0, _chats.ChatsService));
+parcelHelpers.export(exports, "SocketsCreator", ()=>(0, _sockets.SocketsCreator));
 var _signup = require("./signup");
 var _authorization = require("./authorization");
 var _profile = require("./profile");
 var _chats = require("./chats");
+var _sockets = require("./sockets");
 
-},{"./signup":"5UN4o","./authorization":"3hYWC","./profile":"iAQR1","./chats":"NtgIu","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5UN4o":[function(require,module,exports) {
+},{"./signup":"5UN4o","./authorization":"3hYWC","./profile":"iAQR1","./chats":"NtgIu","./sockets":"7Ucge","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5UN4o":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "SignUpServiceClass", ()=>SignUpServiceClass);
@@ -13608,11 +13713,10 @@ const DefualtHeaders = {
         accept: "application/json"
     },
     ["DELETE"]: {
+        "Content-Type": "application/json",
         accept: "application/json"
     }
 };
-// Самая простая версия. Реализовать штучку со всеми проверками им предстоит в конце спринта
-// Необязательный метод
 function queryStringify(data) {
     if (typeof data !== "object") throw new Error("Data must be object");
     // Здесь достаточно и [object Object] для объекта
@@ -13750,6 +13854,22 @@ class ChatsAPIClass {
             data
         });
     }
+    deleteChat(data) {
+        return (0, _httpTrasnportDefault.default).delete("chats", {
+            data
+        });
+    }
+    getChatUsers(chatID) {
+        return (0, _httpTrasnportDefault.default).get(`chats/${chatID}/users`);
+    }
+    getChatToken(chatID) {
+        return (0, _httpTrasnportDefault.default).post(`chats/token/${chatID}`);
+    }
+    addUsersToChat(data) {
+        return (0, _httpTrasnportDefault.default).put("chats/users", {
+            data
+        });
+    }
     changeAvatar(data) {
         return (0, _httpTrasnportDefault.default).put("chats/avatar", {
             headers: {
@@ -13765,7 +13885,7 @@ const ChatsAPI = new ChatsAPIClass();
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "EnumLoginAPIErrors", ()=>EnumLoginAPIErrors);
-parcelHelpers.export(exports, "afterAuthenticationHandler", ()=>afterAuthenticationHandler);
+parcelHelpers.export(exports, "afterAuthorizationHandler", ()=>afterAuthorizationHandler);
 parcelHelpers.export(exports, "AuthorizationService", ()=>AuthorizationService);
 var _api = require("api");
 var _services = require("services");
@@ -13775,10 +13895,10 @@ let EnumLoginAPIErrors;
 (function(EnumLoginAPIErrors) {
     EnumLoginAPIErrors["AlreadyInSystem"] = "User already in system";
 })(EnumLoginAPIErrors || (EnumLoginAPIErrors = {}));
-const afterAuthenticationHandler = async function(authenticationFailedCallback = ()=>{}) {
+const afterAuthorizationHandler = async function(authorizationFailedCallback = ()=>{}) {
     const userResponse = await this.getUser();
     if ((0, _api1.APIResponseHasError)(userResponse)) {
-        await authenticationFailedCallback(userResponse);
+        await authorizationFailedCallback(userResponse);
         return;
     }
     await (0, _services.ProfileService).getUserProfile(userResponse.id);
@@ -13787,6 +13907,7 @@ const afterAuthenticationHandler = async function(authenticationFailedCallback =
     window.store.dispatch({
         currentChatID
     });
+    await (0, _services.SocketsCreator).createAllChatsSockets();
 };
 class AuthorizationServiceClass {
     async getUser() {
@@ -13800,7 +13921,7 @@ class AuthorizationServiceClass {
         const { status , response  } = requestLogin;
         console.log(`LOGIN REQUEST: status ${status}; response ${JSON.stringify(response)}`);
         if (!(0, _api1.APIResponseHasError)(response) || response.reason === "User already in system") {
-            await afterAuthenticationHandler.call(this, (userResponse)=>{
+            await afterAuthorizationHandler.call(this, (userResponse)=>{
                 throw new Error(`Unexpecter User Response After Login: ${userResponse.reason}`);
             });
             window.router.go((0, _router.EnumAppRoutes).Chats);
@@ -13830,6 +13951,7 @@ parcelHelpers.export(exports, "transformProfileFormDatatoAPI", ()=>(0, _toApiDat
 parcelHelpers.export(exports, "transformAvatarURL", ()=>(0, _fromApiDataTransformers.transformAvatarURL));
 parcelHelpers.export(exports, "transformProfileAPIResponseToUserData", ()=>(0, _fromApiDataTransformers.transformProfileAPIResponseToUserData));
 parcelHelpers.export(exports, "transformChatsGetResponseToChatsData", ()=>(0, _fromApiDataTransformers.transformChatsGetResponseToChatsData));
+parcelHelpers.export(exports, "transformChatGetTokenResponseToToken", ()=>(0, _fromApiDataTransformers.transformChatGetTokenResponseToToken));
 var _responseHasError = require("./response-has-error");
 var _toApiDataTransformers = require("./to-api-data-transformers");
 var _fromApiDataTransformers = require("./from-api-data-transformers");
@@ -13848,37 +13970,555 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "transformSignUpFormDatatoAPI", ()=>transformSignUpFormDatatoAPI);
 parcelHelpers.export(exports, "transformLoginFormDatatoAPI", ()=>transformLoginFormDatatoAPI);
 parcelHelpers.export(exports, "transformProfileFormDatatoAPI", ()=>transformProfileFormDatatoAPI);
-var _formComponent = require("pages/sign-up/form-component");
-var _formComponent1 = require("pages/login/form-component");
-var _dataForm = require("pages/profile/components/data-form");
+parcelHelpers.export(exports, "transformAddUsersFormDataToAPI", ()=>transformAddUsersFormDataToAPI);
+parcelHelpers.export(exports, "transformChatIDToDeleteAPI", ()=>transformChatIDToDeleteAPI);
 function transformSignUpFormDatatoAPI(data) {
     return {
-        first_name: data[(0, _formComponent.EnumInputFields).FirstName],
-        second_name: data[(0, _formComponent.EnumInputFields).SecondName],
-        login: data[(0, _formComponent.EnumInputFields).Login],
-        email: data[(0, _formComponent.EnumInputFields).Email],
-        password: data[(0, _formComponent.EnumInputFields).Password],
-        phone: data[(0, _formComponent.EnumInputFields).Phone]
+        first_name: data.first_name,
+        second_name: data.second_name,
+        login: data.login,
+        email: data.email,
+        password: data.password,
+        phone: data.phone
     };
 }
 function transformLoginFormDatatoAPI(data) {
     return {
-        login: data[(0, _formComponent1.EnumInputFields).Login],
-        password: data[(0, _formComponent1.EnumInputFields).Password]
+        login: data.login,
+        password: data.password
     };
 }
 function transformProfileFormDatatoAPI(data) {
     return {
-        first_name: data[(0, _dataForm.EnumInputFields).FirstName],
-        second_name: data[(0, _dataForm.EnumInputFields).SecondName],
-        display_name: data[(0, _dataForm.EnumInputFields).DisplayName],
-        login: data[(0, _dataForm.EnumInputFields).Login],
-        email: data[(0, _dataForm.EnumInputFields).Email],
-        phone: data[(0, _dataForm.EnumInputFields).Phone]
+        first_name: data.first_name,
+        second_name: data.second_name,
+        display_name: data.display_name,
+        login: data.login,
+        email: data.email,
+        phone: data.phone
+    };
+}
+function transformAddUsersFormDataToAPI(data) {
+    return {
+        chatId: parseInt(data.chatID, 10),
+        users: data.usersList.map((userID)=>parseInt(userID, 10))
+    };
+}
+function transformChatIDToDeleteAPI(chatID) {
+    return {
+        chatId: parseInt(chatID, 10)
     };
 }
 
-},{"pages/sign-up/form-component":"2Czac","pages/login/form-component":"3Zx9f","pages/profile/components/data-form":"kHTlw","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2Czac":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6KHu3":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "transformAvatarURL", ()=>transformAvatarURL);
+parcelHelpers.export(exports, "transformProfileAPIResponseToUserData", ()=>transformProfileAPIResponseToUserData);
+parcelHelpers.export(exports, "transformChatsGetResponseToChatsData", ()=>transformChatsGetResponseToChatsData);
+parcelHelpers.export(exports, "transformChatUsersGetResponseToChatsUsersData", ()=>transformChatUsersGetResponseToChatsUsersData);
+parcelHelpers.export(exports, "transformChatGetTokenResponseToToken", ()=>transformChatGetTokenResponseToToken);
+/* eslint-disable @typescript-eslint/naming-convention */ var _api = require("api");
+function transformAvatarURL(url) {
+    return url ? `${0, _api.baseURL}/resources${url}` : url;
+}
+function transformProfileAPIResponseToUserData(response) {
+    return {
+        id: response.id,
+        firstName: response.first_name,
+        secondName: response.second_name,
+        displayName: response.display_name ? response.display_name : "",
+        login: response.login,
+        email: response.email,
+        phone: response.phone,
+        avatar: transformAvatarURL(response.avatar)
+    };
+}
+function transformChatsGetResponseToChatsData(response) {
+    return response.reduce((acc, chatData)=>{
+        const { id , title , avatar , last_message  } = chatData;
+        acc[id] = {
+            title,
+            avatar: transformAvatarURL(avatar),
+            lastMessage: last_message
+        };
+        return acc;
+    }, {});
+}
+function transformChatUsersGetResponseToChatsUsersData(response) {
+    return response.reduce((acc, userData)=>{
+        acc[userData.id.toString()] = {
+            displayName: userData.display_name
+        };
+        return acc;
+    }, {});
+}
+function transformChatGetTokenResponseToToken(response) {
+    return response.token;
+}
+
+},{"api":"d9ci3","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"iAQR1":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ProfileService", ()=>ProfileService);
+var _api = require("api");
+var _api1 = require("utils/api");
+class ProfileServiceClass {
+    async getUserProfile(userID) {
+        const request = await (0, _api.ProfileAPI).getProfileData(userID);
+        const { status , response  } = request;
+        console.log(`PROFILE GET ID(${userID}) REQUEST: status ${status}; response: ${JSON.stringify(response)}`);
+        if (!(0, _api1.APIResponseHasError)(response)) {
+            const user = (0, _api1.transformProfileAPIResponseToUserData)(response);
+            window.store.dispatch({
+                user
+            });
+        }
+        return response;
+    }
+    async changeUserProfile(data, afterRequestCallback) {
+        const request = await (0, _api.ProfileAPI).changeProfile(data);
+        const { status , response  } = request;
+        console.log(`PROFILE CHANGE REQUEST: status ${status}; response: ${JSON.stringify(response)}`);
+        afterRequestCallback(response);
+        return response;
+    }
+    async changeUserAvatar(avatarFormData, afterRequestCallback) {
+        const request = await (0, _api.ProfileAPI).changeAvatar(avatarFormData);
+        const { status , response  } = request;
+        console.log(`PROFILE CHANGE AVATAR REQUEST: status ${status}; response: ${JSON.stringify(response)}`);
+        afterRequestCallback(response);
+        return response;
+    }
+}
+const ProfileService = new ProfileServiceClass();
+
+},{"api":"d9ci3","utils/api":"i2lTI","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"NtgIu":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ChatsServiceClass", ()=>ChatsServiceClass);
+parcelHelpers.export(exports, "ChatsService", ()=>ChatsService);
+var _api = require("api");
+var _api1 = require("utils/api");
+var _fromApiDataTransformers = require("utils/api/from-api-data-transformers");
+var _toApiDataTransformers = require("utils/api/to-api-data-transformers");
+var _objectsHandle = require("utils/objects-handle");
+var _pages = require("utils/pages");
+var _services = require("services");
+class ChatsServiceClass {
+    async getChats(afterRequestCallback = ()=>{}) {
+        const request = await (0, _api.ChatsAPI).getChats();
+        const { status , response  } = request;
+        console.log(`GET CHATS REQUEST: status ${status}; response ${JSON.stringify(response)}`);
+        if (!(0, _api1.APIResponseHasError)(response)) window.store.dispatch({
+            chats: (0, _api1.transformChatsGetResponseToChatsData)(response)
+        });
+        await afterRequestCallback(response);
+        return response;
+    }
+    async createChat(data, afterRequestCallback) {
+        const request = await (0, _api.ChatsAPI).createChat(data);
+        const { status , response  } = request;
+        console.log(`CREATE CHAT REQUEST: status ${status}; response ${JSON.stringify(response)}`);
+        if (afterRequestCallback) await afterRequestCallback(response);
+        if (!(0, _api1.APIResponseHasError)(response)) {
+            await this.getChats();
+            const chatID = response.id.toString();
+            const socket = (0, _services.SocketsCreator).createChatSocket({
+                chatID
+            });
+            window.store.setStateByPath(`chatsSockets.${chatID}.socket`, value);
+        }
+        return response;
+    }
+    async deleteChat(chatID, afterRequestCallback) {
+        const request = await (0, _api.ChatsAPI).deleteChat((0, _toApiDataTransformers.transformChatIDToDeleteAPI)(chatID));
+        const { status , response  } = request;
+        console.log(`DELETE CHAT(${chatID}) REQUEST: status ${status}; response ${JSON.stringify(response)}`);
+        if (afterRequestCallback) await afterRequestCallback(response);
+        if (!(0, _api1.APIResponseHasError)(response)) {
+            const currentChats = window.store.getChatsDataByPath();
+            const newChats = (0, _objectsHandle.objectWithoutKey)(currentChats, chatID);
+            window.store.dispatch({
+                chats: newChats
+            });
+            window.store.dispatch({
+                currentChatID: null
+            });
+        }
+        return response;
+    }
+    async getChatUsers(chatID, afterRequestCallback) {
+        const request = await (0, _api.ChatsAPI).getChatUsers(chatID);
+        const { status , response  } = request;
+        console.log(`GET CHAT(${chatID}) USERS REQUEST: status ${status}; response ${JSON.stringify(response)}`);
+        if (afterRequestCallback) await afterRequestCallback(response);
+        return response;
+    }
+    async addUsersToChat(data, afterRequestCallback) {
+        const request = await (0, _api.ChatsAPI).addUsersToChat(data);
+        const { status , response  } = request;
+        const chatID = data.chatId;
+        const usersList = data.users;
+        console.log(`ADD USERS TO CHAT(${chatID}) REQUEST: status ${status}; response ${JSON.stringify(response)}`);
+        if (afterRequestCallback) await afterRequestCallback(response);
+        if (!(0, _api1.APIResponseHasError)(response)) {
+            const responseChatUsers = await this.getChatUsers(chatID.toString());
+            const usersData = (0, _fromApiDataTransformers.transformChatUsersGetResponseToChatsUsersData)(responseChatUsers);
+            usersList.forEach((userID)=>{
+                window.store.setStateByPath(`chatsUsers.${userID}`, usersData[userID]);
+            });
+        }
+        return response;
+    }
+    async changeAvatar(avatarPutForm, afterRequestCallback) {
+        const request = await (0, _api.ChatsAPI).changeAvatar(avatarPutForm);
+        const { status , response  } = request;
+        const chatID = avatarPutForm.get("chatId");
+        console.log(`CHANGE CHAT(${chatID}) AVATAR REQUEST: status ${status}; response ${JSON.stringify(response)}`);
+        if (afterRequestCallback) await afterRequestCallback(response);
+        if (!(0, _api1.APIResponseHasError)(response)) {
+            const avatar = (0, _api1.transformAvatarURL)(response.avatar);
+            window.store.setStateByPath(`chats.${chatID}.avatar`, avatar, ()=>{
+                const chatComponent = window.store.getPageRef(`chat-${chatID}`);
+                const avatarImage = (0, _pages.getDescendantByPath)(chatComponent, [
+                    "avatarImage", 
+                ]);
+                avatarImage.setPropByPath("htmlAttributes.src", avatar);
+            });
+        }
+        return response;
+    }
+}
+const ChatsService = new ChatsServiceClass();
+
+},{"api":"d9ci3","utils/api":"i2lTI","utils/api/from-api-data-transformers":"6KHu3","utils/api/to-api-data-transformers":"gwV72","utils/objects-handle":"kOfSo","utils/pages":"5q3PA","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","services":"f5PO7"}],"7Ucge":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "SocketsCreator", ()=>(0, _socketsCreator.SocketsCreator));
+var _socketsCreator = require("./sockets-creator");
+
+},{"./sockets-creator":"3MBUc","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3MBUc":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "SocketsCreatorClass", ()=>SocketsCreatorClass);
+parcelHelpers.export(exports, "SocketsCreator", ()=>SocketsCreator);
+var _fromApiDataTransformers = require("utils/api/from-api-data-transformers");
+var _api = require("api");
+var _socketClass = require("./socket-class");
+class SocketsCreatorClass {
+    async getChatToken(chatID, afterRequestCallback) {
+        const request = await (0, _api.ChatsAPI).getChatToken(chatID);
+        const { status , response  } = request;
+        console.log(`GET CHAT(${chatID}) TOKEN REQUEST: status ${status}; response ${JSON.stringify(response)}`);
+        if (afterRequestCallback) await afterRequestCallback(response);
+        return response;
+    }
+    async createChatSocket({ userID , chatID  }) {
+        if (!userID) userID = window.store.getUserID();
+        const chatTokenResponse = await this.getChatToken(chatID);
+        const chatToken = (0, _fromApiDataTransformers.transformChatGetTokenResponseToToken)(chatTokenResponse);
+        return new (0, _socketClass.ChatWebSocket)({
+            userID,
+            chatID,
+            chatToken
+        });
+    }
+    async createAllChatsSockets() {
+        const { store  } = window;
+        const userID = store.getUserID();
+        const chatsSockets = (await Promise.all(Object.keys(store.getChatsDataByPath()).map(async (chatID)=>{
+            return [
+                chatID,
+                await this.createChatSocket({
+                    userID,
+                    chatID
+                })
+            ];
+        }))).reduce((acc, [chatID, socket])=>{
+            acc[chatID] = socket;
+            return acc;
+        }, {});
+        window.store.dispatch({
+            chatsSockets
+        });
+    }
+}
+const SocketsCreator = new SocketsCreatorClass();
+
+},{"utils/api/from-api-data-transformers":"6KHu3","api":"d9ci3","./socket-class":"2qxfp","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2qxfp":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ChatWebSocket", ()=>ChatWebSocket);
+class ChatWebSocket {
+    constructor({ userID , chatID , chatToken  }){
+        this.userID = userID;
+        this.chatID = chatID;
+        this.chatToken = chatToken;
+        this._createSocket();
+    }
+    _createSocket() {
+        const { userID , chatID , chatToken  } = this;
+        const socket = new WebSocket(`wss://ya-praktikum.tech/ws/chats/${userID}/${chatID}/${chatToken}`);
+        this.socket = socket;
+        socket.addEventListener("close", (function(event) {
+            if (!event.wasClean) console.log(`Chat(${chatID}) Socket Closed Clearly`);
+            else {
+                console.log(`Chat(${chatID}) Socket Closed With Error: code ${event.code}, reason ${event.reason}`);
+                clearInterval(this.ping);
+            }
+        }).bind(this));
+        socket.addEventListener("message", function(event) {
+            console.log(`Message Received: '${event.data}'`);
+        });
+        socket.addEventListener("error", (function(event) {
+            console.log(`Error: ${event.message}`);
+            clearInterval(this.ping);
+        }).bind(this));
+        this.ping = setInterval(function() {
+            socket.send(JSON.stringify({
+                type: "ping"
+            }));
+            console.log("PING");
+        }, 20000);
+    }
+    send(content, type = "message") {
+        this.socket.send(JSON.stringify({
+            content,
+            type
+        }));
+    }
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kycHr":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "EnumInputFields", ()=>(0, _enumInputFields.EnumInputFields));
+parcelHelpers.export(exports, "MapInputFieldsProps", ()=>(0, _inputFields.MapInputFieldsProps));
+var _enumInputFields = require("./enum-input-fields");
+var _inputFields = require("./input-fields");
+
+},{"./enum-input-fields":"gJdld","./input-fields":"dohp9","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gJdld":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "EnumInputFields", ()=>EnumInputFields);
+let EnumInputFields;
+(function(EnumInputFields) {
+    EnumInputFields["Login"] = "login";
+    EnumInputFields["Password"] = "password";
+})(EnumInputFields || (EnumInputFields = {}));
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dohp9":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "MapInputFieldsProps", ()=>MapInputFieldsProps);
+var _enumInputFields = require("./enum-input-fields");
+var _inputValidators = require("./input-validators");
+const MapInputFieldsProps = {
+    [(0, _enumInputFields.EnumInputFields).Login]: {
+        htmlAttributes: {
+            name: "login",
+            placeholder: "Your Login"
+        },
+        validators: (0, _inputValidators.FormValidators)[(0, _enumInputFields.EnumInputFields).Login]
+    },
+    [(0, _enumInputFields.EnumInputFields).Password]: {
+        htmlAttributes: {
+            name: "password",
+            placeholder: "Your Password"
+        },
+        validators: (0, _inputValidators.FormValidators)[(0, _enumInputFields.EnumInputFields).Password]
+    }
+};
+
+},{"./enum-input-fields":"gJdld","./input-validators":"rL6NJ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"rL6NJ":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "FormValidators", ()=>FormValidators);
+var _formInputValidator = require("utils/form-input-validator");
+var _enumInputFields = require("./enum-input-fields");
+const FormValidators = [
+    {
+        field: (0, _enumInputFields.EnumInputFields).Login,
+        validatorsList: [
+            (0, _formInputValidator.validateLoginRegex)
+        ]
+    },
+    {
+        field: (0, _enumInputFields.EnumInputFields).Password,
+        validatorsList: [
+            (0, _formInputValidator.validatePasswordRegex)
+        ]
+    }, 
+].reduce((acc, { field , validatorsList  })=>{
+    validatorsList.unshift((0, _formInputValidator.validateNotEmptyValue));
+    const validator = (0, _formInputValidator.makeValidator)({
+        validatorsList
+    });
+    acc[field] = {
+        blur: [
+            validator
+        ]
+    };
+    return acc;
+}, {});
+
+},{"utils/form-input-validator":"4RFK4","./enum-input-fields":"gJdld","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4RFK4":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "makeValidator", ()=>(0, _makeValidator.makeValidator));
+parcelHelpers.export(exports, "TInputSingleValidator", ()=>(0, _makeValidator.TInputSingleValidator));
+parcelHelpers.export(exports, "validateNotEmptyValue", ()=>(0, _commonValidators.validateNotEmptyValue));
+parcelHelpers.export(exports, "validateLoginRegex", ()=>(0, _commonValidators.validateLoginRegex));
+parcelHelpers.export(exports, "validatePasswordRegex", ()=>(0, _commonValidators.validatePasswordRegex));
+parcelHelpers.export(exports, "validateNameRegex", ()=>(0, _commonValidators.validateNameRegex));
+parcelHelpers.export(exports, "validatePhoneRegex", ()=>(0, _commonValidators.validatePhoneRegex));
+parcelHelpers.export(exports, "validateEmailRegex", ()=>(0, _commonValidators.validateEmailRegex));
+parcelHelpers.export(exports, "validateTwoFieldsMatching", ()=>(0, _commonValidators.validateTwoFieldsMatching));
+var _makeValidator = require("./make-validator");
+var _commonValidators = require("./common-validators");
+
+},{"./make-validator":"6rqZs","./common-validators":"lJxTH","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6rqZs":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "makeValidator", ()=>makeValidator);
+function makeValidator({ validatorsList  }) {
+    return function validate() {
+        let error = "";
+        const value = this.getValue();
+        for (const validator of validatorsList){
+            error = validator.call(this, value);
+            if (error !== "") break;
+        }
+        this.state.inputError = error;
+        this.setPropByPath("htmlAttributes.value", value);
+        return !error;
+    };
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lJxTH":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "validateNotEmptyValue", ()=>validateNotEmptyValue);
+parcelHelpers.export(exports, "validateLoginRegex", ()=>validateLoginRegex);
+parcelHelpers.export(exports, "validatePasswordRegex", ()=>validatePasswordRegex);
+parcelHelpers.export(exports, "validateTwoFieldsMatching", ()=>validateTwoFieldsMatching);
+parcelHelpers.export(exports, "validateNameRegex", ()=>validateNameRegex);
+parcelHelpers.export(exports, "validatePhoneRegex", ()=>validatePhoneRegex);
+parcelHelpers.export(exports, "validateEmailRegex", ()=>validateEmailRegex);
+function validateNotEmptyValue(value) {
+    if (value === "") return "Value is empty";
+    return "";
+}
+function validateLoginRegex(value) {
+    if (value.length < 3) return "length must be ≥ 3";
+    if (!value.match("^[a-zA-Z0-9_-]+$")) return "only latin, digits and _ -";
+    if (!value.match("[a-zA-Z]+")) return "must include letter(s)";
+    if (value.length > 20) return "length must be ≤ 3";
+    return "";
+}
+function validatePasswordRegex(value) {
+    if (value.length < 8) return "length must be ≥ 8";
+    if (!value.match("[A-Z]+")) return "One capital letter at minimun";
+    if (!value.match("[0-9]+")) return "One digit at minimun";
+    if (value.length > 40) return "length must be ≤ 40";
+    return "";
+}
+function validateTwoFieldsMatching({ fieldNames , notMatchErrorText  }) {
+    return function validateMatching() {
+        const form = this.refs.Form;
+        const inputFirst = form.refs[fieldNames.first];
+        const inputSecond = form.refs[fieldNames.second];
+        const value = this.getValue();
+        const inputs = {};
+        if (this === inputFirst) Object.assign(inputs, {
+            valueOther: inputSecond.getValue(),
+            this: inputFirst,
+            other: inputSecond
+        });
+        else Object.assign(inputs, {
+            valueOther: inputFirst.getValue(),
+            this: inputSecond,
+            other: inputFirst
+        });
+        let error = "";
+        const valuesMatching = value === inputs.valueOther;
+        const stateThis = inputs.this.state;
+        const stateOther = inputs.other.state;
+        if (!valuesMatching) {
+            error = notMatchErrorText;
+            stateThis.inputError = error;
+            stateOther.inputError = error;
+        } else if (stateOther.inputError === notMatchErrorText) {
+            stateOther.inputError = "";
+            stateThis.inputError = "";
+        }
+        return error;
+    };
+}
+function validateNameRegex(value) {
+    if (!value.match("^[а-яА-Яa-zA-Z]+$")) return "only latin and cyrillik and -";
+    if (!value.match("^[А-ЯA-Z]")) return "must start with capital letter";
+    return "";
+}
+function validatePhoneRegex(value) {
+    if (!value.match(`^[+]?[\\d]+$`)) return "must be digits (starting/not with +)";
+    if (!(value.length >= 10 && value.length <= 15)) return "10 ≤ phone length ≤ 15";
+    return "";
+}
+function validateEmailRegex(value) {
+    if (!value.match("^[a-zA-z]+[a-zA-Z\\d-_]*@[a-z]+\\.")) return "incorrect email";
+    return "";
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"35s0o":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "SignUpPage", ()=>SignUpPage);
+var _dom = require("core/dom");
+var _components = require("components");
+var _hocs = require("hocs");
+var _router = require("core/router");
+var _formComponent = require("./form-component");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+const LinkWithRouter = (0, _hocs.WithRouter)((0, _components.Link));
+class SignUpPage extends (0, _dom.Block) {
+    constructor(){
+        const children = {};
+        const refs = {};
+        children.signInLink = new LinkWithRouter({
+            props: {
+                label: "Sign In",
+                htmlAttributes: {
+                    name: "Sign in"
+                },
+                htmlClasses: [
+                    "sign-in-link"
+                ],
+                events: {
+                    click: [
+                        function() {
+                            this.router.go((0, _router.EnumAppRoutes).Login);
+                        }, 
+                    ]
+                }
+            }
+        });
+        children.signupForm = new (0, _formComponent.SignUpPageForm)();
+        children.homeButton = new (0, _components.HomeButton)();
+        super({
+            componentName: "SignUp Page",
+            children,
+            refs
+        });
+    }
+    render() {
+        return 0, _templateDefault.default;
+    }
+}
+
+},{"core/dom":"3BLMu","components":"dHnah","hocs":"8D4Xk","core/router":"6PhbH","./form-component":"2Czac","./template":"gzQaV","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2Czac":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "SignUpPageForm", ()=>(0, _component.SignUpPageForm));
@@ -13900,8 +14540,7 @@ class SignUpPageForm extends (0, _components.InputForm) {
             mapInputToProps: (0, _fields.MapInputFieldsProps),
             props: {
                 afterValidationCallback: (0, _afterValidationCallback.afterValidationCallback),
-                formTitle: "Sign Up",
-                componentName: "SignUp Form Component"
+                formTitle: "Sign Up"
             }
         });
     }
@@ -14084,115 +14723,1377 @@ const FormValidators = [
     return acc;
 }, {});
 
-},{"utils/form-input-validator":"4RFK4","./enum-input-fields":"kbcfW","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4RFK4":[function(require,module,exports) {
+},{"utils/form-input-validator":"4RFK4","./enum-input-fields":"kbcfW","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gzQaV":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "makeValidator", ()=>(0, _makeValidator.makeValidator));
-parcelHelpers.export(exports, "TInputSingleValidator", ()=>(0, _makeValidator.TInputSingleValidator));
-parcelHelpers.export(exports, "validateNotEmptyValue", ()=>(0, _commonValidators.validateNotEmptyValue));
-parcelHelpers.export(exports, "validateLoginRegex", ()=>(0, _commonValidators.validateLoginRegex));
-parcelHelpers.export(exports, "validatePasswordRegex", ()=>(0, _commonValidators.validatePasswordRegex));
-parcelHelpers.export(exports, "validateNameRegex", ()=>(0, _commonValidators.validateNameRegex));
-parcelHelpers.export(exports, "validatePhoneRegex", ()=>(0, _commonValidators.validatePhoneRegex));
-parcelHelpers.export(exports, "validateEmailRegex", ()=>(0, _commonValidators.validateEmailRegex));
-parcelHelpers.export(exports, "validateTwoFieldsMatching", ()=>(0, _commonValidators.validateTwoFieldsMatching));
-var _makeValidator = require("./make-validator");
-var _commonValidators = require("./common-validators");
+exports.default = `
+  <main class="sign-up-page">
+  {{{ signupForm }}}
+  <nav class="form-links">
+    <div class="sign-in-link-section">
+      {{{ signInLink }}}
+    </div>
+    <div class="index-page-link-section">
+      {{{ homeButton }}}
+    </div>
+  </nav>
+</main>
+`;
 
-},{"./make-validator":"6rqZs","./common-validators":"lJxTH","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6rqZs":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4muSN":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "makeValidator", ()=>makeValidator);
-function makeValidator({ validatorsList  }) {
-    return function validate() {
-        let error = "";
-        const value = this.getValue();
-        for (const validator of validatorsList){
-            error = validator.call(this, value);
-            if (error !== "") break;
-        }
-        this.state.inputError = error;
-        this.setPropByPath("htmlAttributes.value", value);
-        return !error;
-    };
-}
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lJxTH":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "validateNotEmptyValue", ()=>validateNotEmptyValue);
-parcelHelpers.export(exports, "validateLoginRegex", ()=>validateLoginRegex);
-parcelHelpers.export(exports, "validatePasswordRegex", ()=>validatePasswordRegex);
-parcelHelpers.export(exports, "validateTwoFieldsMatching", ()=>validateTwoFieldsMatching);
-parcelHelpers.export(exports, "validateNameRegex", ()=>validateNameRegex);
-parcelHelpers.export(exports, "validatePhoneRegex", ()=>validatePhoneRegex);
-parcelHelpers.export(exports, "validateEmailRegex", ()=>validateEmailRegex);
-function validateNotEmptyValue(value) {
-    if (value === "") return "Value is empty";
-    return "";
-}
-function validateLoginRegex(value) {
-    if (value.length < 3) return "length must be ≥ 3";
-    if (!value.match("^[a-zA-Z0-9_-]+$")) return "only latin, digits and _ -";
-    if (!value.match("[a-zA-Z]+")) return "must include letter(s)";
-    if (value.length > 20) return "length must be ≤ 3";
-    return "";
-}
-function validatePasswordRegex(value) {
-    if (value.length < 8) return "length must be ≥ 8";
-    if (!value.match("[A-Z]+")) return "One capital letter at minimun";
-    if (!value.match("[0-9]+")) return "One digit at minimun";
-    if (value.length > 40) return "length must be ≤ 40";
-    return "";
-}
-function validateTwoFieldsMatching({ fieldNames , notMatchErrorText  }) {
-    return function validateMatching() {
-        const form = this.refs.Form;
-        const inputFirst = form.refs[fieldNames.first];
-        const inputSecond = form.refs[fieldNames.second];
-        const value = this.getValue();
-        const inputs = {};
-        if (this === inputFirst) Object.assign(inputs, {
-            valueOther: inputSecond.getValue(),
-            this: inputFirst,
-            other: inputSecond
+parcelHelpers.export(exports, "ChatsPage", ()=>ChatsPage);
+var _components = require("hocs/components");
+var _pages = require("utils/pages");
+var _objectsHandle = require("utils/objects-handle");
+var _modals = require("./components/modals");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+var _components1 = require("./components");
+class ChatsPage extends (0, _components.WithStoreBlock) {
+    constructor(){
+        const children = {};
+        children.navigationSection = new (0, _components1.ChatsPageNavigationSection)();
+        children.chatSection = new (0, _components1.ChatsPageMainSection)();
+        children.sideMenu = new (0, _components1.ChatsPageSideMenu)();
+        children.modalWindow = (0, _modals.ModalWindow);
+        super({
+            componentName: "Chats Page",
+            children
         });
-        else Object.assign(inputs, {
-            valueOther: inputFirst.getValue(),
-            this: inputSecond,
-            other: inputFirst
+    }
+    _afterPropsAssignHook() {
+        super._afterPropsAssignHook();
+        const functionalButton = (0, _pages.getDescendantByPath)(this, [
+            "chatSection",
+            "headerSection",
+            "functionalButton", 
+        ]);
+        functionalButton.refs.sideMenu = (0, _pages.getDescendantByPath)(this, [
+            "sideMenu"
+        ]);
+        this.refs.chatSection = this.children.chatSection;
+        this.refs.chatTitle = (0, _pages.getDescendantByPath)(this, [
+            "chatSection",
+            "headerSection",
+            "chatTitle", 
+        ]);
+        this.refs.messagesSection = (0, _pages.getDescendantByPath)(this, [
+            "chatSection",
+            "messagesDisplaySection", 
+        ]);
+        this.refs.attachmentButton = (0, _pages.getDescendantByPath)(this, [
+            "chatSection",
+            "messageInputSection",
+            "attachmentButton", 
+        ]);
+        this.refs.messageInput = (0, _pages.getDescendantByPath)(this, [
+            "chatSection",
+            "messageInputSection",
+            "messageInput", 
+        ]);
+        this.refs.sendMessageButton = (0, _pages.getDescendantByPath)(this, [
+            "chatSection",
+            "messageInputSection",
+            "sendMessageButton", 
+        ]);
+        this.refs.chooseChatAvatarButton = (0, _pages.getDescendantByPath)(this, [
+            "sideMenu",
+            "avatarChooseButton",
+            "chooseButton", 
+        ]);
+        this.refs.addChatUsersButton = (0, _pages.getDescendantByPath)(this, [
+            "sideMenu",
+            "addChatUsersButton", 
+        ]);
+        this.refs.deleteChatButton = (0, _pages.getDescendantByPath)(this, [
+            "sideMenu",
+            "deleteChatButton", 
+        ]);
+        const chatsList = (0, _pages.getDescendantByPath)(this, [
+            "navigationSection",
+            "chatsList", 
+        ]);
+        this.refs.chatsList = chatsList;
+        const chats = (0, _pages.getDescendantByPath)(chatsList, [
+            "chats"
+        ]);
+        chats.forEach((chat)=>{
+            this.refs[`chat-${chat.chatID}`] = chat;
         });
-        let error = "";
-        const valuesMatching = value === inputs.valueOther;
-        const stateThis = inputs.this.state;
-        const stateOther = inputs.other.state;
-        if (!valuesMatching) {
-            error = notMatchErrorText;
-            stateThis.inputError = error;
-            stateOther.inputError = error;
-        } else if (stateOther.inputError === notMatchErrorText) {
-            stateOther.inputError = "";
-            stateThis.inputError = "";
-        }
-        return error;
-    };
-}
-function validateNameRegex(value) {
-    if (!value.match("^[а-яА-Яa-zA-Z]+$")) return "only latin and cyrillik and -";
-    if (!value.match("^[А-ЯA-Z]")) return "must start with capital letter";
-    return "";
-}
-function validatePhoneRegex(value) {
-    if (!value.match(`^[+]?[\\d]+$`)) return "must be digits (starting/not with +)";
-    if (!(value.length >= 10 && value.length <= 15)) return "10 ≤ phone length ≤ 15";
-    return "";
-}
-function validateEmailRegex(value) {
-    if (!value.match("^[a-zA-z]+[a-zA-Z\\d-_]*@[a-z]+\\.")) return "incorrect email";
-    return "";
+        const currentChatID = this.store.getCurrentChatID();
+        if (!(0, _objectsHandle.isNullish)(currentChatID)) this.refs[`chat-${currentChatID}`].toggleHtmlClass("current-chat", "on");
+    }
+    render() {
+        return 0, _templateDefault.default;
+    }
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kHTlw":[function(require,module,exports) {
+},{"hocs/components":"THcGa","utils/pages":"5q3PA","utils/objects-handle":"kOfSo","./components/modals":"jQW89","./template":"iSWX2","./components":"izx8G","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"THcGa":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "WithStoreBlock", ()=>WithStoreBlock);
+parcelHelpers.export(exports, "WithStoreButton", ()=>WithStoreButton);
+parcelHelpers.export(exports, "WithStoreInput", ()=>WithStoreInput);
+parcelHelpers.export(exports, "WithStoreFileInput", ()=>WithStoreFileInput);
+parcelHelpers.export(exports, "WithStoreTextComponent", ()=>WithStoreTextComponent);
+parcelHelpers.export(exports, "WithStoreValidatedInput", ()=>WithStoreValidatedInput);
+var _dom = require("core/dom");
+var _components = require("components");
+var _withStore = require("../with-store");
+const WithStoreBlock = (0, _withStore.WithStore)((0, _dom.Block));
+const WithStoreButton = (0, _withStore.WithStore)((0, _components.Button));
+const WithStoreInput = (0, _withStore.WithStore)((0, _components.Input));
+const WithStoreFileInput = (0, _withStore.WithStore)((0, _components.FileInput));
+const WithStoreTextComponent = (0, _withStore.WithStore)((0, _components.TextComponent));
+const WithStoreValidatedInput = (0, _withStore.WithStore)((0, _components.InputWithValidation));
+
+},{"core/dom":"3BLMu","components":"dHnah","../with-store":"jscFq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jQW89":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ModalWindow", ()=>(0, _modalWindow.ModalWindow));
+parcelHelpers.export(exports, "EnumModalWindows", ()=>(0, _enumModalWindows.EnumModalWindows));
+parcelHelpers.export(exports, "AddChatUsersModalWindow", ()=>(0, _addChatUsers.AddChatUsersModalWindow));
+parcelHelpers.export(exports, "CreateChatModalWindow", ()=>(0, _createChat.CreateChatModalWindow));
+var _modalWindow = require("./modal-window");
+var _enumModalWindows = require("./enum-modal-windows");
+var _addChatUsers = require("./add-chat-users");
+var _createChat = require("./create-chat");
+
+},{"./modal-window":"l5641","./enum-modal-windows":"7XJMs","./add-chat-users":"f230C","./create-chat":"6XvSz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"l5641":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ModalWindow", ()=>ModalWindow);
+var _components = require("components");
+const ModalWindow = new (0, _components.ModalWindow)();
+
+},{"components":"dHnah","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"7XJMs":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "EnumModalWindows", ()=>EnumModalWindows);
+let EnumModalWindows;
+(function(EnumModalWindows) {
+    EnumModalWindows["CreateChat"] = "CreateChatModalWindow";
+    EnumModalWindows["AddUsers"] = "AddChatUsersModalWindow";
+})(EnumModalWindows || (EnumModalWindows = {}));
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"f230C":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "AddChatUsersModalWindow", ()=>(0, _component.AddChatUsersModalWindow));
+var _component = require("./component");
+
+},{"./component":"bLgEB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bLgEB":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "AddChatUsersModalWindow", ()=>AddChatUsersModalWindow);
+var _dom = require("core/dom");
+var _components = require("components");
+var _api = require("utils/api");
+var _services = require("services");
+var _toApiDataTransformers = require("utils/api/to-api-data-transformers");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+class AddChatUsersModalWindow extends (0, _dom.Block) {
+    constructor({ chatID , componentName  }){
+        const state = {
+            apiResponseSuccess: "",
+            apiResponseError: ""
+        };
+        const children = {};
+        children.usersIdenifiersInput = AddChatUsersModalWindow._createUsersIdenifiersInput();
+        const beforePropsAssignHook = function() {
+            this.chatID = chatID;
+        };
+        super({
+            children,
+            state,
+            componentName,
+            helpers: {
+                beforePropsAssignHook
+            }
+        });
+    }
+    _afterPropsAssignHook() {
+        super._afterPropsAssignHook();
+        this._createSubmitButton();
+    }
+    _createSubmitButton() {
+        const refs = {
+            usersInput: this.children.usersIdenifiersInput,
+            modalWindow: this
+        };
+        const afterRequestCallback = (function(response) {
+            if ((0, _api.APIResponseHasError)(response)) this.state.apiResponseError = response.reason;
+            else {
+                this.state.apiResponseSuccess = "Users added successfully";
+                this.children.usersIdenifiersInput.setValue("");
+            }
+        }).bind(this);
+        const submitButton = new (0, _components.Button)({
+            refs,
+            props: {
+                label: "add users",
+                events: {
+                    click: [
+                        function() {
+                            const { usersInput , modalWindow  } = this.refs;
+                            modalWindow.clearAPIResponseStatus();
+                            const { chatID  } = modalWindow;
+                            const usersList = usersInput.getValue().split(",");
+                            const apiData = (0, _toApiDataTransformers.transformAddUsersFormDataToAPI)({
+                                chatID,
+                                usersList
+                            });
+                            console.log(`ADD USERS DATA: ${apiData.chatId}, ${apiData.users}`);
+                            (0, _services.ChatsService).addUsersToChat(apiData, afterRequestCallback);
+                        }, 
+                    ]
+                }
+            }
+        });
+        this.children.submitButton = submitButton;
+    }
+    clearAPIResponseStatus() {
+        this.state.apiResponseSuccess = "";
+        this.state.apiResponseError = "";
+    }
+    render() {
+        return 0, _templateDefault.default;
+    }
+    static _createUsersIdenifiersInput() {
+        return new (0, _components.Input)({
+            props: {
+                htmlAttributes: {
+                    placeholder: "Enter Users ID Numbers"
+                }
+            }
+        });
+    }
+}
+
+},{"core/dom":"3BLMu","components":"dHnah","utils/api":"i2lTI","services":"f5PO7","utils/api/to-api-data-transformers":"gwV72","./template":"3F47H","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3F47H":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+exports.default = `
+    <div class="modal-content">
+      <section class="users-data-input-section">
+        <div class="idenrifierss-input-section">
+          {{{ usersIdenifiersInput }}}
+        </div>
+      </section>
+      
+      <section class="submit-button-section">
+        {{{ submitButton }}}
+      </section>
+
+      <section claas="api-response-status">
+        {{#if apiResponseSuccess}}
+          <span class="api-success"> {{apiResponseSuccess}} </span>
+        {{/if}}
+        {{#if apiResponseError}}
+          <span class="api-error"> {{apiResponseError}} </span>
+        {{/if}}
+      </section>
+    </div>
+`;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6XvSz":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "CreateChatModalWindow", ()=>(0, _component.CreateChatModalWindow));
+var _component = require("./component");
+
+},{"./component":"co08u","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"co08u":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "CreateChatModalWindow", ()=>CreateChatModalWindow);
+var _dom = require("core/dom");
+var _components = require("components");
+var _chats = require("services/chats");
+var _api = require("utils/api");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+class CreateChatModalWindow extends (0, _dom.Block) {
+    constructor(componentName){
+        const state = {
+            apiResponseSuccess: "",
+            apiResponseError: ""
+        };
+        const children = {};
+        children.chatTitleInput = CreateChatModalWindow._createChatTitleInput();
+        super({
+            children,
+            state,
+            componentName
+        });
+    }
+    _afterPropsAssignHook() {
+        super._afterPropsAssignHook();
+        this._createSubmitButton();
+    }
+    _createSubmitButton() {
+        const refs = {
+            titleInput: this.children.chatTitleInput,
+            modalWindow: this
+        };
+        const afterRequestCallback = (function(response) {
+            if ((0, _api.APIResponseHasError)(response)) this.state.apiResponseError = response.reason;
+            else {
+                this.state.apiResponseSuccess = "Chat created successfully";
+                this.children.chatTitleInput.setValue("");
+            }
+        }).bind(this);
+        const submitButton = new (0, _components.Button)({
+            refs,
+            props: {
+                label: "Create",
+                events: {
+                    click: [
+                        function() {
+                            const { titleInput , modalWindow  } = this.refs;
+                            modalWindow.clearAPIResponseStatus();
+                            console.log(`TITLE INPUT: ${titleInput.getValue()}`);
+                            (0, _chats.ChatsService).createChat({
+                                title: titleInput.getValue()
+                            }, afterRequestCallback);
+                        }, 
+                    ]
+                }
+            }
+        });
+        this.children.submitButton = submitButton;
+    }
+    clearAPIResponseStatus() {
+        this.state.apiResponseSuccess = "";
+        this.state.apiResponseError = "";
+    }
+    render() {
+        return 0, _templateDefault.default;
+    }
+    static _createChatTitleInput() {
+        return new (0, _components.Input)({
+            props: {
+                htmlAttributes: {
+                    placeholder: "Enter Chat Title"
+                }
+            }
+        });
+    }
+}
+
+},{"core/dom":"3BLMu","components":"dHnah","services/chats":"NtgIu","utils/api":"i2lTI","./template":"c3UHl","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"c3UHl":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+exports.default = `
+    <div class="modal-content">
+      <section class="chat-data-input-section">
+        <div class="title-input-section">
+          {{{ chatTitleInput }}}
+        </div>
+      </section>
+      
+      <section class="submit-button-section">
+        {{{ submitButton }}}
+      </section>
+
+      <section claas="api-response-status">
+        {{#if apiResponseSuccess}}
+          <span class="api-success"> {{apiResponseSuccess}} </span>
+        {{/if}}
+        {{#if apiResponseError}}
+          <span class="api-error"> {{apiResponseError}} </span>
+        {{/if}}
+      </section>
+    </div>
+`;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"iSWX2":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+exports.default = `
+<div class="chats-page">
+  {{{ navigationSection }}}
+  {{{ chatSection }}}
+  {{{ sideMenu }}}
+  {{{ modalWindow }}}
+`;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"izx8G":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ChatsPageNavigationSection", ()=>(0, _navigation.ChatsPageNavigationSection));
+parcelHelpers.export(exports, "ChatsPageMainSection", ()=>(0, _chatSection.ChatsPageMainSection));
+parcelHelpers.export(exports, "ChatsPageSideMenu", ()=>(0, _sideMenu.ChatsPageSideMenu));
+var _navigation = require("./navigation");
+var _chatSection = require("./chat-section");
+var _sideMenu = require("./side-menu");
+
+},{"./navigation":"85AbS","./chat-section":"j5KBY","./side-menu":"i5mC1","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"85AbS":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ChatsPageNavigationSection", ()=>(0, _component.ChatsPageNavigationSection));
+var _component = require("./component");
+
+},{"./component":"69ESe","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"69ESe":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ChatsPageNavigationSection", ()=>ChatsPageNavigationSection);
+var _components = require("hocs/components");
+var _headerSection = require("./header-section");
+var _chatsList = require("./chats-list");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+class ChatsPageNavigationSection extends (0, _components.WithStoreBlock) {
+    constructor(){
+        const children = {};
+        children.headerSection = new (0, _headerSection.HeaderSection)();
+        children.chatsList = new (0, _chatsList.ChatsList)();
+        super({
+            children
+        });
+    }
+    render() {
+        return 0, _templateDefault.default;
+    }
+}
+
+},{"hocs/components":"THcGa","./header-section":"ga8JD","./chats-list":"3WUWn","./template":"4pU5T","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ga8JD":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "HeaderSection", ()=>(0, _component.HeaderSection));
+var _component = require("./component");
+
+},{"./component":"auCzQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"auCzQ":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "HeaderSection", ()=>HeaderSection);
+var _dom = require("core/dom");
+var _components = require("components");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+class HeaderSection extends (0, _dom.Block) {
+    constructor(){
+        const children = {};
+        children.homeButton = new (0, _components.HomeButton)();
+        super({
+            children
+        });
+    }
+    render() {
+        return 0, _templateDefault.default;
+    }
+}
+
+},{"core/dom":"3BLMu","components":"dHnah","./template":"3KCAY","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3KCAY":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+exports.default = `
+  <header class="navigation-section-header">
+    <div class="home-button-section">
+      {{{ homeButton }}}
+    </div>
+    <div class="search-section">
+      <input type="text" placeholder="Поиск">
+    </div>
+  </header>
+`;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3WUWn":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ChatsList", ()=>(0, _component.ChatsList));
+var _component = require("./component");
+
+},{"./component":"49kFn","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"49kFn":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ChatsList", ()=>ChatsList);
+var _components = require("hocs/components");
+var _chatComponent = require("../chat-component");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+class ChatsList extends (0, _components.WithStoreBlock) {
+    render() {
+        return 0, _templateDefault.default;
+    }
+    _afterPropsAssignHook() {
+        super._afterPropsAssignHook();
+        this._createChatsList();
+    }
+    _createChatsList() {
+        const chats = this.store.getChatsDataByPath();
+        const chatsList = [];
+        Object.keys(chats).forEach((id)=>{
+            chatsList.push(new (0, _chatComponent.NavigationSectionChatComponent)(id));
+        });
+        this.children.chats = chatsList;
+    }
+}
+
+},{"hocs/components":"THcGa","../chat-component":"5kkOV","./template":"8nC5u","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5kkOV":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "NavigationSectionChatComponent", ()=>(0, _components.NavigationSectionChatComponent));
+var _components = require("./components");
+
+},{"./components":"U1Qzb","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"U1Qzb":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "NavigationSectionChatComponent", ()=>NavigationSectionChatComponent);
+var _components = require("components");
+var _avatarPlaceholderChatsSvg = require("static/avatar-placeholder-chats.svg");
+var _avatarPlaceholderChatsSvgDefault = parcelHelpers.interopDefault(_avatarPlaceholderChatsSvg);
+var _components1 = require("hocs/components");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+class NavigationSectionChatComponent extends (0, _components1.WithStoreBlock) {
+    constructor(chatID){
+        const children = {};
+        children.avatarImage = NavigationSectionChatComponent._createAvatarComponent(chatID);
+        children.message = NavigationSectionChatComponent._createMessageComponent(chatID);
+        const beforePropsAssignHook = function() {
+            this.chatID = chatID;
+        };
+        super({
+            children,
+            helpers: {
+                beforePropsAssignHook
+            }
+        });
+    }
+    render() {
+        return 0, _templateDefault.default;
+    }
+    static _createAvatarComponent(chatID) {
+        let avatarSrc = window.store.getChatsDataByPath(`${chatID}.avatar`);
+        avatarSrc ??= (0, _avatarPlaceholderChatsSvgDefault.default);
+        const avatarImage = new (0, _components.ImageComponent)({
+            props: {
+                htmlAttributes: {
+                    src: avatarSrc,
+                    alt: "avatar placeholder"
+                }
+            }
+        });
+        return avatarImage;
+    }
+    static _createMessageComponent(chatID) {
+        const lastMessage = window.store.getChatsDataByPath(`${chatID}.lastMessage`);
+        const text = lastMessage ? lastMessage.content : "No Messages Exist Now";
+        return new (0, _components.TextComponent)({
+            props: {
+                text
+            }
+        });
+    }
+    _afterRenderHook() {
+        super._afterRenderHook();
+        const onclickCallback = function() {
+            this.store.dispatch({
+                currentChatID: this.chatID
+            });
+        };
+        this.dispatchEventListener("click", onclickCallback.bind(this));
+    }
+}
+
+},{"components":"dHnah","static/avatar-placeholder-chats.svg":"5MLUe","hocs/components":"THcGa","./template":"99P6e","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5MLUe":[function(require,module,exports) {
+module.exports = require("./helpers/bundle-url").getBundleURL("7UhFu") + "avatar-placeholder-chats.942b2146.svg" + "?" + Date.now();
+
+},{"./helpers/bundle-url":"lgJ39"}],"lgJ39":[function(require,module,exports) {
+"use strict";
+var bundleURL = {};
+function getBundleURLCached(id) {
+    var value = bundleURL[id];
+    if (!value) {
+        value = getBundleURL();
+        bundleURL[id] = value;
+    }
+    return value;
+}
+function getBundleURL() {
+    try {
+        throw new Error();
+    } catch (err) {
+        var matches = ("" + err.stack).match(/(https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/[^)\n]+/g);
+        if (matches) // The first two stack frames will be this function and getBundleURLCached.
+        // Use the 3rd one, which will be a runtime in the original bundle.
+        return getBaseURL(matches[2]);
+    }
+    return "/";
+}
+function getBaseURL(url) {
+    return ("" + url).replace(/^((?:https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/.+)\/[^/]+$/, "$1") + "/";
+} // TODO: Replace uses with `new URL(url).origin` when ie11 is no longer supported.
+function getOrigin(url) {
+    var matches = ("" + url).match(/(https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/[^/]+/);
+    if (!matches) throw new Error("Origin not found");
+    return matches[0];
+}
+exports.getBundleURL = getBundleURLCached;
+exports.getBaseURL = getBaseURL;
+exports.getOrigin = getOrigin;
+
+},{}],"99P6e":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+exports.default = `
+  <li class="chat-field">
+    <div class="avatar-section">
+      {{{ avatarImage }}}
+    </div>
+    <div class="message-section">
+      {{{ message }}}
+    </div>
+  </li>
+`;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8nC5u":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+exports.default = `
+  <ul class="chats-list">
+    {{{ chats }}}
+  </ul>
+`;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4pU5T":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+exports.default = `
+  <nav class="navigation-section">
+    {{{ headerSection }}}
+    {{{ chatsList }}}
+  </nav>
+`;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"j5KBY":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ChatsPageMainSection", ()=>(0, _component.ChatsPageMainSection));
+var _component = require("./component");
+
+},{"./component":"7Ht37","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"7Ht37":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ChatsPageMainSection", ()=>ChatsPageMainSection);
+var _components = require("hocs/components");
+var _headerSection = require("./header-section");
+var _messagesDisplaySection = require("./messages-display-section");
+var _messageInputSection = require("./message-input-section");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+class ChatsPageMainSection extends (0, _components.WithStoreBlock) {
+    constructor(){
+        const children = {};
+        children.headerSection = new (0, _headerSection.ChatSectionHeader)();
+        children.messagesDisplaySection = new (0, _messagesDisplaySection.MessagesDisplayArea)();
+        children.messageInputSection = new (0, _messageInputSection.MessageInputSection)();
+        super({
+            children
+        });
+    }
+    render() {
+        return 0, _templateDefault.default;
+    }
+}
+
+},{"hocs/components":"THcGa","./header-section":"jutB0","./messages-display-section":"kW6Ou","./message-input-section":"eVftT","./template":"fFRly","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jutB0":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ChatSectionHeader", ()=>(0, _component.ChatSectionHeader));
+var _component = require("./component");
+
+},{"./component":"4Rnah","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4Rnah":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ChatSectionHeader", ()=>ChatSectionHeader);
+var _dom = require("core/dom");
+var _components = require("components");
+var _functionalButtonPng = require("static/functional-button.png");
+var _functionalButtonPngDefault = parcelHelpers.interopDefault(_functionalButtonPng);
+var _chatTitle = require("./chat-title");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+class ChatSectionHeader extends (0, _dom.Block) {
+    constructor(){
+        const children = {};
+        children.chatTitle = new (0, _chatTitle.ChatTitleComponent)();
+        children.functionalButton = ChatSectionHeader._createfunctionalButton();
+        super({
+            children
+        });
+    }
+    render() {
+        return 0, _templateDefault.default;
+    }
+    static _createfunctionalButton() {
+        return new (0, _components.Button)({
+            props: {
+                htmlClasses: [
+                    "functional-button"
+                ],
+                htmlStyle: {
+                    "background-image": (0, _functionalButtonPngDefault.default)
+                },
+                events: {
+                    click: [
+                        function() {
+                            this.refs.sideMenu._element.style.display = "block";
+                        }, 
+                    ]
+                }
+            }
+        });
+    }
+}
+
+},{"core/dom":"3BLMu","components":"dHnah","static/functional-button.png":"eINo8","./chat-title":"f7TQa","./template":"ithxV","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"eINo8":[function(require,module,exports) {
+module.exports = require("./helpers/bundle-url").getBundleURL("7UhFu") + "functional-button.24c40d67.png" + "?" + Date.now();
+
+},{"./helpers/bundle-url":"lgJ39"}],"f7TQa":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ChatTitleComponent", ()=>ChatTitleComponent);
+var _components = require("hocs/components");
+class ChatTitleComponent extends (0, _components.WithStoreTextComponent) {
+    constructor(){
+        super({
+            props: {
+                htmlClasses: [
+                    "chat-title"
+                ]
+            }
+        });
+    }
+    _afterPropsAssignHook() {
+        super._afterPropsAssignHook();
+        this.assignCurrentChat();
+    }
+    assignCurrentChat() {
+        const store = this.store;
+        if (!store.userHasAnyChats()) {
+            this.props.text = "No chats created";
+            return;
+        }
+        let title = "No chat selected";
+        const chatID = store.getCurrentChatID();
+        if (chatID) title = store.getChatsDataByPath(`${chatID}.title`);
+        this.props.text = title;
+    }
+}
+
+},{"hocs/components":"THcGa","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ithxV":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+exports.default = `
+  <header class="main-section-header">
+    <div class="chat-info-section">
+      {{{ chatTitle }}}
+    </div>
+    <div class="functional-button-section">
+      {{{ functionalButton }}}
+    </div>
+  </header>
+`;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kW6Ou":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "MessagesDisplayArea", ()=>(0, _component.MessagesDisplayArea));
+var _component = require("./component");
+
+},{"./component":"h7X2g","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"h7X2g":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "MessagesDisplayArea", ()=>MessagesDisplayArea);
+var _components = require("hocs/components");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+let EnumChatAbsenceWarnings;
+(function(EnumChatAbsenceWarnings) {
+    EnumChatAbsenceWarnings["NoChatsCreated"] = "NO CHATS CREATED";
+    EnumChatAbsenceWarnings["NoChatSelected"] = "NO CHAT SELECTED";
+})(EnumChatAbsenceWarnings || (EnumChatAbsenceWarnings = {}));
+class MessagesDisplayArea extends (0, _components.WithStoreBlock) {
+    _afterPropsAssignHook() {
+        super._afterPropsAssignHook();
+        this.setChatAbsenceWarning();
+    }
+    setChatAbsenceWarning() {
+        let warning = "";
+        if (!this.store.userHasAnyChats()) warning = "NO CHATS CREATED";
+        else if (!this.store.getCurrentChatID()) warning = "NO CHAT SELECTED";
+        this.state.chatAbsenceWarning = warning;
+    }
+    render() {
+        return 0, _templateDefault.default;
+    }
+}
+
+},{"hocs/components":"THcGa","./template":"dlB9P","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dlB9P":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+exports.default = `
+  <section class="chat-display-section">
+    <div class="messages-display-section">
+      {{#if chatAbsenceWarning }}
+        <h1 class="message-placeholder"> {{ chatAbsenceWarning }}</h1>
+      {{/if}}
+    </div>
+  </section>;
+`;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"eVftT":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "MessageInputSection", ()=>(0, _component.MessageInputSection));
+var _component = require("./component");
+
+},{"./component":"f9yMO","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"f9yMO":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "MessageInputSection", ()=>MessageInputSection);
+var _components = require("hocs/components");
+var _sendMessageButton = require("./send-message-button");
+var _attachmentButton = require("./attachment-button");
+var _messageInput = require("./message-input");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+class MessageInputSection extends (0, _components.WithStoreBlock) {
+    constructor(){
+        const children = {};
+        children.attachmentButton = new (0, _attachmentButton.AttachmentButton)();
+        const messageInput = new (0, _messageInput.MessageInput)();
+        children.messageInput = messageInput;
+        children.sendMessageButton = new (0, _sendMessageButton.SendMessageButton)(messageInput);
+        super({
+            children
+        });
+    }
+    render() {
+        return 0, _templateDefault.default;
+    }
+}
+
+},{"hocs/components":"THcGa","./send-message-button":"kdXZ1","./attachment-button":"8MIZJ","./message-input":"4U2ZR","./template":"8cMdl","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kdXZ1":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "SendMessageButton", ()=>(0, _component.SendMessageButton));
+var _component = require("./component");
+
+},{"./component":"hl6Fh","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"hl6Fh":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "SendMessageButton", ()=>SendMessageButton);
+var _components = require("hocs/components");
+var _objectsHandle = require("utils/objects-handle");
+var _iconPng = require("./icon.png");
+var _iconPngDefault = parcelHelpers.interopDefault(_iconPng);
+class SendMessageButton extends (0, _components.WithStoreButton) {
+    constructor(messageInputRef){
+        super({
+            props: {
+                htmlClasses: [
+                    "send-message-button"
+                ],
+                htmlStyle: {
+                    "background-image": (0, _iconPngDefault.default)
+                }
+            },
+            refs: {
+                messageInput: messageInputRef
+            }
+        });
+    }
+    _afterRenderHook() {
+        super._afterRenderHook();
+        this.assignCurrentChat();
+    }
+    assignCurrentChat() {
+        const store = this.store;
+        const currentChatID = store.getCurrentChatID();
+        const messageInput = this.refs.messageInput;
+        const webSocket = store.getSocketByChatID(currentChatID);
+        if ((0, _objectsHandle.isNullish)(currentChatID)) {
+            this.setPropByPath("events.click", []);
+            this.toggleDisabledState(true);
+        } else this.setPropByPath("events.click", [
+            function() {
+                const message = messageInput.getValue();
+                console.log(`MESSAGE: ${message}, CHAT: ${currentChatID}, WEBSOCKET: ${webSocket.chatID}`);
+                webSocket.send(message);
+            }, 
+        ]);
+    }
+}
+
+},{"hocs/components":"THcGa","utils/objects-handle":"kOfSo","./icon.png":"5FAPQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5FAPQ":[function(require,module,exports) {
+module.exports = require("./helpers/bundle-url").getBundleURL("7UhFu") + "icon.88d57a4f.png" + "?" + Date.now();
+
+},{"./helpers/bundle-url":"lgJ39"}],"8MIZJ":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "AttachmentButton", ()=>(0, _component.AttachmentButton));
+var _component = require("./component");
+
+},{"./component":"lz3Wn","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lz3Wn":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "AttachmentButton", ()=>AttachmentButton);
+var _components = require("hocs/components");
+var _objectsHandle = require("utils/objects-handle");
+var _iconPng = require("./icon.png");
+var _iconPngDefault = parcelHelpers.interopDefault(_iconPng);
+class AttachmentButton extends (0, _components.WithStoreButton) {
+    constructor(){
+        super({
+            props: {
+                htmlClasses: [
+                    "attachment-button"
+                ],
+                htmlStyle: {
+                    "background-image": (0, _iconPngDefault.default)
+                }
+            }
+        });
+    }
+    _afterRenderHook() {
+        super._afterRenderHook();
+        this.assignCurrentChat();
+    }
+    assignCurrentChat() {
+        const currentChatID = this.store.getCurrentChatID();
+        if ((0, _objectsHandle.isNullish)(currentChatID)) this.toggleDisabledState(true);
+    }
+}
+
+},{"hocs/components":"THcGa","utils/objects-handle":"kOfSo","./icon.png":"atHXp","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"atHXp":[function(require,module,exports) {
+module.exports = require("./helpers/bundle-url").getBundleURL("7UhFu") + "icon.293890bb.png" + "?" + Date.now();
+
+},{"./helpers/bundle-url":"lgJ39"}],"4U2ZR":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "MessageInput", ()=>(0, _component.MessageInput));
+var _component = require("./component");
+
+},{"./component":"5I718","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5I718":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "MessageInput", ()=>MessageInput);
+var _components = require("hocs/components");
+var _objectsHandle = require("utils/objects-handle");
+class MessageInput extends (0, _components.WithStoreInput) {
+    constructor(){
+        super({
+            props: {
+                htmlAttributes: {
+                    name: "message",
+                    placeholder: "Enter Message"
+                }
+            }
+        });
+    }
+    _afterRenderHook() {
+        super._afterRenderHook();
+        this.assignCurrentChat();
+    }
+    assignCurrentChat() {
+        const currentChatID = this.store.getCurrentChatID();
+        if ((0, _objectsHandle.isNullish)(currentChatID)) this.toggleDisabledState(true);
+    }
+}
+
+},{"hocs/components":"THcGa","utils/objects-handle":"kOfSo","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8cMdl":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+exports.default = `
+  <section class="message-input-section">
+    <div class="attachment-block">
+      {{{ attachmentButton }}}
+    </div>
+    <div class="message-input-block">
+      {{{ messageInput }}}
+    </div>
+    <div class="submit-block">
+      {{{ sendMessageButton }}}
+    </div>
+  </section>
+`;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"fFRly":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+exports.default = `
+  <main class="main-section">
+    {{{ headerSection }}}
+    {{{ messagesDisplaySection }}}
+    {{{ messageInputSection }}}
+  </main>
+`;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"i5mC1":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ChatsPageSideMenu", ()=>(0, _component.ChatsPageSideMenu));
+var _component = require("./component");
+
+},{"./component":"kOksE","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kOksE":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ChatsPageSideMenu", ()=>ChatsPageSideMenu);
+var _dom = require("core/dom");
+var _buttons = require("./buttons");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+class ChatsPageSideMenu extends (0, _dom.Block) {
+    constructor(){
+        const children = {};
+        children.collapseButton = new _buttons.CollapseButton();
+        children.createChatButton = new _buttons.CreateChatButton();
+        children.deleteChatButton = new _buttons.DeleteChatButton();
+        children.addChatUsersButton = new _buttons.AddChatUsersButton();
+        children.avatarChooseButton = new _buttons.AvatarChooseButton();
+        super({
+            props: {
+                htmlStyle: {
+                    display: "none"
+                }
+            },
+            children
+        });
+    }
+    _afterPropsAssignHook() {
+        super._afterPropsAssignHook();
+        this.children.collapseButton.refs.sideMenu = this;
+    }
+    render() {
+        return 0, _templateDefault.default;
+    }
+}
+
+},{"core/dom":"3BLMu","./buttons":"1LasB","./template":"7LQL6","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1LasB":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "CollapseButton", ()=>(0, _collapse.CollapseButton));
+parcelHelpers.export(exports, "CreateChatButton", ()=>(0, _createChat.CreateChatButton));
+parcelHelpers.export(exports, "DeleteChatButton", ()=>(0, _deleteChat.DeleteChatButton));
+parcelHelpers.export(exports, "AddChatUsersButton", ()=>(0, _addChatUsers.AddChatUsersButton));
+parcelHelpers.export(exports, "AvatarChooseButton", ()=>(0, _avatarChoose.AvatarChooseButton));
+var _collapse = require("./collapse");
+var _createChat = require("./create-chat");
+var _deleteChat = require("./delete-chat");
+var _addChatUsers = require("./add-chat-users");
+var _avatarChoose = require("./avatar-choose");
+
+},{"./collapse":"adVzk","./create-chat":"jLVck","./delete-chat":"2AKfD","./add-chat-users":"3L2ct","./avatar-choose":"jlLFE","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"adVzk":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "CollapseButton", ()=>CollapseButton);
+var _components = require("components");
+var _collapseButtonImagePng = require("./collapse-button-image.png");
+var _collapseButtonImagePngDefault = parcelHelpers.interopDefault(_collapseButtonImagePng);
+class CollapseButton extends (0, _components.Button) {
+    constructor(){
+        super({
+            props: {
+                htmlStyle: {
+                    "background-image": (0, _collapseButtonImagePngDefault.default)
+                },
+                htmlClasses: [
+                    "collapse-button"
+                ],
+                events: {
+                    click: [
+                        function() {
+                            this.refs.sideMenu.hide();
+                        }, 
+                    ]
+                }
+            }
+        });
+    }
+}
+
+},{"components":"dHnah","./collapse-button-image.png":"9thx2","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"9thx2":[function(require,module,exports) {
+module.exports = require("./helpers/bundle-url").getBundleURL("7UhFu") + "collapse-button-image.63c5e655.png" + "?" + Date.now();
+
+},{"./helpers/bundle-url":"lgJ39"}],"jLVck":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "CreateChatButton", ()=>CreateChatButton);
+var _components = require("components");
+var _modals = require("pages/chats/components/modals");
+class CreateChatButton extends (0, _components.Button) {
+    constructor(){
+        super({
+            props: {
+                label: "create new chat",
+                events: {
+                    click: [
+                        function() {
+                            const contentType = (0, _modals.ModalWindow).getContentType();
+                            const componentName = (0, _modals.EnumModalWindows).CreateChat;
+                            if (contentType !== componentName) (0, _modals.ModalWindow).dispatchContent(new (0, _modals.CreateChatModalWindow)(componentName));
+                            (0, _modals.ModalWindow).toggleVisibility("on");
+                        }, 
+                    ]
+                }
+            }
+        });
+    }
+}
+
+},{"components":"dHnah","pages/chats/components/modals":"jQW89","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"2AKfD":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "DeleteChatButton", ()=>DeleteChatButton);
+var _components = require("hocs/components");
+var _services = require("services");
+var _toApiDataTransformers = require("utils/api/to-api-data-transformers");
+var _objectsHandle = require("utils/objects-handle");
+class DeleteChatButton extends (0, _components.WithStoreButton) {
+    constructor(){
+        super({
+            props: {
+                label: "delete chat",
+                events: {
+                    click: [
+                        function() {
+                            const currentChatID = this.store.getCurrentChatID();
+                            console.log(`CURRENT CHAT: ${JSON.stringify((0, _toApiDataTransformers.transformChatIDToDeleteAPI)(currentChatID))}`);
+                            (0, _services.ChatsService).deleteChat(currentChatID);
+                        }, 
+                    ]
+                }
+            }
+        });
+    }
+    _afterRenderHook() {
+        const currentChatID = this.store.getCurrentChatID();
+        if ((0, _objectsHandle.isNullish)(currentChatID)) this.toggleDisabledState(true);
+    }
+}
+
+},{"hocs/components":"THcGa","services":"f5PO7","utils/api/to-api-data-transformers":"gwV72","utils/objects-handle":"kOfSo","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3L2ct":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "AddChatUsersButton", ()=>AddChatUsersButton);
+var _components = require("hocs/components");
+var _objectsHandle = require("utils/objects-handle");
+var _modals = require("pages/chats/components/modals");
+class AddChatUsersButton extends (0, _components.WithStoreButton) {
+    constructor(){
+        super({
+            props: {
+                label: "add chat users",
+                events: {
+                    click: [
+                        function() {
+                            const chatID = this.store.getCurrentChatID();
+                            const componentName = `${(0, _modals.EnumModalWindows).AddUsers}(${chatID})`;
+                            const contentType = (0, _modals.ModalWindow).getContentType();
+                            if (contentType !== componentName) (0, _modals.ModalWindow).dispatchContent(new (0, _modals.AddChatUsersModalWindow)({
+                                chatID,
+                                componentName
+                            }));
+                            (0, _modals.ModalWindow).toggleVisibility("on");
+                        }, 
+                    ]
+                }
+            }
+        });
+    }
+    _afterRenderHook() {
+        const currentChatID = this.store.getCurrentChatID();
+        if ((0, _objectsHandle.isNullish)(currentChatID)) this.toggleDisabledState(true);
+    }
+}
+
+},{"hocs/components":"THcGa","utils/objects-handle":"kOfSo","pages/chats/components/modals":"jQW89","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jlLFE":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "AvatarChooseButton", ()=>AvatarChooseButton);
+var _components = require("hocs/components");
+var _services = require("services");
+class AvatarChooseButton extends (0, _components.WithStoreFileInput) {
+    constructor(){
+        const afterRenderHook = function() {
+            if (!this.store.getCurrentChatID()) this.children.chooseButton.toggleDisabledState(true);
+        };
+        const onchangeCallback = async function() {
+            const { form  } = this.refs;
+            const fileInput = this._unwrappedElement;
+            if (!fileInput.value) return;
+            const avatarForm = new FormData(form._unwrappedElement);
+            const chatID = window.store.getCurrentChatID();
+            avatarForm.append("chatId", chatID);
+            await (0, _services.ChatsService).changeAvatar(avatarForm);
+        };
+        super({
+            fileInputProps: {
+                htmlAttributes: {
+                    name: "avatar"
+                },
+                events: {
+                    change: [
+                        onchangeCallback
+                    ]
+                }
+            },
+            chooseButtonProps: {
+                label: "choose avatar"
+            },
+            props: {
+                htmlClasses: [
+                    "choose-chat-avatar"
+                ]
+            },
+            helpers: {
+                afterRenderHook
+            }
+        });
+    }
+}
+
+},{"hocs/components":"THcGa","services":"f5PO7","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"7LQL6":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+exports.default = `
+  <section class="side-menu">
+    {{{ collapseButton }}}
+    {{{ createChatButton }}}
+    {{{ addChatUsersButton }}}
+    {{{ avatarChooseButton }}}
+    {{{ deleteChatButton }}}
+  </section>
+`;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dAQha":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ProfilePage", ()=>ProfilePage);
+var _dom = require("core/dom");
+var _avatarPlaceholderProfilePng = require("static/avatar-placeholder-profile.png");
+var _avatarPlaceholderProfilePngDefault = parcelHelpers.interopDefault(_avatarPlaceholderProfilePng);
+var _components = require("components");
+var _hocs = require("hocs");
+var _template = require("./template");
+var _templateDefault = parcelHelpers.interopDefault(_template);
+var _components1 = require("./components");
+var _fields = require("./components/data-form/fields");
+var _avatarUploadForm = require("./components/avatar-upload-form");
+const ProfilePageBlock = (0, _hocs.WithStore)((0, _dom.Block));
+let EnumProfilePageEvents;
+(function(EnumProfilePageEvents) {
+    EnumProfilePageEvents["UserDidUpdate"] = "events: user data did update";
+    EnumProfilePageEvents["AvatarDidUpdate"] = "events: user avatar did update";
+})(EnumProfilePageEvents || (EnumProfilePageEvents = {}));
+class ProfilePage extends ProfilePageBlock {
+    constructor(){
+        const children = {};
+        const storeAvatar = window.store.getUserDataByPath("avatar");
+        const imageSource = storeAvatar || (0, _avatarPlaceholderProfilePngDefault.default);
+        const avatarImage = new (0, _components.ImageComponent)({
+            props: {
+                htmlAttributes: {
+                    src: imageSource,
+                    alt: "Profile Avatar"
+                }
+            }
+        });
+        children.avatarImage = avatarImage;
+        children.avatarUploadForm = new (0, _avatarUploadForm.AvatarUploadForm)(avatarImage);
+        children.profileDataForm = new (0, _components1.ProfilePageInputForm)();
+        children.homeButton = new (0, _components.HomeButton)();
+        const refs = {};
+        super({
+            children,
+            refs
+        });
+    }
+    render() {
+        return 0, _templateDefault.default;
+    }
+    _afterPropsAssignHook() {
+        super._afterPropsAssignHook();
+        this.children.changeDataButton = new (0, _components1.DataChangeButton)({
+            form: this.children.profileDataForm
+        });
+        this.props.userID = this.store.getUserDataByPath("id");
+    }
+    _beforeRegisterEventsHook() {
+        super._beforeRegisterEventsHook();
+        this.eventBus.on("events: user data did update", this._updateUserInfo.bind(this));
+        this.eventBus.on("events: user avatar did update", this._updateUserAvatar.bind(this));
+    }
+    userDidUpdate() {
+        this.eventBus.emit("events: user data did update");
+    }
+    avatarDidUpdate() {
+        this.eventBus.emit("events: user avatar did update");
+    }
+    _updateUserInfo() {
+        const userData = this.store.getUserDataByPath();
+        Object.entries(this.children.profileDataForm.refs).forEach(([inputName, inputBlock])=>{
+            const recordName = (0, _fields.MapInputFieldToUserDataRecord)[inputName];
+            inputBlock.setPropByPath("htmlAttributes.value", `${userData[recordName]}`);
+        });
+    }
+    _updateUserAvatar() {
+        const newAvatar = this.store.getUserDataByPath("avatar");
+        this.children.avatarImage.setPropByPath("htmlAttributes.src", newAvatar);
+    }
+}
+
+},{"core/dom":"3BLMu","static/avatar-placeholder-profile.png":"g8Vnp","components":"dHnah","hocs":"8D4Xk","./template":"242Fd","./components":"ghiMZ","./components/data-form/fields":"3ZzdV","./components/avatar-upload-form":"iLR7h","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"g8Vnp":[function(require,module,exports) {
+module.exports = require("./helpers/bundle-url").getBundleURL("7UhFu") + "avatar-placeholder-profile.3d7431fd.png" + "?" + Date.now();
+
+},{"./helpers/bundle-url":"lgJ39"}],"242Fd":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+exports.default = `
+      <main class="profile-page">
+        <header class="profile-form-header">
+          <div class="image-section">
+            {{{ avatarImage }}}
+          </div>
+          <div class="name-section">
+            <span class="user-id">ID: {{ userID }}</span>
+          </div>
+        </header>
+        {{{ profileDataForm }}}
+        <nav class="profile-nav-section">
+          <section class="data-change-section">
+            <div>
+              {{{ changeDataButton }}}
+            </div>
+            <div>
+              <a class="change-password" href="#app">Изменить пароль</a>
+            </div>
+          </section>
+          <section class="home-button-section">
+            <div>
+              {{{ homeButton }}}
+            </div>
+          </section>
+          
+          {{{ avatarUploadForm }}}
+        </nav>
+      </main>
+`;
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ghiMZ":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "ProfilePageInputForm", ()=>(0, _dataForm.ProfilePageInputForm));
+parcelHelpers.export(exports, "DataChangeButton", ()=>(0, _dataCangeButton.DataChangeButton));
+var _dataForm = require("./data-form");
+var _dataCangeButton = require("./data-cange-button");
+
+},{"./data-form":"kHTlw","./data-cange-button":"bdQP0","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kHTlw":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "ProfilePageInputForm", ()=>(0, _component.ProfilePageInputForm));
@@ -14212,7 +16113,6 @@ class ProfilePageInputForm extends (0, _components.InputForm) {
     constructor(){
         super({
             props: {
-                componentName: "User Profile Form",
                 htmlClasses: [
                     "profile-data-form"
                 ],
@@ -14227,24 +16127,7 @@ class ProfilePageInputForm extends (0, _components.InputForm) {
     }
 }
 
-},{"components":"dHnah","hocs/components":"THcGa","./after-validation-callback":"65o4o","./fields":"3ZzdV","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"THcGa":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "WithStoreBlock", ()=>WithStoreBlock);
-parcelHelpers.export(exports, "WithStoreButton", ()=>WithStoreButton);
-parcelHelpers.export(exports, "WithStoreInput", ()=>WithStoreInput);
-parcelHelpers.export(exports, "WithStoreFileInput", ()=>WithStoreFileInput);
-parcelHelpers.export(exports, "WithStoreValidatedInput", ()=>WithStoreValidatedInput);
-var _dom = require("core/dom");
-var _components = require("components");
-var _withStore = require("../with-store");
-const WithStoreBlock = (0, _withStore.WithStore)((0, _dom.Block));
-const WithStoreButton = (0, _withStore.WithStore)((0, _components.Button));
-const WithStoreInput = (0, _withStore.WithStore)((0, _components.Input));
-const WithStoreFileInput = (0, _withStore.WithStore)((0, _components.FileInput));
-const WithStoreValidatedInput = (0, _withStore.WithStore)((0, _components.InputWithValidation));
-
-},{"core/dom":"3BLMu","components":"dHnah","../with-store":"jscFq","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"65o4o":[function(require,module,exports) {
+},{"components":"dHnah","hocs/components":"THcGa","./after-validation-callback":"65o4o","./fields":"3ZzdV","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"65o4o":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "afterValidationCallback", ()=>afterValidationCallback);
@@ -14380,7 +16263,7 @@ let EnumInputFields;
 (function(EnumInputFields) {
     EnumInputFields["FirstName"] = "first_name";
     EnumInputFields["SecondName"] = "second_name";
-    EnumInputFields["DisplayName"] = "disolay_name";
+    EnumInputFields["DisplayName"] = "display_name";
     EnumInputFields["Login"] = "login";
     EnumInputFields["Email"] = "email";
     EnumInputFields["Phone"] = "phone";
@@ -14442,1319 +16325,7 @@ const FormValidators = [
     return acc;
 }, {});
 
-},{"utils/form-input-validator":"4RFK4","./enum-input-fields":"eCEQ8","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"6KHu3":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "transformAvatarURL", ()=>transformAvatarURL);
-parcelHelpers.export(exports, "transformProfileAPIResponseToUserData", ()=>transformProfileAPIResponseToUserData);
-parcelHelpers.export(exports, "transformChatsGetResponseToChatsData", ()=>transformChatsGetResponseToChatsData);
-/* eslint-disable @typescript-eslint/naming-convention */ var _api = require("api");
-function transformAvatarURL(url) {
-    return url ? `${0, _api.baseURL}/resources${url}` : url;
-}
-function transformProfileAPIResponseToUserData(data) {
-    return {
-        id: data.id,
-        firstName: data.first_name,
-        secondName: data.second_name,
-        displayName: data.display_name,
-        login: data.login,
-        email: data.email,
-        phone: data.phone,
-        avatar: transformAvatarURL(data.avatar)
-    };
-}
-function transformChatsGetResponseToChatsData(data) {
-    return data.reduce((acc, chatData)=>{
-        const { id , title , avatar , last_message  } = chatData;
-        acc[id] = {
-            title,
-            avatar: transformAvatarURL(avatar),
-            lastMessage: last_message
-        };
-        return acc;
-    }, {});
-}
-
-},{"api":"d9ci3","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"iAQR1":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ProfileService", ()=>ProfileService);
-var _api = require("api");
-var _api1 = require("utils/api");
-class ProfileServiceClass {
-    async getUserProfile(userID) {
-        const request = await (0, _api.ProfileAPI).getProfileData(userID);
-        const { status , response  } = request;
-        console.log(`PROFILE GET ID(${userID}) REQUEST: status ${status}; response: ${JSON.stringify(response)}`);
-        if (!(0, _api1.APIResponseHasError)(response)) {
-            const user = (0, _api1.transformProfileAPIResponseToUserData)(response);
-            window.store.dispatch({
-                user
-            });
-        }
-        return response;
-    }
-    async changeUserProfile(data, afterRequestCallback) {
-        const request = await (0, _api.ProfileAPI).changeProfile(data);
-        const { status , response  } = request;
-        console.log(`PROFILE CHANGE REQUEST: status ${status}; response: ${JSON.stringify(response)}`);
-        afterRequestCallback(response);
-        return response;
-    }
-    async changeUserAvatar(avatarFormData, afterRequestCallback) {
-        const request = await (0, _api.ProfileAPI).changeAvatar(avatarFormData);
-        const { status , response  } = request;
-        console.log(`PROFILE CHANGE AVATAR REQUEST: status ${status}; response: ${JSON.stringify(response)}`);
-        afterRequestCallback(response);
-        return response;
-    }
-}
-const ProfileService = new ProfileServiceClass();
-
-},{"api":"d9ci3","utils/api":"i2lTI","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"NtgIu":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ChatsServiceClass", ()=>ChatsServiceClass);
-parcelHelpers.export(exports, "ChatsService", ()=>ChatsService);
-var _api = require("api");
-var _api1 = require("utils/api");
-class ChatsServiceClass {
-    async getChats(afterRequestCallback = ()=>{}) {
-        const request = await (0, _api.ChatsAPI).getChats();
-        const { status , response  } = request;
-        console.log(`GET CHATS REQUEST: status ${status}; response ${JSON.stringify(response)}`);
-        if (!(0, _api1.APIResponseHasError)(response)) window.store.dispatch({
-            chats: (0, _api1.transformChatsGetResponseToChatsData)(response)
-        });
-        await afterRequestCallback(response);
-        return response;
-    }
-    async createChat(data, afterRequestCallback) {
-        const request = await (0, _api.ChatsAPI).createChat(data);
-        const { status , response  } = request;
-        console.log(`CREATE CHAT REQUEST: status ${status}; response ${JSON.stringify(response)}`);
-        if (afterRequestCallback) await afterRequestCallback(response);
-        if (!(0, _api1.APIResponseHasError)(response)) await this.getChats();
-        return response;
-    }
-    async changeAvatar({ chatID , avatarForm , afterRequestCallback  }) {
-        avatarForm.append("chatId", chatID);
-        const request = await (0, _api.ChatsAPI).changeAvatar(avatarForm);
-        const { status , response  } = request;
-        console.log(`CHANGE CHAT(${chatID}) AVATAR REQUEST: status ${status}; response ${JSON.stringify(response)}`);
-        if (afterRequestCallback) await afterRequestCallback(response);
-        if (!(0, _api1.APIResponseHasError)(response)) {
-            const avatar = (0, _api1.transformAvatarURL)(response.avatar);
-            window.store.setStateByPath({
-                pathString: `chats.${chatID}.avatar`,
-                value: avatar,
-                afterSetCallback () {
-                    const chatComponent = window.store.getPageRef(`chat-${chatID}`);
-                    chatComponent.children.avatarImage.setPropByPath("htmlAttributes.src", avatar);
-                }
-            });
-        }
-        return response;
-    }
-}
-const ChatsService = new ChatsServiceClass();
-
-},{"api":"d9ci3","utils/api":"i2lTI","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kycHr":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "EnumInputFields", ()=>(0, _enumInputFields.EnumInputFields));
-parcelHelpers.export(exports, "MapInputFieldsProps", ()=>(0, _inputFields.MapInputFieldsProps));
-var _enumInputFields = require("./enum-input-fields");
-var _inputFields = require("./input-fields");
-
-},{"./enum-input-fields":"gJdld","./input-fields":"dohp9","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gJdld":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "EnumInputFields", ()=>EnumInputFields);
-let EnumInputFields;
-(function(EnumInputFields) {
-    EnumInputFields["Login"] = "login";
-    EnumInputFields["Password"] = "password";
-})(EnumInputFields || (EnumInputFields = {}));
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dohp9":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "MapInputFieldsProps", ()=>MapInputFieldsProps);
-var _enumInputFields = require("./enum-input-fields");
-var _inputValidators = require("./input-validators");
-const MapInputFieldsProps = {
-    [(0, _enumInputFields.EnumInputFields).Login]: {
-        htmlAttributes: {
-            name: "login",
-            placeholder: "Your Login"
-        },
-        validators: (0, _inputValidators.FormValidators)[(0, _enumInputFields.EnumInputFields).Login]
-    },
-    [(0, _enumInputFields.EnumInputFields).Password]: {
-        htmlAttributes: {
-            name: "password",
-            placeholder: "Your Password"
-        },
-        validators: (0, _inputValidators.FormValidators)[(0, _enumInputFields.EnumInputFields).Password]
-    }
-};
-
-},{"./enum-input-fields":"gJdld","./input-validators":"rL6NJ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"rL6NJ":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "FormValidators", ()=>FormValidators);
-var _formInputValidator = require("utils/form-input-validator");
-var _enumInputFields = require("./enum-input-fields");
-const FormValidators = [
-    {
-        field: (0, _enumInputFields.EnumInputFields).Login,
-        validatorsList: [
-            (0, _formInputValidator.validateLoginRegex)
-        ]
-    },
-    {
-        field: (0, _enumInputFields.EnumInputFields).Password,
-        validatorsList: [
-            (0, _formInputValidator.validatePasswordRegex)
-        ]
-    }, 
-].reduce((acc, { field , validatorsList  })=>{
-    validatorsList.unshift((0, _formInputValidator.validateNotEmptyValue));
-    const validator = (0, _formInputValidator.makeValidator)({
-        validatorsList
-    });
-    acc[field] = {
-        blur: [
-            validator
-        ]
-    };
-    return acc;
-}, {});
-
-},{"utils/form-input-validator":"4RFK4","./enum-input-fields":"gJdld","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"35s0o":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "SignUpPage", ()=>SignUpPage);
-var _dom = require("core/dom");
-var _components = require("components");
-var _hocs = require("hocs");
-var _router = require("core/router");
-var _formComponent = require("./form-component");
-var _template = require("./template");
-var _templateDefault = parcelHelpers.interopDefault(_template);
-const LinkWithRouter = (0, _hocs.WithRouter)((0, _components.Link));
-class SignUpPage extends (0, _dom.Block) {
-    constructor(){
-        const children = {};
-        const refs = {};
-        children.signInLink = new LinkWithRouter({
-            props: {
-                label: "Sign In",
-                htmlAttributes: {
-                    name: "Sign in"
-                },
-                htmlClasses: [
-                    "sign-in-link"
-                ],
-                events: {
-                    click: [
-                        function() {
-                            this.router.go((0, _router.EnumAppRoutes).Login);
-                        }, 
-                    ]
-                }
-            }
-        });
-        children.signupForm = new (0, _formComponent.SignUpPageForm)();
-        children.homeButton = new (0, _components.HomeButton)();
-        super({
-            children,
-            props: {
-                componentName: "SignUp Page"
-            },
-            refs
-        });
-    }
-    render() {
-        return 0, _templateDefault.default;
-    }
-}
-
-},{"core/dom":"3BLMu","components":"dHnah","hocs":"8D4Xk","core/router":"6PhbH","./form-component":"2Czac","./template":"gzQaV","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gzQaV":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-exports.default = `
-  <main class="sign-up-page">
-  {{{ signupForm }}}
-  <nav class="form-links">
-    <div class="sign-in-link-section">
-      {{{ signInLink }}}
-    </div>
-    <div class="index-page-link-section">
-      {{{ homeButton }}}
-    </div>
-  </nav>
-</main>
-`;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4muSN":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ChatsPage", ()=>ChatsPage);
-var _components = require("hocs/components");
-var _pages = require("utils/pages");
-var _template = require("./template");
-var _templateDefault = parcelHelpers.interopDefault(_template);
-var _components1 = require("./components");
-class ChatsPage extends (0, _components.WithStoreBlock) {
-    constructor(){
-        const children = {};
-        children.navigationSection = new (0, _components1.ChatsPageNavigationSection)();
-        children.chatSection = new (0, _components1.ChatsPageMainSection)();
-        children.sideMenu = new (0, _components1.ChatsPageSideMenu)();
-        children.addChatModal = new (0, _components1.ModalWindow)();
-        super({
-            props: {
-                componentName: "Chats Page"
-            },
-            children
-        });
-    }
-    _afterPropsAssignHook() {
-        super._afterPropsAssignHook();
-        const functionalButton = (0, _pages.getDescendantByPath)(this, [
-            "chatSection",
-            "headerSection",
-            "functionalButton", 
-        ]);
-        functionalButton.refs.sideMenu = this.children.sideMenu;
-        const createChatButton = (0, _pages.getDescendantByPath)(this, [
-            "sideMenu",
-            "createChatButton", 
-        ]);
-        createChatButton.refs.addChatModal = this.children.addChatModal;
-        this.refs.chatTitle = (0, _pages.getDescendantByPath)(this, [
-            "chatSection",
-            "headerSection",
-            "chatTitle", 
-        ]);
-        this.refs.messagesSection = (0, _pages.getDescendantByPath)(this, [
-            "chatSection",
-            "messagesDisplaySection", 
-        ]);
-        this.refs.attachmentButton = (0, _pages.getDescendantByPath)(this, [
-            "chatSection",
-            "messageInputSection",
-            "attachmentButton", 
-        ]);
-        this.refs.messageInput = (0, _pages.getDescendantByPath)(this, [
-            "chatSection",
-            "messageInputSection",
-            "messageInput", 
-        ]);
-        this.refs.sendMessageButton = (0, _pages.getDescendantByPath)(this, [
-            "chatSection",
-            "messageInputSection",
-            "sendMessageButton", 
-        ]);
-        this.refs.chooseChatAvatarButton = (0, _pages.getDescendantByPath)(this, [
-            "sideMenu",
-            "avatarChooseButton",
-            "chooseButton", 
-        ]);
-        const chatsList = (0, _pages.getDescendantByPath)(this, [
-            "navigationSection",
-            "chatsList", 
-        ]);
-        this.refs.chatsList = chatsList;
-        const chats = (0, _pages.getDescendantByPath)(chatsList, [
-            "chats"
-        ]);
-        chats.forEach((chat)=>{
-            console.log(`CHAT REF: chat-${chat.chatID}`);
-            this.refs[`chat-${chat.chatID}`] = chat;
-        });
-    }
-    render() {
-        return 0, _templateDefault.default;
-    }
-}
-
-},{"hocs/components":"THcGa","utils/pages":"5q3PA","./template":"iSWX2","./components":"izx8G","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"iSWX2":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-exports.default = `
-<div class="chats-page">
-  {{{ navigationSection }}}
-  {{{ chatSection }}}
-  {{{ sideMenu }}}
-  {{{ addChatModal }}}
-`;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"izx8G":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ChatsPageNavigationSection", ()=>(0, _navigation.ChatsPageNavigationSection));
-parcelHelpers.export(exports, "ChatsPageMainSection", ()=>(0, _chatSection.ChatsPageMainSection));
-parcelHelpers.export(exports, "ChatsPageSideMenu", ()=>(0, _sideMenu.ChatsPageSideMenu));
-parcelHelpers.export(exports, "ModalWindow", ()=>(0, _addChatModal.ModalWindow));
-var _navigation = require("./navigation");
-var _chatSection = require("./chat-section");
-var _sideMenu = require("./side-menu");
-var _addChatModal = require("./add-chat-modal");
-
-},{"./navigation":"85AbS","./chat-section":"j5KBY","./side-menu":"i5mC1","./add-chat-modal":"cqDbK","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"85AbS":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ChatsPageNavigationSection", ()=>(0, _component.ChatsPageNavigationSection));
-var _component = require("./component");
-
-},{"./component":"69ESe","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"69ESe":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ChatsPageNavigationSection", ()=>ChatsPageNavigationSection);
-var _components = require("hocs/components");
-var _headerSection = require("./header-section");
-var _chatsList = require("./chats-list");
-var _template = require("./template");
-var _templateDefault = parcelHelpers.interopDefault(_template);
-class ChatsPageNavigationSection extends (0, _components.WithStoreBlock) {
-    constructor(){
-        const children = {};
-        children.headerSection = new (0, _headerSection.HeaderSection)();
-        children.chatsList = new (0, _chatsList.ChatsList)();
-        super({
-            children
-        });
-    }
-    render() {
-        return 0, _templateDefault.default;
-    }
-}
-
-},{"hocs/components":"THcGa","./header-section":"ga8JD","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./chats-list":"3WUWn","./template":"4pU5T"}],"ga8JD":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "HeaderSection", ()=>(0, _component.HeaderSection));
-var _component = require("./component");
-
-},{"./component":"auCzQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"auCzQ":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "HeaderSection", ()=>HeaderSection);
-var _dom = require("core/dom");
-var _components = require("components");
-var _template = require("./template");
-var _templateDefault = parcelHelpers.interopDefault(_template);
-class HeaderSection extends (0, _dom.Block) {
-    constructor(){
-        const children = {};
-        children.homeButton = new (0, _components.HomeButton)();
-        super({
-            children
-        });
-    }
-    render() {
-        return 0, _templateDefault.default;
-    }
-}
-
-},{"core/dom":"3BLMu","components":"dHnah","./template":"3KCAY","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3KCAY":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-exports.default = `
-  <header class="navigation-section-header">
-    <div class="home-button-section">
-      {{{ homeButton }}}
-    </div>
-    <div class="search-section">
-      <input type="text" placeholder="Поиск">
-    </div>
-  </header>
-`;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3WUWn":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ChatsList", ()=>(0, _component.ChatsList));
-var _component = require("./component");
-
-},{"./component":"49kFn","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"49kFn":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ChatsList", ()=>ChatsList);
-var _components = require("hocs/components");
-var _chatComponent = require("../chat-component");
-var _template = require("./template");
-var _templateDefault = parcelHelpers.interopDefault(_template);
-class ChatsList extends (0, _components.WithStoreBlock) {
-    render() {
-        return 0, _templateDefault.default;
-    }
-    _afterPropsAssignHook() {
-        super._afterPropsAssignHook();
-        this._createChatsList();
-    }
-    _createChatsList() {
-        const chats = this.store.getChatsDataByPath();
-        const chatsList = [];
-        Object.keys(chats).forEach((id)=>{
-            chatsList.push(new (0, _chatComponent.NavigationSectionChatComponent)(id));
-        });
-        this.children.chats = chatsList;
-    }
-}
-
-},{"hocs/components":"THcGa","../chat-component":"5kkOV","./template":"8nC5u","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5kkOV":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "NavigationSectionChatComponent", ()=>(0, _components.NavigationSectionChatComponent));
-var _components = require("./components");
-
-},{"./components":"U1Qzb","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"U1Qzb":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "NavigationSectionChatComponent", ()=>NavigationSectionChatComponent);
-var _components = require("components");
-var _avatarPlaceholderChatsSvg = require("static/avatar-placeholder-chats.svg");
-var _avatarPlaceholderChatsSvgDefault = parcelHelpers.interopDefault(_avatarPlaceholderChatsSvg);
-var _components1 = require("hocs/components");
-var _template = require("./template");
-var _templateDefault = parcelHelpers.interopDefault(_template);
-class NavigationSectionChatComponent extends (0, _components1.WithStoreBlock) {
-    constructor(chatID){
-        const children = {};
-        children.avatarImage = NavigationSectionChatComponent._createAvatarComponent(chatID);
-        children.message = NavigationSectionChatComponent._createMessageComponent(chatID);
-        const beforePropsAssignHook = function() {
-            this.chatID = chatID;
-        };
-        super({
-            children,
-            helpers: {
-                beforePropsAssignHook
-            }
-        });
-    }
-    render() {
-        return 0, _templateDefault.default;
-    }
-    static _createAvatarComponent(chatID) {
-        let avatarSrc = window.store.getChatsDataByPath(`${chatID}.avatar`);
-        avatarSrc ??= (0, _avatarPlaceholderChatsSvgDefault.default);
-        const avatarImage = new (0, _components.ImageComponent)({
-            props: {
-                htmlAttributes: {
-                    src: avatarSrc,
-                    alt: "avatar placeholder"
-                },
-                componentName: "Avatar Image"
-            }
-        });
-        return avatarImage;
-    }
-    static _createMessageComponent(chatID) {
-        const lastMessage = window.store.getChatsDataByPath(`${chatID}.lastMessage`);
-        const text = lastMessage ? lastMessage.content : "No Messages Exist Now";
-        return new (0, _components.TextComponent)({
-            props: {
-                text,
-                componentName: "Chat Component Message"
-            }
-        });
-    }
-    _afterRenderHook() {
-        super._afterRenderHook();
-        const onclickCallback = function() {
-            this.store.dispatch({
-                currentChatID: this.chatID
-            });
-        };
-        this.dispatchEventListener("click", onclickCallback.bind(this));
-    }
-}
-
-},{"components":"dHnah","static/avatar-placeholder-chats.svg":"5MLUe","hocs/components":"THcGa","./template":"99P6e","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"5MLUe":[function(require,module,exports) {
-module.exports = require("./helpers/bundle-url").getBundleURL("7UhFu") + "avatar-placeholder-chats.942b2146.svg" + "?" + Date.now();
-
-},{"./helpers/bundle-url":"lgJ39"}],"lgJ39":[function(require,module,exports) {
-"use strict";
-var bundleURL = {};
-function getBundleURLCached(id) {
-    var value = bundleURL[id];
-    if (!value) {
-        value = getBundleURL();
-        bundleURL[id] = value;
-    }
-    return value;
-}
-function getBundleURL() {
-    try {
-        throw new Error();
-    } catch (err) {
-        var matches = ("" + err.stack).match(/(https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/[^)\n]+/g);
-        if (matches) // The first two stack frames will be this function and getBundleURLCached.
-        // Use the 3rd one, which will be a runtime in the original bundle.
-        return getBaseURL(matches[2]);
-    }
-    return "/";
-}
-function getBaseURL(url) {
-    return ("" + url).replace(/^((?:https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/.+)\/[^/]+$/, "$1") + "/";
-} // TODO: Replace uses with `new URL(url).origin` when ie11 is no longer supported.
-function getOrigin(url) {
-    var matches = ("" + url).match(/(https?|file|ftp|(chrome|moz|safari-web)-extension):\/\/[^/]+/);
-    if (!matches) throw new Error("Origin not found");
-    return matches[0];
-}
-exports.getBundleURL = getBundleURLCached;
-exports.getBaseURL = getBaseURL;
-exports.getOrigin = getOrigin;
-
-},{}],"99P6e":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-exports.default = `
-  <li class="chat-field">
-    <div class="avatar-section">
-      {{{ avatarImage }}}
-    </div>
-    <div class="message-section">
-      {{{ message }}}
-    </div>
-  </li>
-`;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8nC5u":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-exports.default = `
-  <ul class="chats-list">
-    {{{ chats }}}
-  </ul>
-`;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4pU5T":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-exports.default = `
-  <nav class="navigation-section">
-    {{{ headerSection }}}
-    {{{ chatsList }}}
-  </nav>
-`;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"j5KBY":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ChatsPageMainSection", ()=>(0, _component.ChatsPageMainSection));
-var _component = require("./component");
-
-},{"./component":"7Ht37","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"7Ht37":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ChatsPageMainSection", ()=>ChatsPageMainSection);
-var _dom = require("core/dom");
-var _headerSection = require("./header-section");
-var _messagesDisplaySection = require("./messages-display-section");
-var _messageInputSection = require("./message-input-section");
-var _template = require("./template");
-var _templateDefault = parcelHelpers.interopDefault(_template);
-class ChatsPageMainSection extends (0, _dom.Block) {
-    constructor(){
-        const children = {};
-        children.headerSection = new (0, _headerSection.ChatSectionHeader)();
-        children.messagesDisplaySection = new (0, _messagesDisplaySection.MessagesDisplayArea)();
-        children.messageInputSection = new (0, _messageInputSection.MessageInputSection)();
-        super({
-            children
-        });
-    }
-    render() {
-        return 0, _templateDefault.default;
-    }
-}
-
-},{"core/dom":"3BLMu","./header-section":"jutB0","./messages-display-section":"kW6Ou","./message-input-section":"eVftT","./template":"fFRly","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jutB0":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ChatSectionHeader", ()=>(0, _component.ChatSectionHeader));
-var _component = require("./component");
-
-},{"./component":"4Rnah","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4Rnah":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ChatSectionHeader", ()=>ChatSectionHeader);
-var _dom = require("core/dom");
-var _components = require("components");
-var _functionalButtonPng = require("static/functional-button.png");
-var _functionalButtonPngDefault = parcelHelpers.interopDefault(_functionalButtonPng);
-var _chatTitle = require("./chat-title");
-var _template = require("./template");
-var _templateDefault = parcelHelpers.interopDefault(_template);
-class ChatSectionHeader extends (0, _dom.Block) {
-    constructor(){
-        const children = {};
-        children.chatTitle = new (0, _chatTitle.ChatTitleComponent)();
-        children.functionalButton = ChatSectionHeader._createfunctionalButton();
-        super({
-            children
-        });
-    }
-    render() {
-        return 0, _templateDefault.default;
-    }
-    static _createfunctionalButton() {
-        return new (0, _components.Button)({
-            props: {
-                htmlClasses: [
-                    "functional-button"
-                ],
-                htmlStyle: {
-                    "background-image": (0, _functionalButtonPngDefault.default)
-                },
-                events: {
-                    click: [
-                        function() {
-                            this.refs.sideMenu._element.style.display = "block";
-                        }, 
-                    ]
-                }
-            }
-        });
-    }
-}
-
-},{"core/dom":"3BLMu","components":"dHnah","static/functional-button.png":"eINo8","./chat-title":"f7TQa","./template":"ithxV","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"eINo8":[function(require,module,exports) {
-module.exports = require("./helpers/bundle-url").getBundleURL("7UhFu") + "functional-button.24c40d67.png" + "?" + Date.now();
-
-},{"./helpers/bundle-url":"lgJ39"}],"f7TQa":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ChatTitleComponent", ()=>ChatTitleComponent);
-var _hocs = require("hocs");
-var _components = require("components");
-class ChatTitleComponent extends (0, _hocs.WithStore)((0, _components.TextComponent)) {
-    constructor(){
-        super({
-            props: {
-                htmlClasses: [
-                    "chat-title"
-                ]
-            }
-        });
-    }
-    _afterPropsAssignHook() {
-        super._afterPropsAssignHook();
-        if (!this.store.userHasAnyChats()) {
-            this.props.text = "No chats created";
-            return;
-        }
-        const chatID = this.store.getCurrentChatID();
-        if (!chatID) this.props.text = "No chat selected";
-        else {
-            const title = this.store.getChatsDataByPath(`${chatID}.title`);
-            this.props.text = title;
-        }
-    }
-    titleDidUpdate(newText) {
-        this.props.text = newText;
-    }
-}
-
-},{"hocs":"8D4Xk","components":"dHnah","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ithxV":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-exports.default = `
-  <header class="main-section-header">
-    <div class="chat-info-section">
-      {{{ chatTitle }}}
-    </div>
-    <div class="functional-button-section">
-      {{{ functionalButton }}}
-    </div>
-  </header>
-`;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kW6Ou":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "MessagesDisplayArea", ()=>(0, _component.MessagesDisplayArea));
-var _component = require("./component");
-
-},{"./component":"h7X2g","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"h7X2g":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "MessagesDisplayArea", ()=>MessagesDisplayArea);
-var _components = require("hocs/components");
-var _template = require("./template");
-var _templateDefault = parcelHelpers.interopDefault(_template);
-let EnumChatAbsenceWarnings;
-(function(EnumChatAbsenceWarnings) {
-    EnumChatAbsenceWarnings["NoChatsCreated"] = "NO CHATS CREATED";
-    EnumChatAbsenceWarnings["NoChatSelected"] = "NO CHAT SELECTED";
-})(EnumChatAbsenceWarnings || (EnumChatAbsenceWarnings = {}));
-class MessagesDisplayArea extends (0, _components.WithStoreBlock) {
-    _afterPropsAssignHook() {
-        super._afterPropsAssignHook();
-        this._setChatAbsenceWarning();
-    }
-    _setChatAbsenceWarning() {
-        let warning = "";
-        if (!this.store.userHasAnyChats()) warning = "NO CHATS CREATED";
-        else if (!this.store.getCurrentChatID()) warning = "NO CHAT SELECTED";
-        this.state.chatAbsenceWarning = warning;
-    }
-    removeChatAbsenceWarning() {
-        this.state.chatAbsenceWarning = "";
-    }
-    render() {
-        return 0, _templateDefault.default;
-    }
-}
-
-},{"hocs/components":"THcGa","./template":"dlB9P","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dlB9P":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-exports.default = `
-  <section class="chat-display-section">
-    <div class="messages-display-section">
-      {{#if chatAbsenceWarning }}
-        <h1 class="message-placeholder"> {{ chatAbsenceWarning }}</h1>
-      {{/if}}
-    </div>
-  </section>;
-`;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"eVftT":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "MessageInputSection", ()=>(0, _component.MessageInputSection));
-var _component = require("./component");
-
-},{"./component":"f9yMO","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"f9yMO":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "MessageInputSection", ()=>MessageInputSection);
-var _components = require("hocs/components");
-var _components1 = require("components");
-var _template = require("./template");
-var _templateDefault = parcelHelpers.interopDefault(_template);
-var _attachmentButtonPng = require("./icons/attachment_button.png");
-var _attachmentButtonPngDefault = parcelHelpers.interopDefault(_attachmentButtonPng);
-var _sendMessageButtonPng = require("./icons/send-message-button.png");
-var _sendMessageButtonPngDefault = parcelHelpers.interopDefault(_sendMessageButtonPng);
-class MessageInputSection extends (0, _components.WithStoreBlock) {
-    constructor(){
-        const children = {};
-        children.attachmentButton = MessageInputSection._createAttachmentButton();
-        children.sendMessageButton = MessageInputSection._createSendMessageButton();
-        children.messageInput = MessageInputSection._createMessageInput();
-        super({
-            children
-        });
-    }
-    render() {
-        return 0, _templateDefault.default;
-    }
-    _afterPropsAssignHook() {
-        super._afterPropsAssignHook();
-        const chatID = this.store.getCurrentChatID();
-        if (!chatID) Object.values(this.children).forEach((child)=>{
-            child.toggleDisabledState();
-        });
-    }
-    static _createAttachmentButton() {
-        return new (0, _components1.Button)({
-            props: {
-                htmlClasses: [
-                    "attachment-button"
-                ],
-                htmlStyle: {
-                    "background-image": (0, _attachmentButtonPngDefault.default)
-                }
-            }
-        });
-    }
-    static _createSendMessageButton() {
-        return new (0, _components1.Button)({
-            props: {
-                htmlClasses: [
-                    "send-message-button"
-                ],
-                htmlStyle: {
-                    "background-image": (0, _sendMessageButtonPngDefault.default)
-                }
-            }
-        });
-    }
-    static _createMessageInput() {
-        return new (0, _components1.Input)({
-            props: {
-                htmlAttributes: {
-                    name: "message",
-                    placeholder: "Enter Message"
-                }
-            }
-        });
-    }
-}
-
-},{"hocs/components":"THcGa","components":"dHnah","./template":"8cMdl","./icons/attachment_button.png":"jvPcl","./icons/send-message-button.png":"ewmaY","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8cMdl":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-exports.default = `
-  <section class="message-input-section">
-    <div class="attachment-block">
-      {{{ attachmentButton }}}
-    </div>
-    <div class="message-input-block">
-      {{{ messageInput }}}
-    </div>
-    <div class="submit-block">
-      {{{ sendMessageButton }}}
-    </div>
-  </section>
-`;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jvPcl":[function(require,module,exports) {
-module.exports = require("./helpers/bundle-url").getBundleURL("7UhFu") + "attachment_button.86b550b5.png" + "?" + Date.now();
-
-},{"./helpers/bundle-url":"lgJ39"}],"ewmaY":[function(require,module,exports) {
-module.exports = require("./helpers/bundle-url").getBundleURL("7UhFu") + "send-message-button.67a87b68.png" + "?" + Date.now();
-
-},{"./helpers/bundle-url":"lgJ39"}],"fFRly":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-exports.default = `
-  <main class="main-section">
-    {{{ headerSection }}}
-    {{{ messagesDisplaySection }}}
-    {{{ messageInputSection }}}
-  </main>
-`;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"i5mC1":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ChatsPageSideMenu", ()=>(0, _component.ChatsPageSideMenu));
-var _component = require("./component");
-
-},{"./component":"kOksE","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kOksE":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ChatsPageSideMenu", ()=>ChatsPageSideMenu);
-var _dom = require("core/dom");
-var _buttons = require("./buttons");
-var _template = require("./template");
-var _templateDefault = parcelHelpers.interopDefault(_template);
-class ChatsPageSideMenu extends (0, _dom.Block) {
-    constructor(){
-        const children = {};
-        children.collapseButton = new (0, _buttons.CollapseButton)();
-        children.createChatButton = new (0, _buttons.CreateChatButton)();
-        children.avatarChooseButton = new (0, _buttons.AvatarChooseButton)();
-        super({
-            props: {
-                htmlStyle: {
-                    display: "none"
-                }
-            },
-            children
-        });
-    }
-    _afterPropsAssignHook() {
-        super._afterPropsAssignHook();
-        this.children.collapseButton.refs.sideMenu = this;
-    }
-    render() {
-        return 0, _templateDefault.default;
-    }
-}
-
-},{"core/dom":"3BLMu","./buttons":"1LasB","./template":"7LQL6","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1LasB":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "CollapseButton", ()=>(0, _collapseButton.CollapseButton));
-parcelHelpers.export(exports, "CreateChatButton", ()=>(0, _createChatButton.CreateChatButton));
-parcelHelpers.export(exports, "AvatarChooseButton", ()=>(0, _avatarChooseButton.AvatarChooseButton));
-var _collapseButton = require("./collapse-button");
-var _createChatButton = require("./create-chat-button");
-var _avatarChooseButton = require("./avatar-choose-button");
-
-},{"./collapse-button":"dq3PS","./create-chat-button":"ctJSi","./avatar-choose-button":"dX49h","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dq3PS":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "CollapseButton", ()=>CollapseButton);
-var _components = require("components");
-var _collapseButtonImagePng = require("./collapse-button-image.png");
-var _collapseButtonImagePngDefault = parcelHelpers.interopDefault(_collapseButtonImagePng);
-class CollapseButton extends (0, _components.Button) {
-    constructor(){
-        super({
-            props: {
-                htmlStyle: {
-                    "background-image": (0, _collapseButtonImagePngDefault.default)
-                },
-                htmlClasses: [
-                    "collapse-button"
-                ],
-                events: {
-                    click: [
-                        function() {
-                            this.refs.sideMenu.hide();
-                        }, 
-                    ]
-                }
-            }
-        });
-    }
-}
-
-},{"components":"dHnah","./collapse-button-image.png":"9thx2","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"9thx2":[function(require,module,exports) {
-module.exports = require("./helpers/bundle-url").getBundleURL("7UhFu") + "collapse-button-image.63c5e655.png" + "?" + Date.now();
-
-},{"./helpers/bundle-url":"lgJ39"}],"ctJSi":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "CreateChatButton", ()=>CreateChatButton);
-var _components = require("components");
-class CreateChatButton extends (0, _components.Button) {
-    constructor(){
-        super({
-            props: {
-                label: "create new chat",
-                events: {
-                    click: [
-                        function() {
-                            this.refs.addChatModal.toggleModal();
-                        }, 
-                    ]
-                }
-            }
-        });
-    }
-}
-
-},{"components":"dHnah","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dX49h":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "AvatarChooseButton", ()=>AvatarChooseButton);
-var _components = require("hocs/components");
-var _services = require("services");
-class AvatarChooseButton extends (0, _components.WithStoreFileInput) {
-    constructor(){
-        const afterRenderHook = function() {
-            if (!this.store.getCurrentChatID()) this.children.chooseButton.toggleDisabledState(true);
-        };
-        const onchangeCallback = async function() {
-            const { form  } = this.refs;
-            const fileInput = this._unwrappedElement;
-            console.log(`FILE: ${fileInput.value}`);
-            if (!fileInput.value) return;
-            const avatarForm = new FormData(form._unwrappedElement);
-            for (const [name, value] of avatarForm)console.log(`NAME: ${name}, VALUE: ${value}`);
-            const chatID = window.store.getCurrentChatID();
-            await (0, _services.ChatsService).changeAvatar({
-                chatID,
-                avatarForm
-            });
-        };
-        super({
-            fileInputProps: {
-                htmlAttributes: {
-                    name: "avatar"
-                },
-                events: {
-                    change: [
-                        onchangeCallback
-                    ]
-                }
-            },
-            chooseButtonProps: {
-                label: "choose avatar"
-            },
-            props: {
-                htmlClasses: [
-                    "choose-chat-avatar"
-                ]
-            },
-            helpers: {
-                afterRenderHook
-            }
-        });
-    }
-}
-
-},{"hocs/components":"THcGa","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","services":"f5PO7"}],"7LQL6":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-exports.default = `
-  <section class="side-menu">
-    {{{ collapseButton }}}
-    {{{ createChatButton }}}
-    {{{ avatarChooseButton }}}
-  </section>
-`;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"cqDbK":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ModalWindow", ()=>(0, _component.ModalWindow));
-var _component = require("./component");
-
-},{"./component":"1JLMm","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"1JLMm":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ModalWindow", ()=>ModalWindow);
-var _components = require("components");
-var _dom = require("core/dom");
-var _chats = require("services/chats");
-var _api = require("utils/api");
-var _template = require("./template");
-var _templateDefault = parcelHelpers.interopDefault(_template);
-class ModalWindow extends (0, _dom.Block) {
-    constructor(){
-        const state = {
-            apiResponseSuccess: "",
-            apiResponseError: ""
-        };
-        const children = {};
-        children.chatTitleInput = ModalWindow._createChatTitleInput();
-        children.closeButton = ModalWindow._createCloseButton();
-        super({
-            children,
-            state
-        });
-    }
-    _afterPropsAssignHook() {
-        super._afterPropsAssignHook();
-        this.children.closeButton.refs.modalWindow = this;
-        this._makeCreateChatButton();
-    }
-    _makeCreateChatButton() {
-        const refs = {
-            titleInput: this.children.chatTitleInput,
-            modalWindow: this
-        };
-        const afterRequestCallback = (function(response) {
-            if (!this.props.htmlClasses.includes("show-modal")) this.props.htmlClasses.push("show-modal");
-            if ((0, _api.APIResponseHasError)(response)) this.state.apiResponseError = response.reason;
-            else this.state.apiResponseSuccess = "Chat created successfully";
-        }).bind(this);
-        const createChatButton = new (0, _components.Button)({
-            refs,
-            props: {
-                label: "Create",
-                events: {
-                    click: [
-                        function() {
-                            const { titleInput , modalWindow  } = this.refs;
-                            modalWindow.clearAPIResponseStatus();
-                            console.log(`TITLE INPUT: ${titleInput.getValue()}`);
-                            // afterRequestCallback({}); // DEBUG
-                            (0, _chats.ChatsService).createChat({
-                                title: titleInput.getValue()
-                            }, afterRequestCallback);
-                        }, 
-                    ]
-                }
-            }
-        });
-        this.children.createChatButton = createChatButton;
-    }
-    toggleModal() {
-        this._element?.classList.toggle("show-modal");
-    }
-    clearAPIResponseStatus() {
-        this.state.apiResponseSuccess = "";
-        this.state.apiResponseError = "";
-    }
-    render() {
-        return 0, _templateDefault.default;
-    }
-    static _createChatTitleInput() {
-        return new (0, _components.Input)({
-            props: {
-                htmlAttributes: {
-                    placeholder: "Enter Chat Title"
-                }
-            }
-        });
-    }
-    static _createCloseButton() {
-        return new (0, _components.Button)({
-            props: {
-                htmlClasses: [
-                    "close-button"
-                ],
-                label: "\xd7",
-                events: {
-                    click: [
-                        function() {
-                            this.refs.modalWindow.toggleModal();
-                        }, 
-                    ]
-                }
-            }
-        });
-    }
-}
-
-},{"components":"dHnah","core/dom":"3BLMu","utils/api":"i2lTI","./template":"3xE9u","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","services/chats":"NtgIu"}],"3xE9u":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-exports.default = `
-  <div class="modal">
-    <div class="modal-content">
-      <section class="chat-data-input-section">
-        <div class="title-input-section">
-          {{{ chatTitleInput }}}
-        </div>
-      </section>
-      
-      <section class="create-button-section">
-        {{{ createChatButton }}}
-      </section>
-
-      {{#if apiResponseSuccess}}
-        <span class="api-success"> {{apiResponseSuccess}} </span>
-      {{/if}}
-      {{#if apiResponseError}}
-        <span class="api-error"> {{apiResponseError}} </span>
-      {{/if}}
-
-      {{{ closeButton }}}
-    </div>
-  </div>;
-`;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dAQha":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ProfilePage", ()=>ProfilePage);
-var _dom = require("core/dom");
-var _avatarPlaceholderProfilePng = require("static/avatar-placeholder-profile.png");
-var _avatarPlaceholderProfilePngDefault = parcelHelpers.interopDefault(_avatarPlaceholderProfilePng);
-var _components = require("components");
-var _hocs = require("hocs");
-var _template = require("./template");
-var _templateDefault = parcelHelpers.interopDefault(_template);
-var _components1 = require("./components");
-var _fields = require("./components/data-form/fields");
-var _avatarUploadForm = require("./components/avatar-upload-form");
-const ProfilePageBlock = (0, _hocs.WithStore)((0, _dom.Block));
-let EnumProfilePageEvents;
-(function(EnumProfilePageEvents) {
-    EnumProfilePageEvents["UserDidUpdate"] = "events: user data did update";
-    EnumProfilePageEvents["AvatarDidUpdate"] = "events: user avatar did update";
-})(EnumProfilePageEvents || (EnumProfilePageEvents = {}));
-class ProfilePage extends ProfilePageBlock {
-    constructor(){
-        const children = {};
-        const storeAvatar = window.store.getUserDataByPath("avatar");
-        const imageSource = storeAvatar || (0, _avatarPlaceholderProfilePngDefault.default);
-        const avatarImage = new (0, _components.ImageComponent)({
-            props: {
-                htmlAttributes: {
-                    src: imageSource,
-                    alt: "Profile Avatar"
-                },
-                componentName: "Avatar Image"
-            }
-        });
-        children.avatarImage = avatarImage;
-        children.avatarUploadForm = new (0, _avatarUploadForm.AvatarUploadForm)(avatarImage);
-        children.profileDataForm = new (0, _components1.ProfilePageInputForm)();
-        children.homeButton = new (0, _components.HomeButton)();
-        const refs = {};
-        super({
-            children,
-            refs
-        });
-    }
-    render() {
-        return 0, _templateDefault.default;
-    }
-    _afterPropsAssignHook() {
-        super._afterPropsAssignHook();
-        this.children.changeDataButton = new (0, _components1.DataChangeButton)({
-            form: this.children.profileDataForm
-        });
-        this.props.userID = this.store.getUserDataByPath("id");
-    }
-    _beforeRegisterEventsHook() {
-        super._beforeRegisterEventsHook();
-        this.eventBus.on("events: user data did update", this._updateUserInfo.bind(this));
-        this.eventBus.on("events: user avatar did update", this._updateUserAvatar.bind(this));
-    }
-    userDidUpdate() {
-        this.eventBus.emit("events: user data did update");
-    }
-    avatarDidUpdate() {
-        this.eventBus.emit("events: user avatar did update");
-    }
-    _updateUserInfo() {
-        const userData = this.store.getUserDataByPath();
-        Object.entries(this.children.profileDataForm.refs).forEach(([inputName, inputBlock])=>{
-            const recordName = (0, _fields.MapInputFieldToUserDataRecord)[inputName];
-            inputBlock.setPropByPath("htmlAttributes.value", `${userData[recordName]}`);
-        });
-    }
-    _updateUserAvatar() {
-        const newAvatar = this.store.getUserDataByPath("avatar");
-        this.children.avatarImage.setPropByPath("htmlAttributes.src", newAvatar);
-    }
-}
-
-},{"core/dom":"3BLMu","static/avatar-placeholder-profile.png":"g8Vnp","components":"dHnah","hocs":"8D4Xk","./template":"242Fd","./components":"ghiMZ","./components/data-form/fields":"3ZzdV","./components/avatar-upload-form":"iLR7h","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"g8Vnp":[function(require,module,exports) {
-module.exports = require("./helpers/bundle-url").getBundleURL("7UhFu") + "avatar-placeholder-profile.3d7431fd.png" + "?" + Date.now();
-
-},{"./helpers/bundle-url":"lgJ39"}],"242Fd":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-exports.default = `
-      <main class="profile-page">
-        <header class="profile-form-header">
-          <div class="image-section">
-            {{{ avatarImage }}}
-          </div>
-          <div class="name-section">
-            <span class="user-id">ID: {{ userID }}</span>
-          </div>
-        </header>
-        {{{ profileDataForm }}}
-        <nav class="profile-nav-section">
-          <section class="data-change-section">
-            <div>
-              {{{ changeDataButton }}}
-            </div>
-            <div>
-              <a class="change-password" href="#app">Изменить пароль</a>
-            </div>
-          </section>
-          <section class="home-button-section">
-            <div>
-              {{{ homeButton }}}
-            </div>
-          </section>
-          
-          {{{ avatarUploadForm }}}
-        </nav>
-      </main>
-`;
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"ghiMZ":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "ProfilePageInputForm", ()=>(0, _dataForm.ProfilePageInputForm));
-parcelHelpers.export(exports, "DataChangeButton", ()=>(0, _dataCangeButton.DataChangeButton));
-var _dataForm = require("./data-form");
-var _dataCangeButton = require("./data-cange-button");
-
-},{"./data-form":"kHTlw","./data-cange-button":"bdQP0","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bdQP0":[function(require,module,exports) {
+},{"utils/form-input-validator":"4RFK4","./enum-input-fields":"eCEQ8","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bdQP0":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "DataChangeButton", ()=>DataChangeButton);
@@ -15793,7 +16364,6 @@ class DataChangeButton extends (0, _components.Button) {
             },
             refs,
             props: {
-                componentName: "change/save data button",
                 label: "change data",
                 htmlClasses: [
                     "change-data-button"
@@ -16037,9 +16607,7 @@ class NavigationPage extends (0, _dom.Block) {
         children.logoutButton = new (0, _logoutButton.LogoutButton)();
         super({
             children,
-            props: {
-                componentName: "Navigation Page"
-            }
+            componentName: "Navigation Page"
         });
     }
     render() {
@@ -16225,7 +16793,7 @@ function getDescendantByPath(block, pathArray) {
     return result;
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"f8dJ8":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"4fFtk":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "appIsInitedSetter", ()=>(0, _appIsInited.appIsInitedSetter));
@@ -16239,31 +16807,31 @@ var _user = require("./user");
 var _chats = require("./chats");
 var _currentChatId = require("./current-chat-id");
 
-},{"./app-is-inited":"gwmwO","./page":"9VF22","./user":"7ixXa","./current-chat-id":"iUzLN","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./chats":"7wTGV"}],"gwmwO":[function(require,module,exports) {
+},{"./app-is-inited":"eYboL","./page":"jGROx","./user":"3WGvP","./chats":"48pRd","./current-chat-id":"kE50e","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"eYboL":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "appIsInitedSetter", ()=>appIsInitedSetter);
-var _enumStoreEvents = require("../enum-store-events");
+var _store = require("store");
 function appIsInitedSetter(oldValue, newValue) {
     if (!oldValue && newValue) {
         const { route , path  } = window.router.matchRouteByPath(window.location.pathname);
-        this.eventBus.emit((0, _enumStoreEvents.EnumStoreEvents).AppInit, {
+        this.eventBus.emit((0, _store.EnumStoreEvents).AppInit, {
             route,
             path
         });
     }
 }
 
-},{"../enum-store-events":"ioWNT","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"9VF22":[function(require,module,exports) {
+},{"store":"8EiUk","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"jGROx":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "pageSetter", ()=>pageSetter);
-var _enumStoreEvents = require("../enum-store-events");
+var _store = require("store");
 function pageSetter(oldValue, newValue) {
-    if (oldValue !== newValue) this.eventBus.emit((0, _enumStoreEvents.EnumStoreEvents).PageChanged, newValue);
+    this.eventBus.emit((0, _store.EnumStoreEvents).PageChanged, newValue);
 }
 
-},{"../enum-store-events":"ioWNT","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"7ixXa":[function(require,module,exports) {
+},{"store":"8EiUk","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3WGvP":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "userSetter", ()=>userSetter);
@@ -16281,41 +16849,12 @@ function userSetter(oldValue, newValue) {
     }
 }
 
-},{"pages":"kIGWd","utils/objects-handle":"kOfSo","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"iUzLN":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "currentChatSetter", ()=>currentChatSetter);
-var _pages = require("pages");
-var _objectsHandle = require("utils/objects-handle");
-function currentChatSetter(oldValue, newValue) {
-    const { page  } = this.state;
-    if (page === (0, _pages.EnumAppPages).Navigation) {
-        if ((0, _objectsHandle.isNullish)(newValue)) localStorage.removeItem("currentChatID");
-        return;
-    }
-    if (page !== (0, _pages.EnumAppPages).Chats) return;
-    if ((0, _objectsHandle.isNullish)(newValue)) throw new Error("Current Chat ID Can't Be Nullified On Chats Page");
-    const { refs  } = this.page;
-    if (oldValue !== newValue) {
-        const title = this.getChatsDataByPath(`${newValue}.title`);
-        refs.chatTitle.titleDidUpdate(title);
-    }
-    if ((0, _objectsHandle.isNullish)(oldValue)) {
-        refs.messagesSection.removeChatAbsenceWarning();
-        refs.attachmentButton.toggleDisabledState(false);
-        refs.messageInput.toggleDisabledState(false);
-        refs.sendMessageButton.toggleDisabledState(false);
-        refs.chooseChatAvatarButton.toggleDisabledState(false);
-    }
-    localStorage.currentChatID = newValue;
-}
-
-},{"pages":"kIGWd","utils/objects-handle":"kOfSo","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"7wTGV":[function(require,module,exports) {
+},{"pages":"kIGWd","utils/objects-handle":"kOfSo","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"48pRd":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "chatsSetter", ()=>chatsSetter);
 var _pages = require("pages");
-function chatsSetter(oldValue, newValue) {
+function chatsSetter() {
     const { page  } = this.state;
     if (page !== (0, _pages.EnumAppPages).Chats) return;
     const { chatsList  } = this.page.refs;
@@ -16326,6 +16865,31 @@ function chatsSetter(oldValue, newValue) {
     chatsList._componentDidUpdate("", "", true);
 }
 
-},{"pages":"kIGWd","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["iJYvl","h7u1C"], "h7u1C", "parcelRequire8a48")
+},{"pages":"kIGWd","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kE50e":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "currentChatSetter", ()=>currentChatSetter);
+var _pages = require("pages");
+var _objectsHandle = require("utils/objects-handle");
+function currentChatSetter(oldValue, newValue) {
+    const newValueIsNull = (0, _objectsHandle.isNullish)(newValue);
+    const { page  } = this.state;
+    if (newValueIsNull) localStorage.removeItem("currentChatID");
+    else localStorage.currentChatID = newValue;
+    if (page !== (0, _pages.EnumAppPages).Chats) return;
+    const { refs  } = this.page;
+    refs.chatTitle.assignCurrentChat();
+    refs.messagesSection.setChatAbsenceWarning();
+    refs.addChatUsersButton.toggleDisabledState(newValueIsNull);
+    refs.deleteChatButton.toggleDisabledState(newValueIsNull);
+    refs.attachmentButton.assignCurrentChat();
+    refs.messageInput.assignCurrentChat();
+    refs.sendMessageButton.assignCurrentChat();
+    refs.chooseChatAvatarButton.toggleDisabledState(newValueIsNull);
+    if (!(0, _objectsHandle.isNullish)(oldValue)) refs[`chat-${oldValue}`].toggleHtmlClass("current-chat", "off");
+    if (!(0, _objectsHandle.isNullish)(newValue)) refs[`chat-${newValue}`].toggleHtmlClass("current-chat", "on");
+}
+
+},{"pages":"kIGWd","utils/objects-handle":"kOfSo","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["iJYvl","h7u1C"], "h7u1C", "parcelRequire8a48")
 
 //# sourceMappingURL=index.b71e74eb.js.map

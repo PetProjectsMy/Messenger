@@ -382,7 +382,7 @@
   overflow: auto;
 }
 
-.chats-page .navigation-section .chats-list .chat-field:hover {
+.chats-page .navigation-section .chats-list .chat-field.current-chat {
   background-color: #dae9ff;
 }
 
@@ -564,10 +564,11 @@
 
 .chats-page .modal .modal-content section {
   width: 100%;
+  flex: 1;
 }
 
-.chats-page .modal .modal-content section.chat-data-input-section, .chats-page .modal .modal-content section.create-button-section {
-  flex: 1;
+.chats-page .modal .modal-content input {
+  text-align: center;
 }
 
 .chats-page .modal .modal-content .close-button {
