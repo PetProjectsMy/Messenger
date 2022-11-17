@@ -5,15 +5,6 @@ import template from "./template";
 export class ModalWindow extends Block {
   private contentType: string;
 
-  constructor() {
-    const children = {} as TComponentChildren;
-
-    children.content = new Block();
-
-    super({ children });
-    this.contentType = "";
-  }
-
   protected render(): string {
     return template;
   }
@@ -21,9 +12,10 @@ export class ModalWindow extends Block {
   protected _afterPropsAssignHook(): void {
     super._afterPropsAssignHook();
 
-    const closeButton = this._createCloseButton();
-    closeButton.refs.modalWindow = this;
-    this.children.closeButton = this;
+    this.contentType = "";
+
+    this.children.closeButton = this._createCloseButton();
+    this.children.content = new Block();
 
     this.children = new Proxy(this.children, {
       set: function (

@@ -165,13 +165,7 @@ export class ChatsServiceClass {
 
     if (!APIResponseHasError(response)) {
       const avatar = transformAvatarURL(response.avatar);
-      window.store.setStateByPath(`chats.${chatID}.avatar`, avatar, () => {
-        const chatComponent = window.store.getPageRef(`chat-${chatID}`);
-        const avatarImage = getDescendantByPath(chatComponent, [
-          "avatarImage",
-        ]) as ImageComponent;
-        avatarImage.setPropByPath("htmlAttributes.src", avatar);
-      });
+      window.store.setStateByPath(`chats.${chatID}.avatar`, avatar);
     }
 
     return response;

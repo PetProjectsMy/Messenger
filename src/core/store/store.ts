@@ -1,10 +1,19 @@
 import { getPageComponent } from "utils/pages";
 import { EnumAppPages } from "pages";
 import { renderDOM } from "core/dom";
-import { deepEqual, getPropByPath, setPropByPath } from "utils/objects-handle";
+import {
+  comparePropByPath,
+  deepEqual,
+  getPropByPath,
+  setPropByPath,
+} from "utils/objects-handle";
 import { EnumStoreEvents } from "./enum-store-events";
 import { EventBus } from "../event-bus";
 import * as StateProxies from "./state-proxies/main-states-proxies";
+import {
+  stateByPathSetter,
+  statePathRegex,
+} from "./state-proxies/by-path-proxies";
 
 export const defaultState: TAppState = {
   page: null,
@@ -61,10 +70,6 @@ export class Store {
 
   public getCurrentChatID() {
     return this._getStateValueByPath("currentChatID");
-  }
-
-  public getPageRef(ref: string) {
-    return this.page.refs[ref];
   }
 
   public getPageType(): Nullable<string> {
@@ -146,14 +151,19 @@ export class Store {
     Object.assign(this.state, nextState);
   }
 
-  public setStateByPath(
-    pathString: string,
-    value: unknown,
-    afterSetCallback?: () => void
-  ) {
-    setPropByPath(this.state, pathString, value);
-    if (afterSetCallback) {
-      afterSetCallback();
+  public setStateByPath(pathString: string, newValue: unknown) {
+    const isValueChanged = !comparePropByPath(this.state, pathString, newValue);
+    setPropByPath(this.state, pathString, newValue);
+
+    if (!isValueChanged) {
+      return;
+    }
+
+    const match = [...pathString.matchAll(statePathRegex.ChatAvatarChange)];
+    if (match.length === 1) {
+      const chatID = match[0][1];
+      console.log(`PATHSTRING: ${pathString}, CHAT ID: ${chatID}`);
+      stateByPathSetter.ChatAvatar.call(this, chatID, newValue);
     }
   }
 
