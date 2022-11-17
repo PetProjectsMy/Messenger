@@ -51,22 +51,22 @@ export class Store {
     }
   }
 
-  public getStateValueByPath(pathString: string = "") {
-    return getPropByPath(this.state, pathString);
+  public getStateValueByPath(pathString: string = "", doLog: boolean = false) {
+    return getPropByPath(this.state, pathString, doLog);
   }
 
-  public getUserDataByPath(pathString: string = "") {
+  public getUserDataByPath(pathString: string = "", doLog = false) {
     const path = `user${pathString ? "." : ""}${pathString}`;
-    return this.getStateValueByPath(path);
+    return this.getStateValueByPath(path, doLog);
   }
 
   public getUserID() {
     return this.getStateValueByPath("user.id");
   }
 
-  public getChatsDataByPath(pathString: string = "") {
+  public getChatsDataByPath(pathString: string = "", doLog = false) {
     const path = `chats${pathString ? "." : ""}${pathString}`;
-    return this.getStateValueByPath(path);
+    return this.getStateValueByPath(path, doLog);
   }
 
   public getCurrentChatID() {
@@ -152,18 +152,23 @@ export class Store {
     Object.assign(this.state, nextState);
   }
 
-  public setStateByPath(pathString: string, newValue: unknown) {
+  public setStateByPath(
+    pathString: string,
+    newValue: unknown,
+    doLog: boolean = false
+  ) {
     const isValueChanged = !comparePropByPath(
       this.state,
       pathString,
       newValue,
-      true
+      doLog
     );
-    setPropByPath(this.state, pathString, newValue);
 
     if (!isValueChanged) {
       return;
     }
+
+    setPropByPath(this.state, pathString, newValue, doLog);
 
     let match = [...pathString.matchAll(statePathRegex.ChatAvatarChange)];
     if (match.length === 1) {

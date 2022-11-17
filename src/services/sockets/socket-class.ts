@@ -66,8 +66,11 @@ export class ChatWebSocket {
       if (isNullish(currentMessages)) {
         window.store.setStateByPath(messagesStatePath, [message]);
       } else {
-        currentMessages.push(message);
-        window.store.setStateByPath(messagesStatePath, currentMessages);
+        window.store.setStateByPath(
+          messagesStatePath,
+          [...currentMessages, message],
+          true
+        );
       }
     });
 

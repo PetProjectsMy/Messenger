@@ -5,7 +5,8 @@ import { isObject } from "./is-object";
 export function setPropByPath(
   object: Indexed | unknown,
   pathString: string,
-  value: unknown
+  value: unknown,
+  doLog: boolean = false
 ): Indexed | unknown {
   if (!isObject(object)) {
     return object;
@@ -27,6 +28,11 @@ export function setPropByPath(
     value as any
   );
 
+  if (doLog) {
+    console.log(
+      `SET PROP BY PATH '${pathString}': value ${JSON.stringify(value)}`
+    );
+  }
   return merge(object as Indexed, result);
 }
 
@@ -61,8 +67,10 @@ export function comparePropByPath(
   if (doLog) {
     console.log(
       `PATH '${pathString}' EXISTING PART: ` +
-        `${pathExisting.join(".")}, ` +
-        `value: ${value}, ${JSON.stringify(value)}`
+        `${pathExisting.join(".")}\n` +
+        `OLD VALUE ${JSON.stringify(value)}, TO COMPARE ${JSON.stringify(
+          valueToCompare
+        )}`
     );
   }
 

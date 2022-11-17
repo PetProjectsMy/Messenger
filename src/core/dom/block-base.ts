@@ -144,13 +144,14 @@ export default class BlockBase<
   public setPropByPath(
     propPath: string,
     newValue: unknown,
-    forceUpdate: boolean = false
+    forceUpdate: boolean = false,
+    doLog: boolean = false
   ): void {
     const didUpdate =
-      forceUpdate || !comparePropByPath(this.props, propPath, newValue);
+      forceUpdate || !comparePropByPath(this.props, propPath, newValue, doLog);
 
     if (didUpdate) {
-      setPropByPath(this.props, propPath, newValue);
+      setPropByPath(this.props, propPath, newValue, doLog);
       this._componentDidUpdate("" as any, "" as any, true);
     }
   }
@@ -158,13 +159,15 @@ export default class BlockBase<
   public setChildByPath(
     childPath: string,
     newValue: TComponentChild | TComponentChildArray,
-    forceUpdate: boolean = false
+    forceUpdate: boolean = false,
+    doLog: boolean = false
   ) {
     const didUpdate =
-      forceUpdate || !comparePropByPath(this.children, childPath, newValue);
+      forceUpdate ||
+      !comparePropByPath(this.children, childPath, newValue, doLog);
 
     if (didUpdate) {
-      setPropByPath(this.children, childPath, newValue);
+      setPropByPath(this.children, childPath, newValue, doLog);
       this._componentDidUpdate("" as any, "" as any, true);
     }
   }
