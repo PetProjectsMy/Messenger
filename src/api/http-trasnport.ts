@@ -24,14 +24,12 @@ const DefualtHeaders = {
 type TRequestOptions = {
   method: METHODS;
   headers?: Record<string, string>;
-  data?: Record<string, string | number> | FormData;
+  data?: Record<string, unknown> | FormData;
   timeout?: number;
 };
 
 type TRequestOptionsWithoutMethod = Omit<TRequestOptions, "method">;
 
-// Самая простая версия. Реализовать штучку со всеми проверками им предстоит в конце спринта
-// Необязательный метод
 function queryStringify(data: any) {
   if (typeof data !== "object") {
     throw new Error("Data must be object");

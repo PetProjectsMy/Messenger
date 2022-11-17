@@ -2,6 +2,7 @@ import { Block } from "core/dom";
 import { Button, Input } from "components";
 import { APIResponseHasError } from "utils/api";
 import { ChatsService } from "services";
+import { transformAddUsersFormDataToAPI } from "utils/api/to-api-data-transformers";
 import template from "./template";
 
 export class AddChatUsersModalWindow extends Block {
@@ -51,7 +52,7 @@ export class AddChatUsersModalWindow extends Block {
       if (APIResponseHasError(response)) {
         this.state.apiResponseError = response.reason;
       } else {
-        this.state.apiResponseSuccess = "Uses added successfully";
+        this.state.apiResponseSuccess = "Users added successfully";
         this.children.usersIdenifiersInput.setValue("");
       }
     }.bind(this);
@@ -67,13 +68,17 @@ export class AddChatUsersModalWindow extends Block {
               modalWindow.clearAPIResponseStatus();
 
               const { chatID } = modalWindow;
-              console.log(`USERS INPUT: ${usersInput.getValue()}`);
-              console.log(`CHAT ID: ${chatID}`);
+              const usersList = usersInput.getValue().split(",");
+              const apiData = transformAddUsersFormDataToAPI({
+                chatID,
+                usersList,
+              });
 
-              // ChatsService.createChat(
-              //   { title: usersInput.getValue() },
-              //   afterRequestCallback
-              // );
+              console.log(
+                `ADD USERS DATA: ${apiData.chatId}, ${apiData.users}`
+              );
+
+              ChatsService.addUsersToChat(apiData, afterRequestCallback);
             },
           ],
         },

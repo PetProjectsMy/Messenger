@@ -1,6 +1,10 @@
 import Handlebars from "handlebars";
 import { nanoid } from "nanoid";
-import { setPropByPath, comparePropByPath } from "utils/objects-handle";
+import {
+  setPropByPath,
+  comparePropByPath,
+  deepMerge,
+} from "utils/objects-handle";
 import { toggleHtmlClassToList } from "utils/components";
 import BlockBase, { BlockCommonEvents } from "./block-base";
 
@@ -43,7 +47,7 @@ export class Block<
     this.componentName =
       componentName ?? `Not Named Block of type ${this.constructor.name}`;
 
-    this.props = props;
+    this.props = deepMerge({}, props) as TProps;
     this.props.events = this.props.events ?? {};
     this.props.htmlAttributes ??= {};
     this.props.htmlClasses ??= [];

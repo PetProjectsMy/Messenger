@@ -41,12 +41,8 @@ export class InputWithValidation extends InputExtended {
   }
 
   protected _bindValidators() {
-    if (this.props.validators === undefined) {
-      throw new Error("validators prop is undefined");
-    }
-
     const bindedValidators = {} as Record<string, TInputValidator[]>;
-    Object.entries(this.props.validators).forEach(([event, validators]) => {
+    Object.entries(this.props.validators!).forEach(([event, validators]) => {
       const events = this.props.events as Record<
         string,
         ComponentEventHandler[]
