@@ -21,6 +21,7 @@ export class ChatsList extends WithStoreBlock {
     Object.keys(chats!).forEach((id) => {
       chatsList.push(new ChatComponent(id));
     });
+
     this.children.chats = chatsList;
   }
 }

@@ -11,3 +11,5 @@ export function ChatAvatar(chatID: string | number, newAvatar: string) {
   const { avatarImage } = chatComponent.children;
   avatarImage.setPropByPath("htmlAttributes.src", newAvatar);
 }
+
+export function ChatNewMessage() {}

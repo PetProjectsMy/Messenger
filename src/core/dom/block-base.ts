@@ -7,6 +7,7 @@ import {
 } from "utils/objects-handle";
 import { EventBus } from "core/event-bus";
 import { toggleHtmlClassToList } from "utils/components";
+import { getDescendantByPath } from "utils/pages";
 
 export const enum BlockCommonEvents {
   INIT = "init",
@@ -45,6 +46,8 @@ export default class BlockBase<
   >();
 
   public componentName: string;
+
+  protected children: TComponentChildren;
 
   protected props: TProps;
 
@@ -111,6 +114,10 @@ export default class BlockBase<
     return this._element;
   }
 
+  public getChildByPath<TChild = TComponentChild>(pathString: string = "") {
+    return getDescendantByPath<TChild>(this.children, pathString);
+  }
+
   public getStateByPath(pathString: string = "") {
     return getPropByPath(this.state, pathString);
   }
@@ -136,13 +143,28 @@ export default class BlockBase<
 
   public setPropByPath(
     propPath: string,
-    value: unknown,
+    newValue: unknown,
     forceUpdate: boolean = false
   ): void {
     const didUpdate =
-      forceUpdate || !comparePropByPath(this.props, propPath, value);
+      forceUpdate || !comparePropByPath(this.props, propPath, newValue);
+
     if (didUpdate) {
-      setPropByPath(this.props, propPath, value);
+      setPropByPath(this.props, propPath, newValue);
+      this._componentDidUpdate("" as any, "" as any, true);
+    }
+  }
+
+  public setChildByPath(
+    childPath: string,
+    newValue: TComponentChild | TComponentChildArray,
+    forceUpdate: boolean = false
+  ) {
+    const didUpdate =
+      forceUpdate || !comparePropByPath(this.children, childPath, newValue);
+
+    if (didUpdate) {
+      setPropByPath(this.children, childPath, newValue);
       this._componentDidUpdate("" as any, "" as any, true);
     }
   }

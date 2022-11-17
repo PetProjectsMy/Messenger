@@ -28,22 +28,26 @@ export class SendMessageButton extends WithStoreButton {
     const store = this.store!;
 
     const currentChatID = store.getCurrentChatID();
+    const isChatSelected = !isNullish(currentChatID);
+
     const messageInput = this.refs.messageInput as Input;
     const webSocket = store.getSocketByChatID(currentChatID);
 
-    if (isNullish(currentChatID)) {
-      this.setPropByPath("events.click", []);
-      this.toggleDisabledState(true);
-    } else {
+    if (isChatSelected) {
       this.setPropByPath("events.click", [
         function () {
           const message = messageInput.getValue();
-          console.log(
-            `MESSAGE: ${message}, CHAT: ${currentChatID}, WEBSOCKET: ${webSocket.chatID}`
-          );
+          // console.log(
+          //   `MESSAGE: ${message}, CHAT: ${currentChatID}, WEBSOCKET: ${webSocket.chatID}`
+          // );
           webSocket.send(message);
+          messageInput.setValue("");
         },
       ]);
+    } else {
+      this.setPropByPath("events.click", []);
     }
+
+    this.toggleDisabledState(!isChatSelected);
   }
 }

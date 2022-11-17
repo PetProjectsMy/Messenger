@@ -33,7 +33,8 @@ export function setPropByPath(
 export function comparePropByPath(
   object: Indexed | unknown,
   pathString: string,
-  valueToCompare: unknown
+  valueToCompare: unknown,
+  doLog: boolean = false
 ): Indexed | unknown {
   if (!isObject(object)) {
     throw new Error(
@@ -45,22 +46,35 @@ export function comparePropByPath(
   }
 
   const path = pathString.split(".");
+  let pathExisting = path;
   let value = object as any;
 
   for (let i = 0; i < path.length; i++) {
     if (!isObject(value) || !Object.hasOwn(value, path[i])) {
-      return false;
+      pathExisting = path.slice(0, i);
+      break;
     }
 
     value = value[path[i]];
   }
 
-  return deepEqual(value, valueToCompare);
+  if (doLog) {
+    console.log(
+      `PATH '${pathString}' EXISTING PART: ` +
+        `${pathExisting.join(".")}, ` +
+        `value: ${value}, ${JSON.stringify(value)}`
+    );
+  }
+
+  return pathExisting.length < path.length
+    ? false
+    : deepEqual(value, valueToCompare);
 }
 
 export function getPropByPath(
   object: Indexed | unknown,
-  pathString: string
+  pathString: string,
+  doLog: boolean = false
 ): any {
   if (!isObject(object)) {
     throw new Error(
@@ -71,24 +85,26 @@ export function getPropByPath(
     throw new Error("path must be not empty string");
   }
 
-  let path = pathString.split(".");
+  const path = pathString.split(".");
+  let pathExisting = path;
   let value = object as any;
 
   for (let i = 0; i < path.length; i++) {
     if (!isObject(value) || !Object.hasOwn(value, path[i])) {
-      path = path.slice(0, i);
+      pathExisting = path.slice(0, i);
       break;
     }
 
     value = value[path[i]];
   }
 
-  const pathExisting = path.join(".");
-  console.log(
-    `PATH '${pathString}' EXISTING PART: ${pathExisting}, value: ${value}, ${JSON.stringify(
-      value
-    )}`
-  );
+  if (doLog) {
+    console.log(
+      `PATH '${pathString}' EXISTING PART: ` +
+        `${pathExisting.join(".")}, ` +
+        `value: ${value}, ${JSON.stringify(value)}`
+    );
+  }
   const result = setPropByPath({}, "", value);
   return result;
 }

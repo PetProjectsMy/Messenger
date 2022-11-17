@@ -1,7 +1,6 @@
 import { Block } from "core/dom";
 import { Button } from "components";
 import functionalButtonBackgroundImage from "static/functional-button.png";
-import { ChatTitleComponent } from "../../navigation/chat-component/chat-title";
 import template from "./template";
 
 export class ChatSectionHeader extends Block {

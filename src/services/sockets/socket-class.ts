@@ -1,3 +1,6 @@
+import { transformMessageDTOtoAppMessage } from "utils/api";
+import { isNullish } from "utils/objects-handle";
+
 export class ChatWebSocket {
   private userID: string;
 
@@ -35,7 +38,7 @@ export class ChatWebSocket {
           type: "ping",
         })
       );
-    }, 20000);
+    }, 30000);
 
     socket.addEventListener("close", (event) => {
       if (!event.wasClean) {
@@ -49,7 +52,23 @@ export class ChatWebSocket {
     });
 
     socket.addEventListener("message", function (event) {
-      console.log(`Message Received: '${event.data}'`);
+      let message = JSON.parse(event.data);
+      if (message.type === "pong" || message.type === "user connected") {
+        return;
+      }
+
+      console.log(`Message Received: '${JSON.stringify(message)}'`);
+      message = transformMessageDTOtoAppMessage(message);
+      const messagesStatePath = `chatsMessages.${chatID}`;
+
+      const currentMessages =
+        window.store.getStateValueByPath(messagesStatePath);
+      if (isNullish(currentMessages)) {
+        window.store.setStateByPath(messagesStatePath, [message]);
+      } else {
+        currentMessages.push(message);
+        window.store.setStateByPath(messagesStatePath, currentMessages);
+      }
     });
 
     socket.addEventListener("error", () => {

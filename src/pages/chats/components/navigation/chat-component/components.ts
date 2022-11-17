@@ -16,7 +16,13 @@ export class ChatComponent extends WithStoreBlock {
       this.chatID = chatID;
     };
 
-    super({ children, helpers: { beforePropsAssignHook } });
+    const afterRenderHook = function () {
+      if (this.chatID === this.store.getCurrentChatID()) {
+        this.toggleHtmlClass("current-chat", "on");
+      }
+    };
+
+    super({ children, helpers: { beforePropsAssignHook, afterRenderHook } });
   }
 
   protected render() {

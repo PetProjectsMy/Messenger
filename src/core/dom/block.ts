@@ -9,8 +9,6 @@ export class Block<
   TProps extends TComponentCommonProps = TComponentCommonProps,
   TState extends TComponentState = TComponentState
 > extends BlockBase<TProps, TState> {
-  protected children: TComponentChildren;
-
   protected helpers: TComponentHelpers;
 
   private htmlWrapped: boolean;
@@ -69,6 +67,7 @@ export class Block<
     this._beforePropsProxyHook();
     this.props = this._makeProxy(this.props) as TProps;
     this.state = this._makeProxy(this.state) as TState;
+    this.children = this._makeProxy(this.children);
 
     this._beforeRegisterEventsHook();
     this._registerEvents();

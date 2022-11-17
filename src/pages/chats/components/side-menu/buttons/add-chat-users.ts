@@ -19,7 +19,7 @@ export class AddChatUsersButton extends WithStoreButton {
               const contentType = ModalWindow.getContentType();
 
               if (contentType !== componentName) {
-                ModalWindow.dispatchContent(
+                ModalWindow.setContent(
                   new AddChatUsersModalWindow({ chatID, componentName })
                 );
               }

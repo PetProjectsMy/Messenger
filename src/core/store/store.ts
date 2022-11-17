@@ -21,6 +21,7 @@ export const defaultState: TAppState = {
   chats: null,
   chatsUsers: null,
   chatsSockets: null,
+  chatsMessages: null,
   currentChatID: null,
 };
 
@@ -50,26 +51,26 @@ export class Store {
     }
   }
 
-  private _getStateValueByPath(pathString: string = "") {
+  public getStateValueByPath(pathString: string = "") {
     return getPropByPath(this.state, pathString);
   }
 
   public getUserDataByPath(pathString: string = "") {
     const path = `user${pathString ? "." : ""}${pathString}`;
-    return this._getStateValueByPath(path);
+    return this.getStateValueByPath(path);
   }
 
   public getUserID() {
-    return this._getStateValueByPath("user.id");
+    return this.getStateValueByPath("user.id");
   }
 
   public getChatsDataByPath(pathString: string = "") {
     const path = `chats${pathString ? "." : ""}${pathString}`;
-    return this._getStateValueByPath(path);
+    return this.getStateValueByPath(path);
   }
 
   public getCurrentChatID() {
-    return this._getStateValueByPath("currentChatID");
+    return this.getStateValueByPath("currentChatID");
   }
 
   public getPageType(): Nullable<string> {
@@ -82,7 +83,7 @@ export class Store {
   }
 
   public getSocketByChatID(chatID: string) {
-    return this._getStateValueByPath(`chatsSockets.${chatID}`);
+    return this.getStateValueByPath(`chatsSockets.${chatID}`);
   }
 
   init() {
@@ -152,18 +153,31 @@ export class Store {
   }
 
   public setStateByPath(pathString: string, newValue: unknown) {
-    const isValueChanged = !comparePropByPath(this.state, pathString, newValue);
+    const isValueChanged = !comparePropByPath(
+      this.state,
+      pathString,
+      newValue,
+      true
+    );
     setPropByPath(this.state, pathString, newValue);
 
     if (!isValueChanged) {
       return;
     }
 
-    const match = [...pathString.matchAll(statePathRegex.ChatAvatarChange)];
+    let match = [...pathString.matchAll(statePathRegex.ChatAvatarChange)];
     if (match.length === 1) {
       const chatID = match[0][1];
       console.log(`PATHSTRING: ${pathString}, CHAT ID: ${chatID}`);
       stateByPathSetter.ChatAvatar.call(this, chatID, newValue);
+      return;
+    }
+
+    match = [...pathString.matchAll(statePathRegex.ChatNewMessage)];
+    if (match.length === 1) {
+      const chatID = match[0][1];
+      console.log(`PATHSTRING: ${pathString}, CHAT ID: ${chatID}`);
+      stateByPathSetter.ChatNewMessage.call(this, chatID, newValue);
     }
   }
 

@@ -1,5 +1,6 @@
 import { WithStoreBlock } from "hocs/components";
 import { isNullish } from "utils/objects-handle";
+import { MessageComponent } from "./message";
 import template from "./template";
 
 const enum EnumChatAbsenceWarnings {
@@ -13,6 +14,7 @@ export class MessagesDisplayArea extends WithStoreBlock {
     super._afterPropsAssignHook();
 
     this.setChatAbsenceWarning();
+    this.createMessagesList();
   }
 
   public setChatAbsenceWarning() {
@@ -36,6 +38,28 @@ export class MessagesDisplayArea extends WithStoreBlock {
     }
 
     this.state.chatAbsenceWarning = warning;
+  }
+
+  public createMessagesList() {
+    const chatID = this.store.getCurrentChatID();
+    if (isNullish(chatID)) {
+      return;
+    }
+
+    const messages = this.store.getStateValueByPath(`chatsMessages.${chatID}`);
+    if (isNullish(messages)) {
+      return;
+    }
+
+    console.log(`MESSAGES: ${JSON.stringify(messages)}`);
+
+    const messagesList = [] as TComponentChildArray;
+
+    for (const { content } of messages) {
+      messagesList.push(new MessageComponent({ props: { content } }));
+    }
+
+    this.children.messagesList = messagesList;
   }
 
   protected render() {

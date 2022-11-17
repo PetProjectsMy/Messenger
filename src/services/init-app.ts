@@ -15,7 +15,6 @@ export async function initApp() {
 
   await afterAuthorizationHandler.call(AuthorizationService);
 
-  console.log(`PATH: ${window.location.pathname}`);
   const { route, path } = router.matchRouteByPath(window.location.pathname);
   router.start(route, path);
 

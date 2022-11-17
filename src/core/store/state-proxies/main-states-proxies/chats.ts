@@ -12,5 +12,4 @@ export function chatsSetter() {
   Object.values(chatsList.children.chats).forEach((chat: any) => {
     this.page.refs[`chat-${chat.chatID}`] = chat;
   });
-  chatsList._componentDidUpdate("", "", true);
 }

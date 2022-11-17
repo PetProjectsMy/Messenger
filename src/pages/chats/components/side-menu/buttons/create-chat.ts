@@ -17,7 +17,7 @@ export class CreateChatButton extends Button {
               const componentName = EnumModalWindows.CreateChat;
 
               if (contentType !== componentName) {
-                ModalWindow.dispatchContent(
+                ModalWindow.setContent(
                   new CreateChatModalWindow(componentName)
                 );
               }

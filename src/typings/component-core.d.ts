@@ -34,9 +34,14 @@ declare global {
 
   export type WithComponentCommonProps<Tprops> = Tprops & TComponentCommonProps;
 
-  export type TComponentChild = Block | Block[];
+  export type TComponentChild = Block;
 
-  export type TComponentChildren = Record<string, TComponentChild>;
+  export type TComponentChildArray = TComponentChild[];
+
+  export type TComponentChildren = Record<
+    string,
+    TComponentChild | TComponentChildArray
+  >;
 
   export type TComponentRefs = Record<string, Block>;
 

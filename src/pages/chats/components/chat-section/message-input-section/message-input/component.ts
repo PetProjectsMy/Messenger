@@ -18,9 +18,6 @@ export class MessageInput extends WithStoreInput {
 
   public assignCurrentChat() {
     const currentChatID = this.store!.getCurrentChatID();
-
-    if (isNullish(currentChatID)) {
-      this.toggleDisabledState(true);
-    }
+    this.toggleDisabledState(isNullish(currentChatID));
   }
 }

@@ -1,5 +1,4 @@
 import { ChatsAPI } from "api";
-import { type ImageComponent } from "components";
 import {
   APIResponseHasError,
   transformAvatarURL,
@@ -8,7 +7,6 @@ import {
 import { transformChatUsersGetResponseToChatsUsersData } from "utils/api/from-api-data-transformers";
 import { transformChatIDToDeleteAPI } from "utils/api/to-api-data-transformers";
 import { objectWithoutKey } from "utils/objects-handle";
-import { getDescendantByPath } from "utils/pages";
 import { SocketsCreator } from "services";
 
 export class ChatsServiceClass {

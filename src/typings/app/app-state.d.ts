@@ -38,12 +38,19 @@ declare global {
 
   export type TAppChatsSockets = Nullable<Record<string, ChatWebSocket>>;
 
+  export type TChatMessage = {
+    content: string;
+    userID: string;
+    time: string;
+  };
+
   export type TAppState = {
     page: Nullable<EnumAppPages>;
     user: Nullable<TAppUserData>;
     chats: Nullable<TAppChatsData>;
     chatsUsers: Nullable<Record<string, TAppChatUsersData>>;
     chatsSockets: TAppChatsSockets;
+    chatsMessages: Nullable<TChatMessage>;
     currentChatID: Nullable<number>;
   };
 }

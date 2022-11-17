@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { baseURL } from "api";
+import { TAppChatMessage, TChatMessageDTO } from "typings/app/websocket";
 
 export function transformAvatarURL(url: Nullable<string>) {
   return url ? `${baseURL}/resources${url}` : url;
@@ -52,4 +53,13 @@ export function transformChatGetTokenResponseToToken(
   response: TChatGetTokenResponse
 ): string {
   return response.token;
+}
+
+export function transformMessageDTOtoAppMessage(
+  message: TChatMessageDTO
+): TAppChatMessage {
+  return {
+    userID: message.user_id.toString(),
+    content: message.content,
+  };
 }

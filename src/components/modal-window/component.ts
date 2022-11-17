@@ -5,10 +5,6 @@ import template from "./template";
 export class ModalWindow extends Block {
   private contentType: string;
 
-  protected render(): string {
-    return template;
-  }
-
   protected _afterPropsAssignHook(): void {
     super._afterPropsAssignHook();
 
@@ -16,34 +12,12 @@ export class ModalWindow extends Block {
 
     this.children.closeButton = this._createCloseButton();
     this.children.content = new Block();
-
-    this.children = new Proxy(this.children, {
-      set: function (
-        target: TComponentChildren,
-        childName: string,
-        component: Block
-      ) {
-        if (childName === "content") {
-          const oldContentType = this.contentType;
-
-          target[childName] = component;
-          this._componentDidUpdate("", "", true);
-
-          this.contentType = component.componentName;
-          console.log(
-            `MODAL CONTENT: ${oldContentType} -> ${this.contentType}`
-          );
-        }
-
-        return true;
-      }.bind(this),
-    });
   }
 
   private _createCloseButton() {
     return new Button({
       refs: {
-        ModalWindow: this,
+        modalWindow: this,
       },
       props: {
         htmlClasses: ["close-button"],
@@ -51,7 +25,7 @@ export class ModalWindow extends Block {
         events: {
           click: [
             function () {
-              this.refs.modalWindow.toggleModal();
+              this.refs.modalWindow.toggleVisibility();
             },
           ],
         },
@@ -59,15 +33,23 @@ export class ModalWindow extends Block {
     });
   }
 
-  toggleVisibility(state?: Nullable<"on" | "off">) {
-    this.toggleHtmlClass("show-modal", state);
-  }
-
-  public dispatchContent(component: Block) {
-    this.children.content = component;
+  protected render(): string {
+    return template;
   }
 
   public getContentType() {
     return this.contentType;
+  }
+
+  public setContent(newContentBlock: Block) {
+    const oldContentType = this.contentType;
+    const newContentType = newContentBlock.componentName;
+    console.log(`MODAL CONTENT: ${oldContentType} -> ${newContentType}`);
+
+    this.setChildByPath("content", newContentBlock);
+  }
+
+  toggleVisibility(state?: Nullable<"on" | "off">) {
+    this.toggleHtmlClass("show-modal", state);
   }
 }
