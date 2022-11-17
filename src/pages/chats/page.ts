@@ -34,6 +34,8 @@ export class ChatsPage extends WithStoreBlock {
     ]);
     functionalButton.refs.sideMenu = getDescendantByPath(this, ["sideMenu"]);
 
+    this.refs.chatSection = this.children.chatSection as Block;
+
     this.refs.chatTitle = getDescendantByPath(this, [
       "chatSection",
       "headerSection",

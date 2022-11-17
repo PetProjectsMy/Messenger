@@ -18,13 +18,13 @@ export function currentChatSetter(
   }
 
   const { refs } = this.page;
-  refs.chatTitle.setCurrentChatTitle();
+  refs.chatTitle.assignCurrentChat();
   refs.messagesSection.setChatAbsenceWarning();
   refs.addChatUsersButton.toggleDisabledState(newValueIsNull);
   refs.deleteChatButton.toggleDisabledState(newValueIsNull);
-  refs.attachmentButton.toggleDisabledState(newValueIsNull);
-  refs.messageInput.toggleDisabledState(newValueIsNull);
-  refs.sendMessageButton.toggleDisabledState(newValueIsNull);
+  refs.attachmentButton.assignCurrentChat();
+  refs.messageInput.assignCurrentChat();
+  refs.sendMessageButton.assignCurrentChat();
   refs.chooseChatAvatarButton.toggleDisabledState(newValueIsNull);
 
   if (!isNullish(oldValue)) {

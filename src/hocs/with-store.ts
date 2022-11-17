@@ -4,8 +4,8 @@ export function WithStore<
   P extends TComponentCommonProps,
   S extends TComponentState
 >(ComponentClass: BlockClass<P, S>) {
-  class WrappedComponentClass extends ComponentClass {
-    protected store: Store;
+  class WithStoreComponent extends ComponentClass {
+    public store: Store;
 
     protected _beforePropsAssignHook() {
       this.store = window.store;
@@ -14,5 +14,5 @@ export function WithStore<
     }
   }
 
-  return WrappedComponentClass;
+  return WithStoreComponent;
 }

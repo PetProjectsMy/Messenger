@@ -33,7 +33,7 @@ export class FileInput extends Block {
   }: {
     fileInputProps: TFileInputProps;
     chooseButtonProps?: TchooseButtonProps;
-    props?: TComponentProps;
+    props?: TComponentCommonProps;
     helpers?: TComponentHelpers;
   }) {
     const children = {} as TComponentChildren;

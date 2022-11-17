@@ -59,4 +59,8 @@ export class ChatWebSocket {
 
     return socket;
   }
+
+  public send(content: string, type: string = "message") {
+    this.socket.send(JSON.stringify({ content, type }));
+  }
 }

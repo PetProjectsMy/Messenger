@@ -133,19 +133,21 @@ export class ChatsServiceClass {
     const { store } = window;
     const userID = store.getUserID();
 
-    const chatsSockets = Object.keys(store.getChatsDataByPath()).reduce(
-      async function (acc: TAppChatsSockets, chatID: string) {
-        const chatTokenResponse = await this.getChatToken(chatID);
-        const chatToken =
-          transformChatGetTokenResponseToToken(chatTokenResponse);
-        const socket = new ChatWebSocket({ userID, chatID, chatToken });
+    const chatsSockets = (
+      await Promise.all(
+        Object.keys(store.getChatsDataByPath()).map(async (chatID) => {
+          const chatTokenResponse = await this.getChatToken(chatID);
+          const chatToken =
+            transformChatGetTokenResponseToToken(chatTokenResponse);
+          return [chatID, new ChatWebSocket({ userID, chatID, chatToken })];
+        })
+      )
+    ).reduce((acc, [chatID, socket]: [string, ChatWebSocket]) => {
+      acc![chatID] = socket;
+      return acc;
+    }, {} as TAppChatsSockets);
 
-        acc![chatID] = socket;
-        return acc;
-      }.bind(this),
-      {} as TAppChatsSockets
-    );
-
+    console.log(`SOCKETS: ${JSON.stringify(chatsSockets)}`);
     window.store.dispatch({ chatsSockets });
   }
 

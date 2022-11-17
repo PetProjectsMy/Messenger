@@ -1,10 +1,10 @@
-import { Block } from "core/dom";
+import { WithStoreBlock } from "hocs/components";
 import { ChatSectionHeader } from "./header-section";
 import { MessagesDisplayArea } from "./messages-display-section";
 import { MessageInputSection } from "./message-input-section";
 import template from "./template";
 
-export class ChatsPageMainSection extends Block {
+export class ChatsPageMainSection extends WithStoreBlock {
   constructor() {
     const children: TComponentChildren = {};
 

@@ -1,15 +1,11 @@
-import { WithStoreButton } from "hocs/components";
+import { WithStoreInput } from "hocs/components";
 import { isNullish } from "utils/objects-handle";
-import backgorundImage from "./icon.png";
 
-export class AttachmentButton extends WithStoreButton {
+export class MessageInput extends WithStoreInput {
   constructor() {
     super({
       props: {
-        htmlClasses: ["attachment-button"],
-        htmlStyle: {
-          "background-image": backgorundImage,
-        },
+        htmlAttributes: { name: "message", placeholder: "Enter Message" },
       },
     });
   }

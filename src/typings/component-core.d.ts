@@ -29,35 +29,10 @@ declare global {
   export type WithCommonHtmlAttributes<THtmlAttrs> = TCommonHtmlAtrributes &
     THtmlAttrs;
 
-  type THTMLElementProps = {
-    htmlAttributes?: {
-      name?: string;
-      id?: string;
-      href?: string;
-      value?: string;
-      placeholder?: string;
-      type?: string;
-      accept?: string;
-      src?: string;
-      alt?: string;
-    };
-  };
-
   export type TComponentCommonProps = TCommonHtmlAtrributes &
     ComponentOptionalProps;
 
   export type WithComponentCommonProps<Tprops> = Tprops & TComponentCommonProps;
-
-  export type TComponentProps = {
-    [prop: string]:
-      | string
-      | unknown[]
-      | boolean
-      | Record<string, Function[] | Function>
-      | TComponentRefs
-      | TComponentState
-      | TComponentProps;
-  };
 
   export type TComponentChild = Block | Block[];
 

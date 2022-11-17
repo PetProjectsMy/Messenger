@@ -1,1 +1,0 @@
-export { MessageSendButton } from "./component";

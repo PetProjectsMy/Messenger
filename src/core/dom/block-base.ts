@@ -1,28 +1,36 @@
 import { nanoid } from "nanoid";
-import { deepEqual } from "utils/objects-handle";
+import {
+  deepEqual,
+  getPropByPath,
+  setPropByPath,
+  comparePropByPath,
+} from "utils/objects-handle";
 import { EventBus } from "core/event-bus";
+import { toggleHtmlClassToList } from "utils/components";
 
 export const enum BlockCommonEvents {
   INIT = "init",
-  FLOW_CDM = "flow:component-did-mount",
   FLOW_CDU = "flow:component-did-update",
   FLOW_RENDER = "flow:render",
 }
 
-export type TBlockCommonEventsHandlersArgs = {
-  [BlockCommonEvents.FLOW_CDM]: [];
+export type TBlockCommonEventsHandlersArgs<
+  TProps extends TComponentCommonProps,
+  TState extends TComponentState
+> = {
   [BlockCommonEvents.INIT]: [];
-  [BlockCommonEvents.FLOW_CDU]: [
-    Values<TComponentProps>,
-    Values<TComponentProps>
-  ];
+  [BlockCommonEvents.FLOW_CDU]:
+    | [Partial<TProps>, Partial<TProps>]
+    | [Partial<TState>, Partial<TState>];
   [BlockCommonEvents.FLOW_RENDER]: [];
 };
 
-export default class BlockBase {
+export default class BlockBase<
+  TProps extends TComponentCommonProps,
+  TState extends TComponentState
+> {
   static EVENTS = {
     INIT: "init",
-    FLOW_CDM: "flow:component-did-mount",
     FLOW_CDU: "flow:component-did-update",
     FLOW_RENDER: "flow:render",
   };
@@ -33,96 +41,36 @@ export default class BlockBase {
 
   protected eventBus = new EventBus<
     typeof BlockCommonEvents,
-    TBlockCommonEventsHandlersArgs
+    TBlockCommonEventsHandlersArgs<TProps, TState>
   >();
 
   public componentName: string;
 
-  protected props: TComponentProps = {};
+  protected props: TProps;
 
-  protected helpers: Record<string, unknown>;
+  protected state: TState;
 
   readonly id: string = `${this.constructor.name}-${nanoid(7)}`;
 
-  protected htmlWrapped: boolean;
-
-  protected htmlWrapper?: TComponentWrapper;
-
-  protected wrappedId?: string;
-
-  protected _componentDidMount(): void {
-    this.componentDidMount();
-  }
-
-  protected componentDidMount(): void {}
-
-  protected dispatchComponentDidMount(): void {
-    this.eventBus.emit(BlockCommonEvents.FLOW_CDM);
-  }
-
   protected _componentDidUpdate(
-    oldPropsOrState: TComponentProps | TComponentState,
-    newPropsOrState: TComponentProps | TComponentState,
+    oldPropsOrState: Partial<TProps> | Partial<TState>,
+    newPropsOrState: Partial<TProps> | Partial<TState>,
     forceUpdate: boolean = false
   ): void {
-    if (forceUpdate) {
-      this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
-      return;
-    }
-
-    const response = this.componentDidUpdate(oldPropsOrState, newPropsOrState);
-    if (response) {
+    if (
+      forceUpdate ||
+      this.componentDidUpdate(oldPropsOrState, newPropsOrState)
+    ) {
       this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
     }
   }
 
   protected componentDidUpdate(
-    oldPropsOrState: TComponentProps | TComponentState,
-    newPropsOrState: TComponentProps | TComponentState
+    oldPropsOrState: Partial<TProps> | Partial<TState>,
+    newPropsOrState: Partial<TProps> | Partial<TState>
   ): boolean {
     const result = !deepEqual(oldPropsOrState, newPropsOrState);
     return result;
-  }
-
-  public getElement(): Nullable<HTMLElement> {
-    return this._element;
-  }
-
-  public dispatchEventListener(event: string, listener: TEventListener) {
-    const events = this.props.events as Record<string, TEventListener[]>;
-
-    events[event] ??= [];
-    events[event].push(listener);
-    this._unwrappedElement!.addEventListener(event, listener);
-  }
-
-  protected _bindTEventListenersToBlock() {
-    const events = this.props.events as Record<string, TEventListener[]>;
-    if (!events) {
-      return;
-    }
-
-    Object.keys(events).forEach((event) => {
-      const listeners = events[event];
-      events[event] = listeners.map((listener) => listener.bind(this));
-    });
-  }
-
-  protected _setUnwrappedElement() {
-    const element = this._element;
-    if (!element) {
-      throw new Error(
-        `BLOCK Set Unwrapped Element: wrong element ${element} of type ${typeof element}`
-      );
-    }
-
-    if (this.htmlWrapped) {
-      this._unwrappedElement = element.querySelector(
-        `[wrapped-id="${this.wrappedId}"]`
-      ) as HTMLElement;
-    } else {
-      this._unwrappedElement = element;
-    }
   }
 
   protected _addEventListenersToElement() {
@@ -133,7 +81,7 @@ export default class BlockBase {
       );
     }
 
-    const events = this.props.events as Record<string, TEventListener[]>;
+    const events = this.props.events!;
 
     Object.entries(events).forEach(([event, listeners]) => {
       listeners.forEach((listener) => {
@@ -142,42 +90,29 @@ export default class BlockBase {
     });
   }
 
-  protected _removeEvents(targetElement: Nullable<HTMLElement> = null): void {
-    const element = targetElement ?? this.getElement();
-    if (!BlockBase.isHTMLElement(element)) {
-      throw new Error(
-        `${
-          this.componentName
-        }: wrong element ${element} of type ${typeof element} to remove event listeners`
-      );
-    }
+  protected _bindEventListenersToBlock() {
+    const events = this.props.events!;
 
-    const events = this.props.events as Record<string, TEventListener[]>;
-    Object.entries(events).forEach(([event, listeners]) => {
-      listeners.forEach((listener) => {
-        element!.removeEventListener(event, listener);
-      });
+    Object.keys(events).forEach((event) => {
+      const listeners = events[event];
+      events[event] = listeners.map((listener) => listener.bind(this));
     });
   }
 
-  protected static _createDocumentElement(tagName: string) {
-    return document.createElement(tagName);
+  public dispatchEventListener(event: string, listener: TEventListener) {
+    const events = this.props.events!;
+
+    events[event] ??= [];
+    events[event].push(listener);
+    this._unwrappedElement!.addEventListener(event, listener);
   }
 
-  public static isHTMLElement(element: any) {
-    return element instanceof HTMLElement;
+  public getElement(): Nullable<HTMLElement> {
+    return this._element;
   }
 
-  public show(): void {
-    const element = this.getElement();
-
-    if (!BlockBase.isHTMLElement(element)) {
-      throw new Error(
-        `Wrong element ${element} of type ${typeof element} to show`
-      );
-    }
-
-    element!.style.display = "block";
+  public getStateByPath(pathString: string = "") {
+    return getPropByPath(this.state, pathString);
   }
 
   public hide(): void {
@@ -187,5 +122,38 @@ export default class BlockBase {
     }
 
     element.style.display = "none";
+  }
+
+  public show(): void {
+    const element = this.getElement();
+
+    element!.style.display = "block";
+  }
+
+  protected render(): string {
+    return "<div></div>";
+  }
+
+  public setPropByPath(
+    propPath: string,
+    value: unknown,
+    forceUpdate: boolean = false
+  ): void {
+    const didUpdate =
+      forceUpdate || !comparePropByPath(this.props, propPath, value);
+    if (didUpdate) {
+      setPropByPath(this.props, propPath, value);
+      this._componentDidUpdate("" as any, "" as any, true);
+    }
+  }
+
+  public toggleHtmlClass(className: string, state: Nullable<"on" | "off">) {
+    const classList = toggleHtmlClassToList(
+      this.props.htmlClasses!,
+      className,
+      state
+    );
+
+    this.props.htmlClasses = classList;
   }
 }

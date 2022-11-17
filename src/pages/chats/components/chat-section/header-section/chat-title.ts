@@ -1,7 +1,6 @@
-import { WithStore } from "hocs";
-import { TextComponent } from "components";
+import { WithStoreTextComponent } from "hocs/components";
 
-export class ChatTitleComponent extends WithStore(TextComponent) {
+export class ChatTitleComponent extends WithStoreTextComponent {
   constructor() {
     super({
       props: {
@@ -12,19 +11,22 @@ export class ChatTitleComponent extends WithStore(TextComponent) {
 
   protected _afterPropsAssignHook() {
     super._afterPropsAssignHook();
-    this.setCurrentChatTitle();
+
+    this.assignCurrentChat();
   }
 
-  public setCurrentChatTitle() {
-    if (!this.store.userHasAnyChats()) {
+  public assignCurrentChat() {
+    const store = this.store!;
+
+    if (!store.userHasAnyChats()) {
       this.props.text = "No chats created";
       return;
     }
 
     let title = "No chat selected";
-    const chatID = this.store.getCurrentChatID();
+    const chatID = store.getCurrentChatID();
     if (chatID) {
-      title = this.store.getChatsDataByPath(`${chatID}.title`);
+      title = store.getChatsDataByPath(`${chatID}.title`);
     }
 
     this.props.text = title;

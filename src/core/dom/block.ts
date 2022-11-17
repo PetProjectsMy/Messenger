@@ -1,28 +1,31 @@
 import Handlebars from "handlebars";
 import { nanoid } from "nanoid";
-import {
-  setPropByPath,
-  comparePropByPath,
-  deepMerge,
-} from "utils/objects-handle";
-import { toggleHtmlClassToList } from "utils/components";
+import { deepMerge } from "utils/objects-handle";
+import { type Store } from "core/store";
+import { type Router } from "core/router";
 import BlockBase, { BlockCommonEvents } from "./block-base";
 
 export class Block<
   TProps extends TComponentCommonProps = TComponentCommonProps,
   TState extends TComponentState = TComponentState
-> extends BlockBase {
+> extends BlockBase<TProps, TState> {
   protected children: TComponentChildren;
 
   protected helpers: TComponentHelpers;
+
+  private htmlWrapped: boolean;
 
   protected props: TProps;
 
   public refs: TComponentRefs;
 
-  protected state: TState;
+  private router?: Router;
+
+  public store?: Store;
 
   private wasRendered: Boolean = false;
+
+  protected wrappedId?: string;
 
   constructor({
     componentName,
@@ -75,29 +78,6 @@ export class Block<
     this._afterRenderHook();
   }
 
-  public setPropByPath(
-    propPath: string,
-    value: unknown,
-    forceUpdate: boolean = false
-  ): void {
-    const didUpdate =
-      forceUpdate || !comparePropByPath(this.props, propPath, value);
-    if (didUpdate) {
-      setPropByPath(this.props, propPath, value);
-      this._componentDidUpdate("" as any, "" as any, true);
-    }
-  }
-
-  public toggleHtmlClass(className: string, state: Nullable<"on" | "off">) {
-    const classList = toggleHtmlClassToList(
-      this.props.htmlClasses!,
-      className,
-      state
-    );
-
-    this.props.htmlClasses = classList;
-  }
-
   private _init() {
     this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
     this.wasRendered = true;
@@ -118,29 +98,6 @@ export class Block<
     });
   }
 
-  private _assertChildrenArray(children: unknown[]) {
-    children.forEach((child) => {
-      if (!(child instanceof Block)) {
-        throw new Error(
-          `${
-            this.componentName
-          }, making stubs: children array wrong element ${child} of type ${typeof child}`
-        );
-      }
-    });
-  }
-
-  protected _registerEvents() {
-    const { eventBus } = this;
-    eventBus.on(BlockCommonEvents.INIT, this._init.bind(this));
-    eventBus.on(BlockCommonEvents.FLOW_CDM, this._componentDidMount.bind(this));
-    eventBus.on(
-      BlockCommonEvents.FLOW_CDU,
-      this._componentDidUpdate.bind(this)
-    );
-    eventBus.on(BlockCommonEvents.FLOW_RENDER, this._render.bind(this));
-  }
-
   private _makeStubs(): Record<string, string | string[]> {
     const stubs: Record<string, string> = {};
     Object.entries(this.children).forEach(([name, child]) => {
@@ -156,71 +113,17 @@ export class Block<
     return stubs;
   }
 
-  private _replaceStub(
-    fragment: HTMLTemplateElement,
-    stubID: string,
-    element: HTMLElement
-  ) {
-    const stub = fragment.content.querySelector(`[data-id="${stubID}"]`);
-
-    if (!stub) {
-      throw new Error(
-        `${this.componentName}: No stub with id "${stubID}" to replace with element ${element}`
-      );
-    }
-    stub.replaceWith(element);
-  }
-
-  private _replaceStubs(fragment: HTMLTemplateElement) {
-    Object.keys(this.children).forEach((key) => {
-      const child = this.children[key];
-      if (Array.isArray(child)) {
-        this._assertChildrenArray(child);
-
-        child.forEach((ch) => {
-          const childElement = ch.getElement();
-          if (!childElement) {
-            throw new Error(
-              `${this.componentName}: replacing stub with id ${
-                ch.id
-              } to wrong element ${childElement} of type ${typeof childElement}`
-            );
-          }
-
-          this._replaceStub(fragment, ch.id, childElement);
-        });
-      } else {
-        const childElement = child.getElement();
-        if (!childElement) {
-          throw new Error(
-            `${this.componentName}: replacing stub with id ${
-              child.id
-            } to wrong element ${childElement} of type ${typeof childElement}`
-          );
-        }
-
-        this._replaceStub(fragment, child.id, childElement);
-      }
-    });
+  private _registerEvents() {
+    const { eventBus } = this;
+    eventBus.on(BlockCommonEvents.INIT, this._init.bind(this));
+    eventBus.on(
+      BlockCommonEvents.FLOW_CDU,
+      this._componentDidUpdate.bind(this)
+    );
+    eventBus.on(BlockCommonEvents.FLOW_RENDER, this._render.bind(this));
   }
 
   private _render(): void {
-    if (!Block.isHTMLElement(this._element)) {
-      if (!(this._element === null && !this.wasRendered)) {
-        throw new Error(
-          `${this.componentName}: wrong element ${
-            this._element
-          } of type ${typeof this._element} to first render`
-        );
-      } else if (this.wasRendered) {
-        throw new Error(
-          `${this.componentName}: wrong element ${
-            this._element
-          } of type ${typeof this._element} to rerender`
-        );
-      }
-    }
-
     const fragment = this._compile();
     const newElement = fragment.firstElementChild as HTMLElement;
 
@@ -234,6 +137,36 @@ export class Block<
     this._setHtmlProperties();
     this._addEventListenersToElement();
   }
+
+  protected _afterPropsAssignHook() {
+    if (this.helpers.afterPropsAssignHook) {
+      (this.helpers.afterPropsAssignHook as Function).call(this);
+    }
+  }
+
+  protected _afterRenderHook() {
+    if (this.helpers.afterRenderHook) {
+      (this.helpers.afterRenderHook as Function).call(this);
+    }
+  }
+
+  protected _beforePropsAssignHook() {
+    if (this.helpers.beforePropsAssignHook) {
+      (this.helpers.beforePropsAssignHook as Function).call(this);
+    }
+  }
+
+  protected _beforePropsProxyHook() {
+    this._bindEventListenersToBlock();
+
+    if (this.helpers.beforePropsProxyHook) {
+      (this.helpers.beforePropsProxyHook as Function).call(this);
+    }
+  }
+
+  protected _beforeRegisterEventsHook() {}
+
+  protected _beforeRenderHook() {}
 
   private _compile(): DocumentFragment {
     const fragment = document.createElement("template") as HTMLTemplateElement;
@@ -264,61 +197,56 @@ export class Block<
     return fragment.content;
   }
 
-  protected render(): string {
-    return "<div></div>";
-  }
+  private _replaceStub(
+    fragment: HTMLTemplateElement,
+    stubID: string,
+    element: HTMLElement
+  ) {
+    const stub = fragment.content.querySelector(`[data-id="${stubID}"]`);
 
-  getComponentName() {
-    return this.componentName;
-  }
-
-  protected _beforePropsAssignHook() {
-    if (this.helpers.beforePropsAssignHook) {
-      (this.helpers.beforePropsAssignHook as Function).call(this);
+    if (!stub) {
+      throw new Error(
+        `${this.componentName}: No stub with id "${stubID}" to replace with element ${element}`
+      );
     }
+    stub.replaceWith(element);
   }
 
-  protected _afterPropsAssignHook() {
-    if (this.helpers.afterPropsAssignHook) {
-      (this.helpers.afterPropsAssignHook as Function).call(this);
-    }
-  }
+  private _replaceStubs(fragment: HTMLTemplateElement) {
+    Object.keys(this.children).forEach((key) => {
+      const child = this.children[key];
+      if (Array.isArray(child)) {
+        child.forEach((ch) => {
+          const childElement = ch.getElement();
+          if (!childElement) {
+            throw new Error(
+              `${this.componentName}: replacing stub with id ${
+                ch.id
+              } to wrong element ${childElement} of type ${typeof childElement}`
+            );
+          }
 
-  protected _beforePropsProxyHook() {
-    this._bindTEventListenersToBlock();
+          this._replaceStub(fragment, ch.id, childElement);
+        });
+      } else {
+        const childElement = child.getElement();
+        if (!childElement) {
+          throw new Error(
+            `${this.componentName}: replacing stub with id ${
+              child.id
+            } to wrong element ${childElement} of type ${typeof childElement}`
+          );
+        }
 
-    if (this.helpers.beforePropsProxyHook) {
-      (this.helpers.beforePropsProxyHook as Function).call(this);
-    }
-  }
-
-  protected _beforeRegisterEventsHook() {}
-
-  protected _beforeRenderHook() {}
-
-  protected _afterRenderHook() {
-    if (this.helpers.afterRenderHook) {
-      (this.helpers.afterRenderHook as Function).call(this);
-    }
-  }
-
-  private _setHtmlProperties() {
-    this._setHtmlClasses();
-    this._setHtmlAttributes();
-    this._setElementStyle();
-    this._unwrappedElement!.removeAttribute("wrapped-id");
+        this._replaceStub(fragment, child.id, childElement);
+      }
+    });
   }
 
   private _setHtmlAttributes() {
     Object.entries(this.props.htmlAttributes!).forEach(([attrName, value]) => {
       this._unwrappedElement!.setAttribute(attrName, value);
     });
-  }
-
-  private _setHtmlClasses() {
-    if (this.props.htmlClasses!.length) {
-      this._unwrappedElement!.classList.add(...this.props.htmlClasses!);
-    }
   }
 
   private _setElementStyle() {
@@ -330,6 +258,36 @@ export class Block<
 
       this._unwrappedElement!.style.setProperty(styleProp, propValue);
     });
+  }
+
+  private _setHtmlProperties() {
+    this._setHtmlClasses();
+    this._setHtmlAttributes();
+    this._setElementStyle();
+    this._unwrappedElement!.removeAttribute("wrapped-id");
+  }
+
+  private _setHtmlClasses() {
+    if (this.props.htmlClasses!.length) {
+      this._unwrappedElement!.classList.add(...this.props.htmlClasses!);
+    }
+  }
+
+  private _setUnwrappedElement() {
+    const element = this._element;
+    if (!element) {
+      throw new Error(
+        `BLOCK Set Unwrapped Element: wrong element ${element} of type ${typeof element}`
+      );
+    }
+
+    if (this.htmlWrapped) {
+      this._unwrappedElement = element.querySelector(
+        `[wrapped-id="${this.wrappedId}"]`
+      ) as HTMLElement;
+    } else {
+      this._unwrappedElement = element;
+    }
   }
 }
 

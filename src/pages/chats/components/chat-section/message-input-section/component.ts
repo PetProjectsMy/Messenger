@@ -1,7 +1,8 @@
 import { WithStoreBlock } from "hocs/components";
-import { type Button, Input } from "components";
-import { MessageSendButton } from "./message-send-button";
+import { getDescendantByPath } from "utils/pages";
+import { SendMessageButton } from "./send-message-button";
 import { AttachmentButton } from "./attachment-button";
+import { MessageInput } from "./message-input";
 import template from "./template";
 
 export class MessageInputSection extends WithStoreBlock {
@@ -9,9 +10,8 @@ export class MessageInputSection extends WithStoreBlock {
     const children = {} as TComponentChildren;
 
     children.attachmentButton = new AttachmentButton();
-    const messageInput = MessageInputSection._createMessageInput();
-    children.messageInput = messageInput;
-    children.sendMessageButton = new MessageSendButton(messageInput);
+    children.messageInput = new MessageInput();
+    children.sendMessageButton = new SendMessageButton();
 
     super({ children });
   }
@@ -23,19 +23,8 @@ export class MessageInputSection extends WithStoreBlock {
   protected _afterPropsAssignHook(): void {
     super._afterPropsAssignHook();
 
-    const chatID = this.store.getCurrentChatID();
-    if (!chatID) {
-      Object.values(this.children).forEach((child: Button | Input) => {
-        child.toggleDisabledState();
-      });
-    }
-  }
-
-  private static _createMessageInput() {
-    return new Input({
-      props: {
-        htmlAttributes: { name: "message", placeholder: "Enter Message" },
-      },
-    });
+    const messageInput = getDescendantByPath(this, ["messageInput"]);
+    const sendMessageButton = getDescendantByPath(this, ["sendMessageButton"]);
+    sendMessageButton.refs.messageInput = messageInput;
   }
 }

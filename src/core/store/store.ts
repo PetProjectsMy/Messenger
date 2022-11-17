@@ -109,13 +109,17 @@ export class Store {
     return this._getStateValueByPath("user.id");
   }
 
+  public getChatsDataByPath(pathString: string = "") {
+    const path = `chats${pathString ? "." : ""}${pathString}`;
+    return this._getStateValueByPath(path);
+  }
+
   public getCurrentChatID() {
     return this._getStateValueByPath("currentChatID");
   }
 
-  public getChatsDataByPath(pathString: string = "") {
-    const path = `chats${pathString ? "." : ""}${pathString}`;
-    return this._getStateValueByPath(path);
+  public getPageRef(ref: string) {
+    return this.page.refs[ref];
   }
 
   public getPageType(): Nullable<string> {
@@ -127,8 +131,8 @@ export class Store {
     return page.constructor.name;
   }
 
-  public getPageRef(ref: string) {
-    return this.page.refs[ref];
+  public getSocketByChatID(chatID: string) {
+    return this._getStateValueByPath(`chatsSockets.${chatID}`);
   }
 
   private _setState(nextState: Partial<TAppState>) {
