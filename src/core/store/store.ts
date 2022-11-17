@@ -8,7 +8,6 @@ import { EventBus } from "../event-bus";
 import * as StateProxies from "./state-proxies/main-states-proxies";
 
 export const defaultState: TAppState = {
-  appIsInited: false,
   page: null,
   user: null,
   chats: null,
@@ -20,7 +19,6 @@ export const defaultState: TAppState = {
 type TStoreEvents = typeof EnumStoreEvents;
 
 type TStoreEventsHandlersArgs = {
-  [EnumStoreEvents.AppInit]: [{ route: EnumAppRoutes; path: string }];
   [EnumStoreEvents.PageChanged]: [EnumAppPages];
 };
 
@@ -85,14 +83,6 @@ export class Store {
 
   init() {
     this.eventBus.on(
-      EnumStoreEvents.AppInit,
-      ({ route, path }: { route: EnumAppRoutes; path: string }) => {
-        window.router.start(route, path);
-        console.log(`Store event '${EnumStoreEvents.AppInit}' emitted`);
-      }
-    );
-
-    this.eventBus.on(
       EnumStoreEvents.PageChanged,
       function (newPage: EnumAppPages) {
         const PageComponent = getPageComponent(newPage);
@@ -133,9 +123,6 @@ export class Store {
         );
 
         switch (prop) {
-          case "appIsInited":
-            StateProxies.appIsInitedSetter.call(this, oldValue, newValue);
-            break;
           case "page":
             StateProxies.pageSetter.call(this, oldValue, newValue);
             break;

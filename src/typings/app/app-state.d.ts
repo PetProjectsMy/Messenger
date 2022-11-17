@@ -39,7 +39,6 @@ declare global {
   export type TAppChatsSockets = Nullable<Record<string, ChatWebSocket>>;
 
   export type TAppState = {
-    appIsInited: boolean;
     page: Nullable<EnumAppPages>;
     user: Nullable<TAppUserData>;
     chats: Nullable<TAppChatsData>;

@@ -4,21 +4,20 @@ import { AuthorizationService } from "services";
 import { afterAuthorizationHandler } from "services/authorization";
 
 export async function initApp() {
-  try {
-    console.log(`INIT APP STATRTING`);
+  console.log(`INIT APP STATRTING`);
 
-    const store = new Store();
-    const router = new Router();
-    window.router = router;
-    window.store = store;
-    router.init();
-    store.init();
+  const store = new Store();
+  const router = new Router();
+  window.router = router;
+  window.store = store;
+  router.init();
+  store.init();
 
-    await afterAuthorizationHandler.call(AuthorizationService);
-  } catch (err) {
-    console.error(err);
-  } finally {
-    window.store.dispatch({ appIsInited: true });
-    console.log(`INIT APP COMPLETED`);
-  }
+  await afterAuthorizationHandler.call(AuthorizationService);
+
+  console.log(`PATH: ${window.location.pathname}`);
+  const { route, path } = router.matchRouteByPath(window.location.pathname);
+  router.start(route, path);
+
+  console.log(`INIT APP COMPLETED`);
 }
