@@ -8,19 +8,6 @@ export class ModalWindow extends Block {
   constructor() {
     const children = {} as TComponentChildren;
 
-    children.closeButton = new Button({
-      props: {
-        htmlClasses: ["close-button"],
-        label: "×",
-        events: {
-          click: [
-            function () {
-              this.refs.modalWindow.toggleVisibility("off");
-            },
-          ],
-        },
-      },
-    });
     children.content = new Block();
 
     super({ children });
@@ -34,7 +21,9 @@ export class ModalWindow extends Block {
   protected _afterPropsAssignHook(): void {
     super._afterPropsAssignHook();
 
-    (this.children.closeButton as Block).refs.modalWindow = this;
+    const closeButton = this._createCloseButton();
+    closeButton.refs.modalWindow = this;
+    this.children.closeButton = this;
 
     this.children = new Proxy(this.children, {
       set: function (

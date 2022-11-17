@@ -1,5 +1,6 @@
 import { Block } from "core/dom";
-import { Link, HomeButton } from "components";
+import { Link } from "components";
+import { HomeButton } from "components/buttons";
 import { WithRouter } from "hocs";
 import { EnumAppRoutes } from "core/router";
 import template from "./template";

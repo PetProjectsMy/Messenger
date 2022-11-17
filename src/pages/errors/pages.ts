@@ -1,4 +1,4 @@
-import { HomeButton } from "components";
+import { HomeButton } from "components/buttons";
 import { Block } from "core/dom";
 import template from "./template";
 

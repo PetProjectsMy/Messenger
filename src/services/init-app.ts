@@ -1,5 +1,5 @@
 import { Store } from "core/store";
-import { Router } from "core/router";
+import { PathRouter } from "core/router";
 import { AuthorizationService } from "services";
 import { afterAuthorizationHandler } from "services/authorization";
 
@@ -7,7 +7,7 @@ export async function initApp() {
   console.log(`INIT APP STATRTING`);
 
   const store = new Store();
-  const router = new Router();
+  const router = new PathRouter();
   window.router = router;
   window.store = store;
   router.init();

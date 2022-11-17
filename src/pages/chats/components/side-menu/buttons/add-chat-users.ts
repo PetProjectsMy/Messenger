@@ -33,7 +33,7 @@ export class AddChatUsersButton extends WithStoreButton {
   }
 
   protected _afterRenderHook(): void {
-    const currentChatID = this.store.getCurrentChatID();
+    const currentChatID = this.store!.getCurrentChatID();
     if (isNullish(currentChatID)) {
       this.toggleDisabledState(true);
     }

@@ -1,20 +1,42 @@
-import { Block } from "core/dom";
-import { WithRouter } from "hocs";
-import { Link } from "components";
-import { LogoutButton } from "components/buttons/logout-button";
+import { LogoutButton } from "components/buttons";
+import { WithStoreBlock, WithRouterLink } from "hocs/components";
 import template from "./template";
 import { EnumNavigationPageLinks, MapNavigationLinkToProps } from "./links";
 
-export class NavigationPage extends Block {
+export class NavigationPage extends WithStoreBlock {
   constructor() {
     const children: TComponentChildren = {};
 
-    const LinkWithRouter = WithRouter(Link);
-    children.links = Object.values(EnumNavigationPageLinks).reduce(
+    children.logoutButton = new LogoutButton();
+
+    super({
+      children,
+      componentName: "Navigation Page",
+    });
+  }
+
+  protected _afterPropsAssignHook() {
+    super._afterPropsAssignHook();
+
+    this.createLinks();
+  }
+
+  public createLinks() {
+    const isUserAuthorized = this.store.isUserAuthorized();
+    let linksList = Object.values(EnumNavigationPageLinks);
+    if (isUserAuthorized) {
+      linksList = linksList.filter(
+        (link) =>
+          link !== EnumNavigationPageLinks.SignUp &&
+          link !== EnumNavigationPageLinks.Login
+      );
+    }
+
+    this.children.links = linksList.reduce(
       (acc: any[], linkName: EnumNavigationPageLinks) => {
         const props = MapNavigationLinkToProps[linkName];
         acc.push(
-          new LinkWithRouter({
+          new WithRouterLink({
             props: {
               ...props,
               htmlWrapper: {
@@ -32,13 +54,6 @@ export class NavigationPage extends Block {
       },
       []
     );
-
-    children.logoutButton = new LogoutButton();
-
-    super({
-      children,
-      componentName: "Navigation Page",
-    });
   }
 
   render(): string {

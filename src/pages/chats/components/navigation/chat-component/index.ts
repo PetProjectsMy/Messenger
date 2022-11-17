@@ -1,1 +1,1 @@
-export { NavigationSectionChatComponent } from "./components";
+export { ChatComponent } from "./components";

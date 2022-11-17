@@ -1,11 +1,11 @@
-import { CoreRouter, EnumAppRoutes } from "core/router";
+import { type PathRouter } from "core/router/path-router";
 
 export function WithRouter<
   P extends TComponentCommonProps,
   S extends TComponentState
 >(ComponentClass: BlockClass<P, S>) {
   return class WrappedComponent extends ComponentClass {
-    protected router: CoreRouter<EnumAppRoutes>;
+    public router: PathRouter;
 
     protected _beforePropsAssignHook() {
       this.router = window.router;

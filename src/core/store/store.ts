@@ -1,7 +1,6 @@
 import { getPageComponent } from "utils/pages";
 import { EnumAppPages } from "pages";
 import { renderDOM } from "core/dom";
-import { EnumAppRoutes } from "core/router";
 import { deepEqual, getPropByPath, setPropByPath } from "utils/objects-handle";
 import { EnumStoreEvents } from "./enum-store-events";
 import { EventBus } from "../event-bus";
@@ -99,7 +98,7 @@ export class Store {
     return Boolean(this.state.page);
   }
 
-  public isUserAthorized(): Boolean {
+  public isUserAuthorized(): Boolean {
     return Boolean(this.state.user);
   }
 
@@ -124,7 +123,7 @@ export class Store {
 
         switch (prop) {
           case "page":
-            StateProxies.pageSetter.call(this, oldValue, newValue);
+            StateProxies.pageSetter.call(this, newValue);
             break;
           case "user":
             StateProxies.userSetter.call(this, oldValue, newValue);

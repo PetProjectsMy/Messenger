@@ -3,18 +3,14 @@ import avatarImagePlaceholder from "static/avatar-placeholder-chats.svg";
 import { WithStoreBlock } from "hocs/components";
 import template from "./template";
 
-export class NavigationSectionChatComponent extends WithStoreBlock {
+export class ChatComponent extends WithStoreBlock {
   // @ts-ignore
   public readonly chatID: string;
 
-  private chatProxy: any;
-
   constructor(chatID: string) {
     const children = {} as TComponentChildren;
-    children.avatarImage =
-      NavigationSectionChatComponent._createAvatarComponent(chatID);
-    children.message =
-      NavigationSectionChatComponent._createMessageComponent(chatID);
+    children.avatarImage = ChatComponent._createAvatarComponent(chatID);
+    children.message = ChatComponent._createMessageComponent(chatID);
 
     const beforePropsAssignHook = function () {
       this.chatID = chatID;

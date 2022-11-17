@@ -2,7 +2,7 @@ import Handlebars from "handlebars";
 import { nanoid } from "nanoid";
 import { deepMerge } from "utils/objects-handle";
 import { type Store } from "core/store";
-import { type Router } from "core/router";
+import { type PathRouter } from "core/router";
 import BlockBase, { BlockCommonEvents } from "./block-base";
 
 export class Block<
@@ -19,7 +19,7 @@ export class Block<
 
   public refs: TComponentRefs;
 
-  private router?: Router;
+  public router?: PathRouter;
 
   public store?: Store;
 

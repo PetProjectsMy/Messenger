@@ -1,8 +1,8 @@
 import { Block } from "core/dom";
 import avatarImagePlaceholder from "static/avatar-placeholder-profile.png";
-import { HomeButton, ImageComponent, Input } from "components";
+import { ImageComponent, Input } from "components";
+import { HomeButton } from "components/buttons";
 import { WithStore } from "hocs";
-import type { EventBus } from "core/event-bus";
 import template from "./template";
 import { DataChangeButton, ProfilePageInputForm } from "./components";
 import { EnumInputFields } from "./components/data-form";
@@ -12,22 +12,7 @@ import { AvatarUploadForm } from "./components/avatar-upload-form";
 type TProfilePageProps = WithComponentCommonProps<{ userID: number }>;
 const ProfilePageBlock = WithStore(Block<TProfilePageProps>);
 
-const enum EnumProfilePageEvents {
-  UserDidUpdate = "events: user data did update",
-  AvatarDidUpdate = "events: user avatar did update",
-}
-
-type ProfilePageEventsHandlersArgs = {
-  [EnumProfilePageEvents.UserDidUpdate]: [];
-  [EnumProfilePageEvents.AvatarDidUpdate]: [];
-};
-
 export class ProfilePage extends ProfilePageBlock {
-  protected eventBus: EventBus<
-    WithCommonEvents<typeof EnumProfilePageEvents>,
-    WithCommonHandlersArgs<ProfilePageEventsHandlersArgs>
-  >;
-
   constructor() {
     const children: TComponentChildren = {};
 
@@ -65,29 +50,7 @@ export class ProfilePage extends ProfilePageBlock {
     this.props.userID = this.store.getUserDataByPath("id") as number;
   }
 
-  protected _beforeRegisterEventsHook() {
-    super._beforeRegisterEventsHook();
-
-    this.eventBus.on(
-      EnumProfilePageEvents.UserDidUpdate,
-      this._updateUserInfo.bind(this)
-    );
-
-    this.eventBus.on(
-      EnumProfilePageEvents.AvatarDidUpdate,
-      this._updateUserAvatar.bind(this)
-    );
-  }
-
-  userDidUpdate() {
-    this.eventBus.emit(EnumProfilePageEvents.UserDidUpdate);
-  }
-
-  avatarDidUpdate() {
-    this.eventBus.emit(EnumProfilePageEvents.AvatarDidUpdate);
-  }
-
-  private _updateUserInfo() {
+  public updateUserInfo() {
     const userData = this.store.getUserDataByPath() as TAppUserData;
 
     Object.entries((this.children.profileDataForm as Block).refs).forEach(
@@ -101,7 +64,7 @@ export class ProfilePage extends ProfilePageBlock {
     );
   }
 
-  private _updateUserAvatar() {
+  public updateUserAvatar() {
     const newAvatar = this.store.getUserDataByPath("avatar") as string;
     (this.children.avatarImage as ImageComponent).setPropByPath(
       "htmlAttributes.src",

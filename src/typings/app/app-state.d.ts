@@ -1,12 +1,12 @@
 import { EnumAppPages } from "pages";
 import { type Store } from "core/store";
-import { type CoreRouter, EnumAppRoutes } from "core/router";
-import { type ChatWebSocket } from "services/socket";
+import { type ChatWebSocket } from "services/sockets/socket-class";
+import { PathRouter } from "core/router/path-router";
 
 declare global {
   interface Window {
     store: Store;
-    router: CoreRouter<EnumAppRoutes>;
+    router: PathRouter;
   }
 
   export type TAppUserData = {

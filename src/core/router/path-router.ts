@@ -15,7 +15,7 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
     Object.entries(this.routesData).forEach(
       ([routeName, routeData]: [EnumAppRoutes, TAppRouteData]) => {
         this.use(routeName, () => {
-          if (store.isUserAthorized() || !routeData.needAuthorization) {
+          if (store.isUserAuthorized() || !routeData.needAuthorization) {
             store.dispatch({ page: routeData.block });
           } else {
             store.dispatch({
@@ -84,7 +84,7 @@ export class PathRouter implements CoreRouter<EnumAppRoutes> {
   } {
     if (pathname === "/") {
       let route;
-      if (window.store.isUserAthorized()) {
+      if (window.store.isUserAuthorized()) {
         route = EnumAppRoutes.Chats;
       } else {
         route = EnumAppRoutes.Login;

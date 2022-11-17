@@ -84,11 +84,11 @@ export function getPropByPath(
   }
 
   const pathExisting = path.join(".");
-  // console.log(
-  //   `PATH '${pathString}' EXISTING PART: ${pathExisting}, value: ${value}, ${JSON.stringify(
-  //     value
-  //   )}`
-  // );
+  console.log(
+    `PATH '${pathString}' EXISTING PART: ${pathExisting}, value: ${value}, ${JSON.stringify(
+      value
+    )}`
+  );
   const result = setPropByPath({}, "", value);
   return result;
 }

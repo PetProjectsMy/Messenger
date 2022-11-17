@@ -55,7 +55,7 @@ export class ChatsServiceClass {
 
       const chatID = (response as TChatCreateAPIResponse).id.toString();
       const socket = SocketsCreator.createChatSocket({ chatID });
-      window.store.setStateByPath(`chatsSockets.${chatID}.socket`, value);
+      window.store.setStateByPath(`chatsSockets.${chatID}.socket`, socket);
     }
 
     return response;

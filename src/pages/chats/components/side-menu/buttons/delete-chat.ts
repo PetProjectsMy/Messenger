@@ -1,4 +1,3 @@
-import { type Button } from "components";
 import { WithStoreButton } from "hocs/components";
 import { ChatsService } from "services";
 import { transformChatIDToDeleteAPI } from "utils/api/to-api-data-transformers";
@@ -27,7 +26,7 @@ export class DeleteChatButton extends WithStoreButton {
   }
 
   protected _afterRenderHook(): void {
-    const currentChatID = this.store.getCurrentChatID();
+    const currentChatID = this.store!.getCurrentChatID();
     if (isNullish(currentChatID)) {
       this.toggleDisabledState(true);
     }

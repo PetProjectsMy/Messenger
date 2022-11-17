@@ -1,6 +1,6 @@
 import { type Block } from "core/dom";
 import { WithStoreBlock } from "hocs/components";
-import { NavigationSectionChatComponent } from "../chat-component";
+import { ChatComponent } from "../chat-component";
 import template from "./template";
 
 export class ChatsList extends WithStoreBlock {
@@ -19,7 +19,7 @@ export class ChatsList extends WithStoreBlock {
 
     const chatsList = [] as Block[];
     Object.keys(chats!).forEach((id) => {
-      chatsList.push(new NavigationSectionChatComponent(id));
+      chatsList.push(new ChatComponent(id));
     });
     this.children.chats = chatsList;
   }

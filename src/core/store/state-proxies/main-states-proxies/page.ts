@@ -1,5 +1,5 @@
-import { EnumStoreEvents } from "store";
+import { EnumStoreEvents } from "core/store";
 
-export function pageSetter(oldValue: TAppPageClass, newValue: TAppPageClass) {
-  this.eventBus.emit(EnumStoreEvents.PageChanged, newValue);
+export function pageSetter(newPage: TAppPageClass) {
+  this.eventBus.emit(EnumStoreEvents.PageChanged, newPage);
 }

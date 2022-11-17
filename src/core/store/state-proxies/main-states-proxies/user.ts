@@ -5,7 +5,10 @@ export function userSetter(
   oldValue: Nullable<TAppUserData>,
   newValue: Nullable<TAppUserData>
 ) {
-  switch (this.state.page as EnumAppPages) {
+  const pageType = this.state.page;
+  const { page } = this;
+
+  switch (pageType as EnumAppPages) {
     case EnumAppPages.Profile:
       if (isNullish(newValue)) {
         throw new Error("User Can't Be Nullified On Profile Page");
@@ -15,10 +18,16 @@ export function userSetter(
       }
 
       if (oldValue.avatar !== newValue!.avatar) {
-        this.page.avatarDidUpdate();
+        page.updateUserAvatar();
       }
-      this.page.userDidUpdate();
+      page.updateUserInfo();
 
+      break;
+    case EnumAppPages.Navigation:
+      if (isNullish(oldValue) !== isNullish(newValue)) {
+        page.createLinks();
+        page._componentDidUpdate("", "", true);
+      }
       break;
     default:
   }

@@ -4,6 +4,9 @@
   "repository": "git@github.com:Issayev/middle.messenger.praktikum.yandex.git",
   "author": "Artur Isaev <isaev.artur.1999@mail.ru>",
   "license": "MIT",
+  "engines": {
+    "node": "v18.7.0"
+  },
   "scripts": {
     "dev": "parcel ./src/index.html --no-cache",
     "start": "parcel build src/index.html && node ./server.js",
@@ -15,10 +18,8 @@
     "core": "./src/core",
     "hocs": "./src/hocs",
     "pages": "./src/pages",
-    "router": "./src/core/router",
     "services": "./src/services",
     "static": "./src/static",
-    "store": "./src/core/store",
     "utils": "./src/utils"
   },
   "devDependencies": {

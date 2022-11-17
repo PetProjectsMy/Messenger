@@ -1,8 +1,8 @@
-import { Button, TButtonProps } from "components/buttons";
-import { WithRouter } from "hocs";
+import { TButtonProps } from "components/buttons";
+import { WithRouterButton } from "hocs/components";
 import { AuthorizationService } from "services";
 
-export class LogoutButton extends WithRouter(Button) {
+export class LogoutButton extends WithRouterButton {
   constructor(props?: TButtonProps) {
     super({
       props: {

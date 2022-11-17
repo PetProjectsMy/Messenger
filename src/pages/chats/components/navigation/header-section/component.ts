@@ -1,5 +1,5 @@
 import { Block } from "core/dom";
-import { HomeButton } from "components";
+import { HomeButton } from "components/buttons";
 import template from "./template";
 
 export class HeaderSection extends Block {

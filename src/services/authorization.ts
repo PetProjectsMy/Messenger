@@ -52,7 +52,7 @@ class AuthorizationServiceClass {
       !APIResponseHasError(response) ||
       response.reason === EnumLoginAPIErrors.AlreadyInSystem
     ) {
-      await afterAuthorizationHandler.call(this, (userResponse) => {
+      await afterAuthorizationHandler.call(this, (userResponse: any) => {
         throw new Error(
           `Unexpecter User Response After Login: ${userResponse.reason}`
         );

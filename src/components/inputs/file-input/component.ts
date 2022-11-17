@@ -1,8 +1,7 @@
 import { Block } from "core/dom";
 import { deepMerge } from "utils/objects-handle";
-import { Input } from "components/inputs";
-import { Button, TButtonProps } from "components/buttons";
-import { TInputProps } from "components/inputs/basic-input";
+import { Input, TInputProps } from "components/inputs/basic-input";
+import { Button, TButtonProps } from "components/buttons/basic-button";
 import template from "./template";
 
 export const enum EnumFileUploadingStatus {
