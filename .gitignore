@@ -8,3 +8,4 @@ dist
 *.css.map
 *.js
 *.txt
+package copy.json
