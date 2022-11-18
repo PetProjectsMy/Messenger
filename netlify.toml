@@ -2,6 +2,21 @@
   publish = "dist"
 
 [[redirects]]
+  from = "/signup"
+  to = "/index.html?path=signup"
+
+[[redirects]]
+  from = "/login"
+  to = "/index.html?path=login"
+
+[[redirects]]
+  from = "/chats"
+  to = "/index.html?path=chats"
+
+[[redirects]]
+  from = "/profile"
+  to = "/index.html?path=profile"
+
+[[redirects]]
   from = "/*"
-  to = "index.html"
-  status = 301
+  to = "/index.html?path=not-found"
