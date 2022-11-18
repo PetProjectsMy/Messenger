@@ -88,8 +88,8 @@ export class Store {
     return page.constructor.name;
   }
 
-  public getSocketByChatID(chatID: string) {
-    return this.getStateValueByPath(`chatsSockets.${chatID}`);
+  public getSocketByChatID(chatID: string, doLog = false) {
+    return this.getStateValueByPath(`chatsSockets.${chatID}`, doLog);
   }
 
   init() {

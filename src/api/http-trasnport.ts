@@ -35,12 +35,16 @@ function queryStringify(data: any) {
     throw new Error("Data must be object");
   }
 
-  // Здесь достаточно и [object Object] для объекта
   const keys = Object.keys(data);
   return keys.reduce((result, key, index) => {
     return `${result}${key}=${data[key]}${index < keys.length - 1 ? "&" : ""}`;
   }, "?");
 }
+
+type THttpMethod = (
+  url: string,
+  options?: TRequestOptionsWithoutMethod
+) => Promise<unknown>;
 
 class HTTPTransport {
   baseURL: string = "";
@@ -49,19 +53,24 @@ class HTTPTransport {
     this.baseURL = baseURL;
   }
 
-  get = (url: string, options: TRequestOptionsWithoutMethod = {}) => {
+  get: THttpMethod = (url, options = {}) => {
+    const { data } = options;
+    if (data) {
+      url = `${url}${queryStringify(data)}`;
+      options.data = undefined;
+    }
     return this.request(url, { ...options, method: METHODS.GET });
   };
 
-  post = (url: string, options: TRequestOptionsWithoutMethod = {}) => {
+  post: THttpMethod = (url, options = {}) => {
     return this.request(url, { ...options, method: METHODS.POST });
   };
 
-  put = (url: string, options: TRequestOptionsWithoutMethod = {}) => {
+  put: THttpMethod = (url, options = {}) => {
     return this.request(url, { ...options, method: METHODS.PUT });
   };
 
-  delete = (url: string, options: TRequestOptionsWithoutMethod = {}) => {
+  delete: THttpMethod = (url, options = {}) => {
     return this.request(url, { ...options, method: METHODS.DELETE });
   };
 
@@ -76,10 +85,9 @@ class HTTPTransport {
       }
 
       const xhr = new XMLHttpRequest();
-      const isGet = method === METHODS.GET;
-
       const url = `${this.baseURL}/${apiURL}`;
-      xhr.open(method, isGet && !!data ? `${url}${queryStringify(data)}` : url);
+      xhr.open(method, url);
+
       xhr.responseType = "json";
       xhr.withCredentials = true;
 
@@ -99,7 +107,7 @@ class HTTPTransport {
       xhr.timeout = timeout;
       xhr.ontimeout = reject;
 
-      if (isGet || !data) {
+      if (!data) {
         xhr.send();
       } else if (data instanceof FormData) {
         xhr.send(data);

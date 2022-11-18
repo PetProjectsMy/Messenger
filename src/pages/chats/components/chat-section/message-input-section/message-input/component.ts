@@ -6,6 +6,15 @@ export class MessageInput extends WithStoreInput {
     super({
       props: {
         htmlAttributes: { name: "message", placeholder: "Enter Message" },
+        events: {
+          keypress: [
+            function (event: KeyboardEvent) {
+              if (event.key === "Enter") {
+                this.refs.sendMessageButton.click();
+              }
+            },
+          ],
+        },
       },
     });
   }

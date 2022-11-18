@@ -60,12 +60,14 @@
 
     @chat-display-section-flex: 100% - @header-section-flex -
       @message-input-section-flex;
+    @chat-display-section-height: (@chat-display-section-flex / 100%) * 100vh;
     .chat-display-section {
-      flex: @chat-display-section-flex;
+      height: @chat-display-section-flex;
 
+      @messages-display-section-height: 0.95 * @chat-display-section-height;
       .messages-display-section {
         width: 95%;
-        height: 95%;
+        height: @messages-display-section-height;
         border: 0.1em dashed rgba(16, 14, 14, 0.71);
         &:extend(.vertical-block);
 
@@ -73,11 +75,24 @@
           font-size: 4em;
         }
 
+        @messages-list-height: 0.95 * @messages-display-section-height;
         .messages-list {
-          height: 90%;
-          width: 95%;
+          // &:extend(.vertical-block);
+          // justify-content: flex-end;
+          height: @messages-list-height;
+          width: 100%;
           overflow: auto;
-          &:extend(.vertical-block);
+
+          @h: calc(@messages-list-height / 5);
+          @left-right-padding: 3.5%;
+          .chat-message {
+            &:extend(.vertical-block);
+            vertical-align: top;
+            align-items: flex-end;
+            padding: 0 @left-right-padding;
+            min-height: @h;
+            width: 100% - 2 * @left-right-padding;
+          }
         }
       }
     }

@@ -77,66 +77,6 @@ export class Block<
     this._afterRenderHook();
   }
 
-  private _init() {
-    this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
-    this.wasRendered = true;
-  }
-
-  protected _makeProxy(object: Record<string, any>) {
-    const self = this;
-
-    return new Proxy(object, {
-      set(target, prop: string, value) {
-        const oldValue = target[prop];
-        target[prop] = value;
-
-        self.eventBus.emit(BlockCommonEvents.FLOW_CDU, oldValue, value);
-
-        return true;
-      },
-    });
-  }
-
-  private _makeStubs(): Record<string, string | string[]> {
-    const stubs: Record<string, string> = {};
-    Object.entries(this.children).forEach(([name, child]) => {
-      if (Array.isArray(child)) {
-        stubs[name] = child
-          .map((ch) => `<div data-id="${ch.id}"></div>`)
-          .join("");
-      } else {
-        stubs[name] = `<div data-id="${child.id}"></div>`;
-      }
-    });
-
-    return stubs;
-  }
-
-  private _registerEvents() {
-    const { eventBus } = this;
-    eventBus.on(BlockCommonEvents.INIT, this._init.bind(this));
-    eventBus.on(
-      BlockCommonEvents.FLOW_CDU,
-      this._componentDidUpdate.bind(this)
-    );
-    eventBus.on(BlockCommonEvents.FLOW_RENDER, this._render.bind(this));
-  }
-
-  private _render(): void {
-    const fragment = this._compile();
-    const newElement = fragment.firstElementChild as HTMLElement;
-
-    if (this.wasRendered) {
-      this._element!.replaceWith(newElement);
-    }
-
-    this._element = newElement;
-
-    this._setUnwrappedElement();
-    this._setHtmlProperties();
-    this._addEventListenersToElement();
-  }
-
   protected _afterPropsAssignHook() {
     if (this.helpers.afterPropsAssignHook) {
       (this.helpers.afterPropsAssignHook as Function).call(this);
@@ -194,6 +134,66 @@ export class Block<
     this._replaceStubs(fragment);
 
     return fragment.content;
+  }
+
+  private _init() {
+    this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
+    this.wasRendered = true;
+  }
+
+  protected _makeProxy(object: Record<string, any>) {
+    const self = this;
+
+    return new Proxy(object, {
+      set(target, prop: string, value) {
+        const oldValue = target[prop];
+        target[prop] = value;
+
+        self.eventBus.emit(BlockCommonEvents.FLOW_CDU, oldValue, value);
+
+        return true;
+      },
+    });
+  }
+
+  private _makeStubs(): Record<string, string | string[]> {
+    const stubs: Record<string, string> = {};
+    Object.entries(this.children).forEach(([name, child]) => {
+      if (Array.isArray(child)) {
+        stubs[name] = child
+          .map((ch) => `<div data-id="${ch.id}"></div>`)
+          .join("");
+      } else {
+        stubs[name] = `<div data-id="${child.id}"></div>`;
+      }
+    });
+
+    return stubs;
+  }
+
+  private _registerEvents() {
+    const { eventBus } = this;
+    eventBus.on(BlockCommonEvents.INIT, this._init.bind(this));
+    eventBus.on(
+      BlockCommonEvents.FLOW_CDU,
+      this._componentDidUpdate.bind(this)
+    );
+    eventBus.on(BlockCommonEvents.FLOW_RENDER, this._render.bind(this));
+  }
+
+  private _render(): void {
+    const fragment = this._compile();
+    const newElement = fragment.firstElementChild as HTMLElement;
+
+    if (this.wasRendered) {
+      this._removeEventsFromElement();
+      this._element!.replaceWith(newElement);
+    }
+
+    this._element = newElement;
+    this._setUnwrappedElement();
+    this._setHtmlProperties();
+    this._addEventListenersToElement();
   }
 
   private _replaceStub(

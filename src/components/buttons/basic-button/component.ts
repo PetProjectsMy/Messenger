@@ -29,4 +29,8 @@ export class Button extends Block<TButtonProps> {
 
     element.disabled = !element.disabled;
   }
+
+  public click() {
+    this._unwrappedElement!.click();
+  }
 }

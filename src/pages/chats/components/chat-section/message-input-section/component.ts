@@ -16,6 +16,14 @@ export class MessageInputSection extends WithStoreBlock {
     super({ children });
   }
 
+  protected _afterPropsAssignHook(): void {
+    super._afterPropsAssignHook();
+
+    const sendMessageButton = this.getChildByPath("sendMessageButton");
+    const messageInput = this.getChildByPath("messageInput");
+    messageInput.refs.sendMessageButton = sendMessageButton;
+  }
+
   protected render(): string {
     return template;
   }

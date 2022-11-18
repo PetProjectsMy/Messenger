@@ -31,15 +31,19 @@ export class SendMessageButton extends WithStoreButton {
     const isChatSelected = !isNullish(currentChatID);
 
     const messageInput = this.refs.messageInput as Input;
-    const webSocket = store.getSocketByChatID(currentChatID);
+    const webSocket = store.getSocketByChatID(currentChatID, true);
+    console.log(
+      `CHAT(${currentChatID}) Websocket: ${JSON.stringify(webSocket)}`
+    );
 
     if (isChatSelected) {
       this.setPropByPath("events.click", [
         function () {
           const message = messageInput.getValue();
-          // console.log(
-          //   `MESSAGE: ${message}, CHAT: ${currentChatID}, WEBSOCKET: ${webSocket.chatID}`
-          // );
+          if (message === "") {
+            return;
+          }
+
           webSocket.send(message);
           messageInput.setValue("");
         },

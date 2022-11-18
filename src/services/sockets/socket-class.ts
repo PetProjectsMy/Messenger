@@ -52,7 +52,19 @@ export class ChatWebSocket {
     });
 
     socket.addEventListener("message", function (event) {
-      let message = JSON.parse(event.data);
+      let message;
+
+      try {
+        message = JSON.parse(event.data);
+      } catch (err) {
+        console.log(
+          `ERROR ON PARSING MESSAGE ${JSON.stringify(
+            message
+          )} ON CHAT(${chatID}) SOCKET`
+        );
+        return;
+      }
+
       if (message.type === "pong" || message.type === "user connected") {
         return;
       }

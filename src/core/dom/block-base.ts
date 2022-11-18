@@ -77,18 +77,13 @@ export default class BlockBase<
   }
 
   protected _addEventListenersToElement() {
-    const targetElement = this._unwrappedElement;
-    if (!targetElement) {
-      throw new Error(
-        `Incorrect element ${targetElement} of type ${typeof targetElement} to add event listeners`
-      );
-    }
+    const targetElement = this._unwrappedElement!;
 
     const events = this.props.events!;
 
     Object.entries(events).forEach(([event, listeners]) => {
       listeners.forEach((listener) => {
-        targetElement!.addEventListener(event, listener);
+        targetElement.addEventListener(event, listener);
       });
     });
   }
@@ -135,6 +130,18 @@ export default class BlockBase<
     const element = this.getElement();
 
     element!.style.display = "block";
+  }
+
+  protected _removeEventsFromElement() {
+    const targetElement = this._unwrappedElement!;
+
+    const events = this.props.events!;
+
+    Object.entries(events).forEach(([event, listeners]) => {
+      listeners.forEach((listener) => {
+        targetElement.removeEventListener(event, listener);
+      });
+    });
   }
 
   protected render(): string {
