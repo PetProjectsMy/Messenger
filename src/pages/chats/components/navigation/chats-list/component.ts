@@ -11,11 +11,14 @@ export class ChatsList extends WithStoreBlock {
   protected _afterPropsAssignHook(): void {
     super._afterPropsAssignHook();
 
-    this._createChatsList();
+    this.createChatsList();
   }
 
-  private _createChatsList() {
-    const chats = this.store.getChatsDataByPath();
+  public createChatsList() {
+    let chats = {};
+    if (!this.store.userHasAnyChats()) {
+      chats = this.store.getChatsDataByPath();
+    }
 
     const chatsList = [] as Block[];
     Object.keys(chats!).forEach((id) => {

@@ -196,10 +196,10 @@ export class Store {
 
   public userHasAnyChats(): Boolean {
     const { chats } = this.state;
-    if (!chats) {
+    if (isNullish(chats)) {
       return false;
     }
 
-    return Object.keys(chats).length > 0;
+    return Object.keys(chats!).length > 0;
   }
 }
