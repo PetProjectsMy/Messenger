@@ -64,13 +64,20 @@
       flex: @chat-display-section-flex;
 
       .messages-display-section {
-        &:extend(.vertical-block);
         width: 95%;
         height: 95%;
         border: 0.1em dashed rgba(16, 14, 14, 0.71);
+        &:extend(.vertical-block);
 
         .message-placeholder {
           font-size: 4em;
+        }
+
+        .messages-list {
+          height: 90%;
+          width: 95%;
+          overflow: auto;
+          &:extend(.vertical-block);
         }
       }
     }

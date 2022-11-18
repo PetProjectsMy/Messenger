@@ -5,6 +5,7 @@ import {
   comparePropByPath,
   deepEqual,
   getPropByPath,
+  isNullish,
   setPropByPath,
 } from "utils/objects-handle";
 import { EnumStoreEvents } from "./enum-store-events";
@@ -41,6 +42,11 @@ export class Store {
 
   constructor(state: TAppState = defaultState) {
     this.state = this._makeStateProxy(state);
+  }
+
+  public chatHasMessages(chatID: string): boolean {
+    const messages = this.state.chatsMessages;
+    return !isNullish(messages) && Object.hasOwn(messages!, chatID);
   }
 
   dispatch(nextStateOrAction: Partial<TAppState> | Function) {
@@ -173,7 +179,6 @@ export class Store {
     let match = [...pathString.matchAll(statePathRegex.ChatAvatarChange)];
     if (match.length === 1) {
       const chatID = match[0][1];
-      console.log(`PATHSTRING: ${pathString}, CHAT ID: ${chatID}`);
       stateByPathSetter.ChatAvatar.call(this, chatID, newValue);
       return;
     }
@@ -181,8 +186,7 @@ export class Store {
     match = [...pathString.matchAll(statePathRegex.ChatNewMessage)];
     if (match.length === 1) {
       const chatID = match[0][1];
-      console.log(`PATHSTRING: ${pathString}, CHAT ID: ${chatID}`);
-      stateByPathSetter.ChatNewMessage.call(this, chatID, newValue);
+      stateByPathSetter.ChatNewMessage.call(this, chatID);
     }
   }
 

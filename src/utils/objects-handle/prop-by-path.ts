@@ -66,7 +66,7 @@ export function comparePropByPath(
 
   if (doLog) {
     console.log(
-      `PATH '${pathString}' EXISTING PART: ` +
+      `PATH COMPARE'${pathString}' EXISTING PART: ` +
         `${pathExisting.join(".")}\n` +
         `OLD VALUE ${JSON.stringify(value)}, TO COMPARE ${JSON.stringify(
           valueToCompare
@@ -108,9 +108,9 @@ export function getPropByPath(
 
   if (doLog) {
     console.log(
-      `PATH '${pathString}' EXISTING PART: ` +
-        `${pathExisting.join(".")}, ` +
-        `value: ${value}, ${JSON.stringify(value)}`
+      `PATH GET '${pathString}' EXISTING PART: ` +
+        `${pathExisting.join(".")}\n` +
+        `value: ${JSON.stringify(value)}`
     );
   }
   const result = setPropByPath({}, "", value);

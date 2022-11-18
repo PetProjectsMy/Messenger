@@ -12,4 +12,14 @@ export function ChatAvatar(chatID: string | number, newAvatar: string) {
   avatarImage.setPropByPath("htmlAttributes.src", newAvatar);
 }
 
-export function ChatNewMessage() {}
+export function ChatNewMessage(chatID: string) {
+  const pageType = this.state.page;
+  if (pageType !== EnumAppPages.Chats) {
+    return;
+  }
+
+  const { page } = this;
+  if (chatID === window.store.getCurrentChatID())
+    page.refs.messagesDisplaySection.createMessagesList();
+  page.refs.messagesDisplaySection.setChatAbsenceWarning();
+}

@@ -1,6 +1,6 @@
-import { ImageComponent, TextComponent } from "components";
 import { WithStoreBlock } from "hocs/components";
-import avatarPlaceholder from "./avatar-placeholder.svg";
+import { ChatAvatar } from "./avatar";
+import { ChatTitle } from "./title";
 import template from "./template";
 
 export class ChatComponent extends WithStoreBlock {
@@ -9,8 +9,8 @@ export class ChatComponent extends WithStoreBlock {
 
   constructor(chatID: string) {
     const children = {} as TComponentChildren;
-    children.avatarImage = ChatComponent._createAvatarComponent(chatID);
-    children.chatTitle = ChatComponent._createChatTitle(chatID);
+    children.avatarImage = new ChatAvatar(chatID);
+    children.chatTitle = new ChatTitle(chatID);
 
     const beforePropsAssignHook = function () {
       this.chatID = chatID;
@@ -27,35 +27,6 @@ export class ChatComponent extends WithStoreBlock {
 
   protected render() {
     return template;
-  }
-
-  private static _createAvatarComponent(chatID: string) {
-    let avatarSrc = window.store.getChatsDataByPath(`${chatID}.avatar`);
-    avatarSrc ??= avatarPlaceholder;
-
-    const avatarImage = new ImageComponent({
-      props: {
-        htmlAttributes: {
-          src: avatarSrc,
-          alt: "avatar placeholder",
-        },
-      },
-    });
-
-    return avatarImage;
-  }
-
-  private static _createChatTitle(chatID: string) {
-    const title = window.store.getChatsDataByPath(`${chatID}.title`);
-
-    const chatTitle = new TextComponent({
-      props: {
-        htmlClasses: ["chat-title"],
-        text: title,
-      },
-    });
-
-    return chatTitle;
   }
 
   protected _afterRenderHook(): void {

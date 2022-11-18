@@ -24,16 +24,15 @@ export class MessagesDisplayArea extends WithStoreBlock {
     if (!store.userHasAnyChats()) {
       warning = EnumChatAbsenceWarnings.NoChatsCreated;
     } else {
-      const currentChatID = store.getCurrentChatID();
-      if (isNullish(currentChatID)) {
+      const chatID = store.getCurrentChatID();
+      if (isNullish(chatID)) {
         warning = EnumChatAbsenceWarnings.NoChatSelected;
-      } else {
-        const lastMessage = store.getChatsDataByPath(
-          `${currentChatID}.lastMessage`
+      } else if (!this.store.chatHasMessages(chatID)) {
+        const messages = this.store.getStateValueByPath(
+          `chatMessages.${chatID}`
         );
-        if (isNullish(lastMessage)) {
-          warning = EnumChatAbsenceWarnings.NoMessagesWritten;
-        }
+        console.log(`CHAT(${chatID}): ${JSON.stringify(messages)}`);
+        warning = EnumChatAbsenceWarnings.NoMessagesWritten;
       }
     }
 
@@ -42,17 +41,12 @@ export class MessagesDisplayArea extends WithStoreBlock {
 
   public createMessagesList() {
     const chatID = this.store.getCurrentChatID();
-    if (isNullish(chatID)) {
+    if (isNullish(chatID) || !this.store.chatHasMessages(chatID)) {
+      this.children.messagesList = [];
       return;
     }
 
     const messages = this.store.getStateValueByPath(`chatsMessages.${chatID}`);
-    if (isNullish(messages)) {
-      return;
-    }
-
-    console.log(`MESSAGES: ${JSON.stringify(messages)}`);
-
     const messagesList = [] as TComponentChildArray;
 
     for (const { content } of messages) {

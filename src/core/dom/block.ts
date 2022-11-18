@@ -48,7 +48,7 @@ export class Block<
     this.componentName =
       componentName ?? `Not Named Block of type ${this.constructor.name}`;
 
-    this.props = deepMerge({}, props) as TProps;
+    this.props = deepMerge(this.props ?? {}, props) as TProps;
     this.props.events = this.props.events ?? {};
     this.props.htmlAttributes ??= {};
     this.props.htmlClasses ??= [];

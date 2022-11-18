@@ -61,8 +61,10 @@ export class ChatWebSocket {
       message = transformMessageDTOtoAppMessage(message);
       const messagesStatePath = `chatsMessages.${chatID}`;
 
-      const currentMessages =
-        window.store.getStateValueByPath(messagesStatePath);
+      const currentMessages = window.store.chatHasMessages(chatID)
+        ? window.store.getStateValueByPath(messagesStatePath)
+        : [];
+
       if (isNullish(currentMessages)) {
         window.store.setStateByPath(messagesStatePath, [message]);
       } else {

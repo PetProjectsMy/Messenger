@@ -1,5 +1,5 @@
 import { Block } from "core/dom";
-import { TextComponent, Link } from "components";
+import { TextComponent, Link, ImageComponent } from "components";
 import { Button } from "components/buttons";
 import { Input, FileInput, InputWithValidation } from "components/inputs";
 import { WithStore } from "../with-store";
@@ -17,6 +17,9 @@ export const WithStoreTextComponent = WithStore(
 export const WithStoreValidatedInput = WithStore(
   InputWithValidation
 ) as any as typeof InputWithValidation;
+export const WithStoreImageComponent = WithStore(
+  ImageComponent
+) as any as typeof ImageComponent;
 
 export const WithRouterLink = WithRouter(Link) as any as typeof Link;
 export const WithRouterButton = WithRouter(Button) as any as typeof Button;

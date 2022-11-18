@@ -6,5 +6,8 @@ export default `
     <div class="chat-title-section">
       {{{ chatTitle }}}
     </div>
+    <div class="unread-messages-count-section">
+      {{{ unreadMessagesCount }}}
+    </div>
   </li>
 `;

@@ -18,7 +18,8 @@ export function currentChatSetter(
   }
 
   const { refs } = this.page;
-  refs.messagesSection.setChatAbsenceWarning();
+  refs.messagesDisplaySection.createMessagesList();
+  refs.messagesDisplaySection.setChatAbsenceWarning();
   refs.addChatUsersButton.toggleDisabledState(newValueIsNull);
   refs.deleteChatButton.toggleDisabledState(newValueIsNull);
   refs.attachmentButton.assignCurrentChat();

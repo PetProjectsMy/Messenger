@@ -23,6 +23,7 @@ declare global {
   type TChatData = {
     title: string;
     avatar: Nullable<string>;
+    unreadCount: number;
     lastMessage: {
       content: string;
     };
@@ -38,11 +39,13 @@ declare global {
 
   export type TAppChatsSockets = Nullable<Record<string, ChatWebSocket>>;
 
-  export type TChatMessage = {
+  export type TAppChatMessage = {
     content: string;
     userID: string;
     time: string;
   };
+
+  export type TAppChatMessages = Record<string, TAppChatMessage>;
 
   export type TAppState = {
     page: Nullable<EnumAppPages>;
@@ -50,7 +53,7 @@ declare global {
     chats: Nullable<TAppChatsData>;
     chatsUsers: Nullable<Record<string, TAppChatUsersData>>;
     chatsSockets: TAppChatsSockets;
-    chatsMessages: Nullable<TChatMessage>;
+    chatsMessages: Nullable<TAppChatMessages>;
     currentChatID: Nullable<number>;
   };
 }

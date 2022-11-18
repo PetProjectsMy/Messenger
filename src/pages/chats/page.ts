@@ -32,7 +32,7 @@ export class ChatsPage extends WithStoreBlock {
     );
     functionalButton.refs.sideMenu = this.getChildByPath("sideMenu");
 
-    this.refs.messagesSection = this.getChildByPath(
+    this.refs.messagesDisplaySection = this.getChildByPath(
       "chatSection.messagesDisplaySection"
     );
 
