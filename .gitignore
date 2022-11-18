@@ -8,4 +8,5 @@ dist
 *.css.map
 *.js
 *.txt
+netlify.toml
 package copy.json

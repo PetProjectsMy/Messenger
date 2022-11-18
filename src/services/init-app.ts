@@ -15,7 +15,16 @@ export async function initApp() {
 
   await afterAuthorizationHandler.call(AuthorizationService);
 
-  const { route, path } = router.matchRouteByPath(window.location.pathname);
+  let initPath = window.location.pathname;
+  const { search } = window.location;
+
+  const pathQueryMatch = [...search.matchAll(/path=(\w+)/g)];
+  const pathQuery = pathQueryMatch.length === 1 ? pathQueryMatch[0][1] : null;
+  if (pathQuery) {
+    initPath = `/${pathQuery}`;
+  }
+
+  const { route, path } = router.matchRouteByPath(initPath);
   router.start(route, path);
 
   console.log(`INIT APP COMPLETED`);

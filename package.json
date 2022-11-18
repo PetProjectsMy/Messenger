@@ -42,6 +42,7 @@
   "scripts": {
     "compile-check": "tsc --noEmit",
     "dev": "parcel ./src/index.html --no-cache",
+    "build": "parcel build src/index.html",
     "start": "parcel build src/index.html && node ./server.js"
   },
   "version": "1.0.0"
