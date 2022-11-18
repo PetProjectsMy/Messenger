@@ -49,11 +49,11 @@ export class ChatsServiceClass {
     }
 
     if (!APIResponseHasError(response)) {
-      await this.getChats();
-
       const chatID = (response as TChatCreateAPIResponse).id.toString();
-      const socket = SocketsCreator.createChatSocket({ chatID });
-      window.store.setStateByPath(`chatsSockets.${chatID}.socket`, socket);
+      const socket = await SocketsCreator.createChatSocket({ chatID });
+      window.store.setSocketByChatID(chatID, socket);
+
+      await this.getChats();
     }
 
     return response;

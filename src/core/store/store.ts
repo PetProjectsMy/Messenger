@@ -154,6 +154,10 @@ export class Store {
     });
   }
 
+  public setSocketByChatID(chatID: string, socket: WebSocket) {
+    return this.setStateByPath(`chatsSockets.${chatID}`, socket, true);
+  }
+
   private _setState(nextState: Partial<TAppState>) {
     Object.assign(this.state, nextState);
   }
