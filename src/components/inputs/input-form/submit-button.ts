@@ -3,7 +3,7 @@ import { type Block } from "core/dom";
 
 export async function formSubmitButtonCallback() {
   const { form } = this.refs;
-
+  this.state.apiResponseSuccess = "";
   form._validateForm();
   if (form.state.apiResponseError !== form.constructor.validationFailedError) {
     await form.props.afterValidationCallback!.call(form);
