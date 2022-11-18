@@ -1,6 +1,5 @@
 import { Block } from "core/dom";
 import { type ImageComponent } from "components";
-import { getDescendantByPath } from "utils/pages";
 import { SubmitSection } from "./submit-section";
 import { AvatarInput } from "./avatar-input";
 import template from "./template";
@@ -22,10 +21,10 @@ export class AvatarUploadForm extends Block {
     const submitSection = this._createAvatarSubmitSection();
     this.children.submitSection = submitSection;
 
-    const avatarFileInput = getDescendantByPath(avatarInput, ["fileInput"]);
+    const avatarFileInput = avatarInput.getChildByPath("fileInput");
     avatarFileInput.refs.avatarSubmit = submitSection;
 
-    const submitButton = getDescendantByPath(submitSection, ["submitButton"]);
+    const submitButton = submitSection.getChildByPath("submitButton");
     Object.assign(submitButton.refs, {
       avatarInput,
     });
