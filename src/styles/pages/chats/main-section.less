@@ -4,6 +4,12 @@
 @chat-display-delimiter-line-width: 96%;
 @chat-display-delimiter-line-color: #ffffff;
 
+@messages-per-display-area: 7;
+
+body {
+  overflow-y: scroll;
+}
+
 .main-section-mixin(
   @flex, 
   @header-section-flex,
@@ -62,7 +68,7 @@
       @message-input-section-flex;
     @chat-display-section-height: (@chat-display-section-flex / 100%) * 100vh;
     .chat-display-section {
-      height: @chat-display-section-flex;
+      height: @chat-display-section-height;
 
       @messages-display-section-height: 0.95 * @chat-display-section-height;
       .messages-display-section {
@@ -72,26 +78,32 @@
         &:extend(.vertical-block);
 
         .message-placeholder {
+          flex: auto;
           font-size: 4em;
         }
 
         @messages-list-height: 0.95 * @messages-display-section-height;
         .messages-list {
-          // &:extend(.vertical-block);
-          // justify-content: flex-end;
+          overflow-y: auto;
+          &:extend(.vertical-block);
+
+          flex-direction: column-reverse;
+          justify-content: flex-start;
           height: @messages-list-height;
           width: 100%;
-          overflow: auto;
 
-          @h: calc(@messages-list-height / 5);
+          @h: calc(@messages-list-height / @messages-per-display-area);
           @left-right-padding: 3.5%;
           .chat-message {
             &:extend(.vertical-block);
-            vertical-align: top;
             align-items: flex-end;
             padding: 0 @left-right-padding;
             min-height: @h;
             width: 100% - 2 * @left-right-padding;
+
+            .message-text {
+              font-size: 2em;
+            }
           }
         }
       }

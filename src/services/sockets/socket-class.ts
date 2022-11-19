@@ -77,15 +77,11 @@ export class ChatWebSocket {
         ? window.store.getStateValueByPath(messagesStatePath)
         : [];
 
-      if (isNullish(currentMessages)) {
-        window.store.setStateByPath(messagesStatePath, [message]);
-      } else {
-        window.store.setStateByPath(
-          messagesStatePath,
-          [...currentMessages, message],
-          true
-        );
-      }
+      window.store.setStateByPath(
+        messagesStatePath,
+        [message, ...currentMessages],
+        true
+      );
     });
 
     socket.addEventListener("error", () => {
