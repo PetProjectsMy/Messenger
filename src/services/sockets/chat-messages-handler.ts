@@ -50,7 +50,7 @@ export class ChatMessagesHandler extends ChatWebSocket {
             `SUCCESSFULLY GOT CHAT(${this.chatID}) MESSAGES BATCH WITH OFFSET ${offset}`
           );
         }
-      }, 400);
+      }, 50);
     })
       .catch((error: TypeError) => {
         console.error(

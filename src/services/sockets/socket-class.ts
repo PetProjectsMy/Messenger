@@ -122,7 +122,7 @@ export class ChatWebSocket {
           clearInterval(awaiter);
           console.log(`SOCKET OF CHAT(${this.chatID}) CONNECTED`);
         }
-      }, 500);
+      }, 50);
     });
   }
 }

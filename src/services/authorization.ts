@@ -10,12 +10,23 @@ export const enum EnumLoginAPIErrors {
 
 class AuthorizationServiceClass {
   async getUser() {
-    const request = await AuthorizationAPI.me();
-    const { status, response } = request;
+    let response;
+    let status;
 
-    console.log(
-      `LOGIN REQUEST: status ${status}; response ${JSON.stringify(response)}`
-    );
+    try {
+      const request = await AuthorizationAPI.me();
+      status = request.status;
+      response = request.response;
+
+      console.log(
+        `GET USER REQUEST: status ${status}; response ${JSON.stringify(
+          response
+        )}`
+      );
+    } catch (error) {
+      console.error(`GET USER REQUEST ERROR: ${error}`);
+      throw error;
+    }
 
     return response;
   }
@@ -24,40 +35,66 @@ class AuthorizationServiceClass {
     data: TLoginFormDTO,
     afterRequestCallback: TAfterRequestCallback = () => {}
   ) {
-    const requestLogin = await AuthorizationAPI.login(data);
-    const { status, response } = requestLogin;
+    let response;
+    let status;
 
-    console.log(
-      `LOGIN REQUEST: status ${status}; response ${JSON.stringify(response)}`
-    );
+    try {
+      const requestLogin = await AuthorizationAPI.login(data);
+      status = requestLogin.status;
+      response = requestLogin.response;
 
-    if (afterRequestCallback) {
-      await afterRequestCallback(response);
-    }
+      console.log(
+        `LOGIN REQUEST: status ${status}; response ${JSON.stringify(response)}`
+      );
 
-    if (
-      !APIResponseHasError(response) ||
-      response.reason === EnumLoginAPIErrors.AlreadyInSystem
-    ) {
-      const userResponse = await this.getUser();
-      if (!APIResponseHasError(userResponse)) {
-        await initAppData(userResponse.id);
-      } else {
-        throw new Error(
-          `Unexpecter User Response After Login: ${userResponse.reason}`
-        );
+      if (afterRequestCallback) {
+        await afterRequestCallback(response);
       }
-      window.router.go(EnumAppRoutes.Chats);
+
+      if (
+        !APIResponseHasError(response) ||
+        response.reason === EnumLoginAPIErrors.AlreadyInSystem
+      ) {
+        const userResponse = await this.getUser();
+        if (!APIResponseHasError(userResponse)) {
+          await initAppData(userResponse.id);
+        } else {
+          throw new Error(
+            `Unexpecter User Response After Login: ${userResponse.reason}`
+          );
+        }
+        window.router.go(EnumAppRoutes.Chats);
+      }
+    } catch (error) {
+      console.error(`LOGIN REQUEST ERROR: ${error}`);
+      throw error;
     }
 
     return response;
   }
 
   async logout() {
-    await AuthorizationAPI.logout();
-    window.store.dispatch({ user: null });
-    window.store.dispatch({ currentChatID: null });
-    window.router.go(EnumAppRoutes.Login);
+    let response;
+    let status;
+
+    try {
+      const request = await AuthorizationAPI.logout();
+      status = request.status;
+      response = request.response;
+
+      console.log(
+        `LOGIN LOGOUT: status ${status}; response ${JSON.stringify(response)}`
+      );
+
+      window.store.dispatch({ user: null });
+      window.store.dispatch({ currentChatID: null });
+      window.router.go(EnumAppRoutes.Login);
+    } catch (error) {
+      console.error(`LOGOUT REQUEST ERROR: ${error}`);
+      throw error;
+    }
+
+    return response;
   }
 }
 
