@@ -6,18 +6,27 @@ import {
 
 class ProfileServiceClass {
   async getUserProfile(userID: number) {
-    const request = await ProfileAPI.getProfileData(userID);
-    const { status, response } = request;
+    let status;
+    let response;
 
-    console.log(
-      `PROFILE GET ID(${userID}) REQUEST: status ${status}; response: ${JSON.stringify(
-        response
-      )}`
-    );
+    try {
+      const request = await ProfileAPI.getProfileData(userID);
+      status = request.status;
+      response = request.response;
 
-    if (!APIResponseHasError(response)) {
-      const user = transformProfileAPIResponseToUserData(response);
-      window.store.dispatch({ user });
+      console.log(
+        `PROFILE WITH ID(${userID}) GET REQUEST: status ${status}; response: ${JSON.stringify(
+          response
+        )}`
+      );
+
+      if (!APIResponseHasError(response)) {
+        const user = transformProfileAPIResponseToUserData(response);
+        window.store.dispatch({ user });
+      }
+    } catch (error) {
+      console.error(`PROFILE WITH ID(${userID}) GET REQUEST ERROR: ${error}`);
+      throw error;
     }
 
     return response;
@@ -25,35 +34,61 @@ class ProfileServiceClass {
 
   async changeUserProfile(
     data: TProfileChangeDTO,
-    afterRequestCallback: TAfterRequestCallback
+    afterRequestCallback?: TAfterRequestCallback
   ) {
-    const request = await ProfileAPI.changeProfile(data);
-    const { status, response } = request;
+    let status;
+    let response;
 
-    console.log(
-      `PROFILE CHANGE REQUEST: status ${status}; response: ${JSON.stringify(
-        response
-      )}`
-    );
+    try {
+      const request = await ProfileAPI.changeProfile(data);
+      status = request.status;
+      response = request.response;
 
-    afterRequestCallback(response);
+      console.log(
+        `PROFILE CHANGE REQUEST: status ${status}; response: ${JSON.stringify(
+          response
+        )}`
+      );
+
+      if (afterRequestCallback) {
+        await afterRequestCallback(response);
+      }
+    } catch (error) {
+      console.error(`PROFILE CHANGE REQUEST GET REQUEST ERROR: ${error}`);
+      throw error;
+    }
+
     return response;
   }
 
   async changeUserAvatar(
     avatarFormData: FormData,
-    afterRequestCallback: TAfterRequestCallback
+    afterRequestCallback?: TAfterRequestCallback
   ) {
-    const request = await ProfileAPI.changeAvatar(avatarFormData);
-    const { status, response } = request;
+    let status;
+    let response;
 
-    console.log(
-      `PROFILE CHANGE AVATAR REQUEST: status ${status}; response: ${JSON.stringify(
-        response
-      )}`
-    );
+    try {
+      const request = await ProfileAPI.changeAvatar(avatarFormData);
+      status = request.status;
+      response = request.response;
 
-    afterRequestCallback(response);
+      console.log(
+        `PROFILE CHANGE AVATAR REQUEST: status ${status}; response: ${JSON.stringify(
+          response
+        )}`
+      );
+
+      if (afterRequestCallback) {
+        await afterRequestCallback(response);
+      }
+    } catch (error) {
+      console.error(
+        `PROFILE CHANGE AVATAR REQUEST GET REQUEST ERROR: ${error}`
+      );
+      throw error;
+    }
+
     return response;
   }
 }

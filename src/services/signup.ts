@@ -5,16 +5,29 @@ export class SignUpServiceClass {
     data: TSignUpFormDTO,
     afterRequestCallback?: TAfterRequestCallback
   ) {
-    const request = await SignUpAPI.signup(data);
-    const { status, response } = request;
+    let status;
+    let response;
 
-    console.log(
-      `SIGN-UP REQUEST: status ${status}; response: ${JSON.stringify(response)}`
-    );
+    try {
+      const request = await SignUpAPI.signup(data);
+      status = request.status;
+      response = request.response;
 
-    if (afterRequestCallback) {
-      await afterRequestCallback(response);
+      console.log(
+        `SIGN UP REQUEST: status ${status}; response: ${JSON.stringify(
+          response
+        )}`
+      );
+
+      if (afterRequestCallback) {
+        await afterRequestCallback(response);
+      }
+    } catch (error) {
+      console.error(`SIGN UP REQUEST ERROR: ${error}`);
+      throw error;
     }
+
+    return response;
   }
 }
 
