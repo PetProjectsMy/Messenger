@@ -1,27 +1,28 @@
-import { transformMessageDTOtoAppMessage } from "utils/api";
-import { isNullish } from "utils/objects-handle";
+import { transformWebsocketMessageDTOtoAppMessage } from "utils/api";
+
+export type TChatWebSocketContructorArgs = {
+  userID: string;
+  chatID: string;
+  chatToken: string;
+};
 
 export class ChatWebSocket {
+  static readonly messagesGetLimit = 20;
+
   private userID: string;
 
   private chatID: string;
 
   private chatToken: string;
 
-  private socket: WebSocket;
+  protected socket: WebSocket;
 
-  constructor({
-    userID,
-    chatID,
-    chatToken,
-  }: {
-    userID: string;
-    chatID: string;
-    chatToken: string;
-  }) {
-    this.userID = userID;
-    this.chatID = chatID;
-    this.chatToken = chatToken;
+  protected allMessagesReceiver: (
+    messagesBatch: TWebsocketMessageDTO[]
+  ) => void = () => {};
+
+  constructor(argsObject: TChatWebSocketContructorArgs) {
+    Object.assign(this, argsObject);
     this._createSocket();
   }
 
@@ -31,6 +32,7 @@ export class ChatWebSocket {
     const socket = new WebSocket(
       `wss://ya-praktikum.tech/ws/chats/${userID}/${chatID}/${chatToken}`
     );
+
     this.socket = socket;
     const ping = setInterval(function () {
       socket.send(
@@ -51,38 +53,50 @@ export class ChatWebSocket {
       }
     });
 
-    socket.addEventListener("message", function (event) {
-      let message;
+    socket.addEventListener(
+      "message",
+      function (event) {
+        let message;
 
-      try {
-        message = JSON.parse(event.data);
-      } catch (err) {
+        try {
+          message = JSON.parse(event.data);
+        } catch (err) {
+          console.log(
+            `ERROR ON PARSING MESSAGE ${JSON.stringify(
+              message
+            )} ON CHAT(${chatID}) SOCKET`
+          );
+          return;
+        }
+
+        if (message.type === "pong" || message.type === "user connected") {
+          return;
+        }
+        if (Array.isArray(message)) {
+          this.allMessagesReceiver(message);
+          return;
+        }
+
         console.log(
-          `ERROR ON PARSING MESSAGE ${JSON.stringify(
+          `MESSAGE OF '${message.type}' TYPE RECEIVED: '${JSON.stringify(
             message
-          )} ON CHAT(${chatID}) SOCKET`
+          )}'`
         );
-        return;
-      }
 
-      if (message.type === "pong" || message.type === "user connected") {
-        return;
-      }
+        message = transformWebsocketMessageDTOtoAppMessage(message);
+        const messagesStatePath = `chatsMessages.${chatID}`;
 
-      console.log(`Message Received: '${JSON.stringify(message)}'`);
-      message = transformMessageDTOtoAppMessage(message);
-      const messagesStatePath = `chatsMessages.${chatID}`;
+        const currentMessages = window.store.chatHasMessages(chatID)
+          ? window.store.getStateValueByPath(messagesStatePath)
+          : [];
 
-      const currentMessages = window.store.chatHasMessages(chatID)
-        ? window.store.getStateValueByPath(messagesStatePath)
-        : [];
-
-      window.store.setStateByPath(
-        messagesStatePath,
-        [message, ...currentMessages],
-        true
-      );
-    });
+        window.store.setStateByPath(
+          messagesStatePath,
+          [message, ...currentMessages],
+          true
+        );
+      }.bind(this)
+    );
 
     socket.addEventListener("error", () => {
       clearInterval(ping);
@@ -91,5 +105,26 @@ export class ChatWebSocket {
 
   public send(content: string, type: string = "message") {
     this.socket.send(JSON.stringify({ content, type }));
+  }
+
+  public getMessages(offset: number) {
+    return this.socket.send(
+      JSON.stringify({
+        content: offset.toString(),
+        type: "get old",
+      })
+    );
+  }
+
+  public async waitSocketConnection() {
+    await new Promise<void>((resolve) => {
+      const awaiter = setInterval(() => {
+        if (this.socket.readyState === 1) {
+          resolve();
+          clearInterval(awaiter);
+          console.log(`SOCKET OF CHAT(${this.chatID}) CONNECTED`);
+        }
+      }, 500);
+    });
   }
 }

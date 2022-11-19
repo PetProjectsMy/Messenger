@@ -10,4 +10,4 @@ export {
   transformChatsGetResponseToChatsData,
   transformChatGetTokenResponseToToken,
 } from "./from-api-data-transformers";
-export { transformMessageDTOtoAppMessage } from "./from-api-data-transformers";
+export { transformWebsocketMessageDTOtoAppMessage } from "./from-api-data-transformers";

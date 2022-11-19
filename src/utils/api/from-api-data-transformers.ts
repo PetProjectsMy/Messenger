@@ -55,8 +55,8 @@ export function transformChatGetTokenResponseToToken(
   return response.token;
 }
 
-export function transformMessageDTOtoAppMessage(
-  message: TChatMessageDTO
+export function transformWebsocketMessageDTOtoAppMessage(
+  message: TWebsocketMessageDTO
 ): TAppChatMessage {
   return {
     userID: message.user_id.toString(),

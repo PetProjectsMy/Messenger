@@ -1,7 +1,8 @@
 import { Store } from "core/store";
 import { PathRouter } from "core/router";
 import { AuthorizationService } from "services";
-import { afterAuthorizationHandler } from "services/authorization";
+import { APIResponseHasError } from "utils/api";
+import { initAppData } from "./init-app-data";
 
 export async function initApp() {
   console.log(`INIT APP STATRTING`);
@@ -13,7 +14,10 @@ export async function initApp() {
   router.init();
   store.init();
 
-  await afterAuthorizationHandler.call(AuthorizationService);
+  const userResponse = await AuthorizationService.getUser();
+  if (!APIResponseHasError(userResponse)) {
+    await initAppData(userResponse.id);
+  }
 
   let initPath = window.location.pathname;
   const { search } = window.location;

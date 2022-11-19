@@ -1,5 +1,5 @@
 declare global {
-  export type TChatMessageDTO = {
+  export type TWebsocketMessageDTO = {
     content: string;
     type: string;
     user_id: number;

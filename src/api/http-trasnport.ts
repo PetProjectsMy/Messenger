@@ -44,7 +44,7 @@ function queryStringify(data: any) {
 type THttpMethod = (
   url: string,
   options?: TRequestOptionsWithoutMethod
-) => Promise<unknown>;
+) => Promise<any>;
 
 class HTTPTransport {
   baseURL: string = "";

@@ -54,6 +54,12 @@ export class SocketsCreatorClass {
       return acc;
     }, {} as TAppChatsSockets);
 
+    await Promise.all(
+      Object.values(chatsSockets!).map(async (socket) =>
+        socket.waitSocketConnection()
+      )
+    );
+
     window.store.dispatch({ chatsSockets });
   }
 }
