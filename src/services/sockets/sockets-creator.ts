@@ -1,6 +1,6 @@
 import { transformChatGetTokenResponseToToken } from "utils/api/from-api-data-transformers";
 import { ChatsAPI } from "api";
-import { ChatWebSocket } from "./socket-class";
+import { ChatMessagesHandler } from "./chat-messages-handler";
 
 export class SocketsCreatorClass {
   async getChatToken(
@@ -36,7 +36,7 @@ export class SocketsCreatorClass {
 
     const chatTokenResponse = await this.getChatToken(chatID);
     const chatToken = transformChatGetTokenResponseToToken(chatTokenResponse);
-    return new ChatWebSocket({ userID, chatID, chatToken });
+    return new ChatMessagesHandler({ userID, chatID, chatToken });
   }
 
   async createAllChatsSockets() {
@@ -49,7 +49,7 @@ export class SocketsCreatorClass {
           return [chatID, await this.createChatSocket({ userID, chatID })];
         })
       )
-    ).reduce((acc, [chatID, socket]: [string, ChatWebSocket]) => {
+    ).reduce((acc, [chatID, socket]: [string, ChatMessagesHandler]) => {
       acc![chatID] = socket;
       return acc;
     }, {} as TAppChatsSockets);

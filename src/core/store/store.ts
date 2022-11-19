@@ -8,6 +8,7 @@ import {
   isNullish,
   setPropByPath,
 } from "utils/objects-handle";
+import { type ChatMessagesHandler } from "services/sockets";
 import { EnumStoreEvents } from "./enum-store-events";
 import { EventBus } from "../event-bus";
 import * as StateProxies from "./state-proxies/main-states-proxies";
@@ -88,7 +89,11 @@ export class Store {
     return page.constructor.name;
   }
 
-  public getSocketByChatID(chatID: string, doLog = false) {
+  public getSocketByChatID(chatID?: string, doLog = false) {
+    if (chatID === undefined) {
+      return this.getStateValueByPath(`chatsSockets`, doLog);
+    }
+
     return this.getStateValueByPath(`chatsSockets.${chatID}`, doLog);
   }
 
@@ -154,7 +159,7 @@ export class Store {
     });
   }
 
-  public setSocketByChatID(chatID: string, socket: WebSocket) {
+  public setSocketByChatID(chatID: string, socket: ChatMessagesHandler) {
     return this.setStateByPath(`chatsSockets.${chatID}`, socket, true);
   }
 

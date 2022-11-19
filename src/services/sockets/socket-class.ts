@@ -1,25 +1,23 @@
 import { transformWebsocketMessageDTOtoAppMessage } from "utils/api";
 
-export type TChatWebSocketContructorArgs = {
+type TChatWebSocketContructorArgs = {
   userID: string;
   chatID: string;
   chatToken: string;
 };
 
 export class ChatWebSocket {
-  static readonly messagesGetLimit = 20;
+  protected userID: string;
 
-  private userID: string;
+  public chatID: string;
 
-  private chatID: string;
-
-  private chatToken: string;
+  protected chatToken: string;
 
   protected socket: WebSocket;
 
-  protected allMessagesReceiver: (
-    messagesBatch: TWebsocketMessageDTO[]
-  ) => void = () => {};
+  protected messagesArrayHander: Nullable<
+    (messagesBatch: TWebsocketMessageDTO[]) => void
+  > = null;
 
   constructor(argsObject: TChatWebSocketContructorArgs) {
     Object.assign(this, argsObject);
@@ -55,7 +53,7 @@ export class ChatWebSocket {
 
     socket.addEventListener(
       "message",
-      function (event) {
+      function (event: any) {
         let message;
 
         try {
@@ -72,8 +70,8 @@ export class ChatWebSocket {
         if (message.type === "pong" || message.type === "user connected") {
           return;
         }
-        if (Array.isArray(message)) {
-          this.allMessagesReceiver(message);
+        if (Array.isArray(message) && this.messagesArrayHander) {
+          this.messagesArrayHander(message);
           return;
         }
 
@@ -107,7 +105,7 @@ export class ChatWebSocket {
     this.socket.send(JSON.stringify({ content, type }));
   }
 
-  public getMessages(offset: number) {
+  public getMessagesByOffset(offset: number) {
     return this.socket.send(
       JSON.stringify({
         content: offset.toString(),

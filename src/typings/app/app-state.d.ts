@@ -1,6 +1,6 @@
 import { EnumAppPages } from "pages";
 import { type Store } from "core/store";
-import { type ChatWebSocket } from "services/sockets/socket-class";
+import { type ChatMessagesHandler } from "services/sockets";
 import { PathRouter } from "core/router/path-router";
 
 declare global {
@@ -37,7 +37,7 @@ declare global {
 
   export type TAppChatUsersData = Record<string, TAppChatUserData>;
 
-  export type TAppChatsSockets = Nullable<Record<string, ChatWebSocket>>;
+  export type TAppChatsSockets = Nullable<Record<string, ChatMessagesHandler>>;
 
   export type TAppChatMessage = {
     content: string;
@@ -45,7 +45,7 @@ declare global {
     time: string;
   };
 
-  export type TAppChatMessages = Record<string, TAppChatMessage>;
+  export type TAppChatMessages = Record<string, TAppChatMessage[]>;
 
   export type TAppState = {
     page: Nullable<EnumAppPages>;
