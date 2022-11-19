@@ -12,7 +12,7 @@ export const enum EnumAppRoutes {
 
 export const AppRoutesData = {
   [EnumAppRoutes.NavigationPage]: {
-    path: "/navigtion",
+    path: "/navigation",
     block: EnumAppPages.Navigation,
     needAuthorization: false,
   },
