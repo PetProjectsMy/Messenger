@@ -2,6 +2,10 @@
   publish = "dist"
 
 [[redirects]]
+  from = "/navigation"
+  to = "/index.html?path=navigation"
+
+[[redirects]]
   from = "/signup"
   to = "/index.html?path=signup"
 
