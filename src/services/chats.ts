@@ -10,23 +10,34 @@ import { objectWithoutKey } from "utils/objects-handle";
 import { SocketsCreator } from "services";
 
 export class ChatsServiceClass {
-  async getChats(afterRequestCallback: TAfterRequestCallback = () => {}) {
-    const request = await ChatsAPI.getChats();
-    const { status, response } = request;
+  async getChats(afterRequestCallback?: TAfterRequestCallback) {
+    let status;
+    let response;
 
-    console.log(
-      `GET CHATS REQUEST: status ${status}; response ${JSON.stringify(
-        response
-      )}`
-    );
+    try {
+      const request = await ChatsAPI.getChats();
+      status = request.status;
+      response = request.response;
 
-    if (!APIResponseHasError(response)) {
-      window.store.dispatch({
-        chats: transformChatsGetResponseToChatsData(response),
-      });
+      console.log(
+        `GET CHATS REQUEST: status ${status}; response ${JSON.stringify(
+          response
+        )}`
+      );
+
+      if (afterRequestCallback) {
+        await afterRequestCallback(response);
+      }
+
+      if (!APIResponseHasError(response)) {
+        window.store.dispatch({
+          chats: transformChatsGetResponseToChatsData(response),
+        });
+      }
+    } catch (error) {
+      console.error(`GET CHATS REQUEST ERROR: ${error}`);
+      throw error;
     }
-
-    await afterRequestCallback(response);
 
     return response;
   }
@@ -35,25 +46,34 @@ export class ChatsServiceClass {
     data: TCreateChatDTO,
     afterRequestCallback?: TAfterRequestCallback
   ) {
-    const request = await ChatsAPI.createChat(data);
-    const { status, response } = request;
+    let status;
+    let response;
 
-    console.log(
-      `CREATE CHAT REQUEST: status ${status}; response ${JSON.stringify(
-        response
-      )}`
-    );
+    try {
+      const request = await ChatsAPI.createChat(data);
+      status = request.status;
+      response = request.response;
 
-    if (afterRequestCallback) {
-      await afterRequestCallback(response);
-    }
+      console.log(
+        `CREATE CHAT REQUEST: status ${status}; response ${JSON.stringify(
+          response
+        )}`
+      );
 
-    if (!APIResponseHasError(response)) {
-      const chatID = (response as TChatCreateAPIResponse).id.toString();
-      const socket = await SocketsCreator.createChatSocket({ chatID });
-      window.store.setSocketByChatID(chatID, socket);
+      if (afterRequestCallback) {
+        await afterRequestCallback(response);
+      }
 
-      await this.getChats();
+      if (!APIResponseHasError(response)) {
+        const chatID = (response as TChatCreateAPIResponse).id.toString();
+        const socket = await SocketsCreator.createChatSocket({ chatID });
+        window.store.setSocketByChatID(chatID, socket);
+
+        await this.getChats();
+      }
+    } catch (error) {
+      console.error(`CREATE CHAT REQUEST ERROR: ${error}`);
+      throw error;
     }
 
     return response;
@@ -63,26 +83,38 @@ export class ChatsServiceClass {
     chatID: string,
     afterRequestCallback?: TAfterRequestCallback
   ) {
-    const request = await ChatsAPI.deleteChat(
-      transformChatIDToDeleteAPI(chatID)
-    );
-    const { status, response } = request;
+    let status;
+    let response;
 
-    console.log(
-      `DELETE CHAT(${chatID}) REQUEST: status ${status}; response ${JSON.stringify(
-        response
-      )}`
-    );
+    try {
+      const request = await ChatsAPI.deleteChat(
+        transformChatIDToDeleteAPI(chatID)
+      );
+      status = request.status;
+      response = request.response;
 
-    if (afterRequestCallback) {
-      await afterRequestCallback(response);
-    }
+      console.log(
+        `DELETE CHAT(${chatID}) REQUEST: status ${status}; response ${JSON.stringify(
+          response
+        )}`
+      );
 
-    if (!APIResponseHasError(response)) {
-      const currentChats = window.store.getChatsDataByPath();
-      const newChats = objectWithoutKey(currentChats, chatID) as TAppChatsData;
-      window.store.dispatch({ chats: newChats });
-      window.store.dispatch({ currentChatID: null });
+      if (afterRequestCallback) {
+        await afterRequestCallback(response);
+      }
+
+      if (!APIResponseHasError(response)) {
+        const currentChats = window.store.getChatsDataByPath();
+        const newChats = objectWithoutKey(
+          currentChats,
+          chatID
+        ) as TAppChatsData;
+        window.store.dispatch({ chats: newChats });
+        window.store.dispatch({ currentChatID: null });
+      }
+    } catch (error) {
+      console.error(`DELETE CHAT(${chatID}) REQUEST ERROR: ${error}`);
+      throw error;
     }
 
     return response;
@@ -92,17 +124,26 @@ export class ChatsServiceClass {
     chatID: string,
     afterRequestCallback?: TAfterRequestCallback
   ) {
-    const request = await ChatsAPI.getChatUsers(chatID);
-    const { status, response } = request;
+    let status;
+    let response;
 
-    console.log(
-      `GET CHAT(${chatID}) USERS REQUEST: status ${status}; response ${JSON.stringify(
-        response
-      )}`
-    );
+    try {
+      const request = await ChatsAPI.getChatUsers(chatID);
+      status = request.status;
+      response = request.response;
 
-    if (afterRequestCallback) {
-      await afterRequestCallback(response);
+      console.log(
+        `GET CHAT(${chatID}) USERS REQUEST: status ${status}; response ${JSON.stringify(
+          response
+        )}`
+      );
+
+      if (afterRequestCallback) {
+        await afterRequestCallback(response);
+      }
+    } catch (error) {
+      console.error(`GET CHAT(${chatID}) REQUEST ERROR: ${error}`);
+      throw error;
     }
 
     return response;
@@ -112,32 +153,45 @@ export class ChatsServiceClass {
     data: TAddChatUsersDTO,
     afterRequestCallback?: TAfterRequestCallback
   ) {
-    const request = await ChatsAPI.addUsersToChat(data);
-    const { status, response } = request;
+    let status;
+    let response;
     const chatID = data.chatId;
-    const usersList = data.users;
 
-    console.log(
-      `ADD USERS TO CHAT(${chatID}) REQUEST: status ${status}; response ${JSON.stringify(
-        response
-      )}`
-    );
+    try {
+      const request = await ChatsAPI.addUsersToChat(data);
+      status = request.status;
+      response = request.response;
 
-    if (afterRequestCallback) {
-      await afterRequestCallback(response);
-    }
+      const usersList = data.users;
 
-    if (!APIResponseHasError(response)) {
-      const responseChatUsers = (await this.getChatUsers(
-        chatID.toString()
-      )) as TChatGetUsersAPIResponse;
+      console.log(
+        `ADD USERS TO CHAT(${chatID}) REQUEST: status ${status}; response ${JSON.stringify(
+          response
+        )}`
+      );
 
-      const usersData =
-        transformChatUsersGetResponseToChatsUsersData(responseChatUsers);
+      if (afterRequestCallback) {
+        await afterRequestCallback(response);
+      }
 
-      usersList.forEach((userID) => {
-        window.store.setStateByPath(`chatsUsers.${userID}`, usersData[userID]);
-      });
+      if (!APIResponseHasError(response)) {
+        const responseChatUsers = (await this.getChatUsers(
+          chatID.toString()
+        )) as TChatGetUsersAPIResponse;
+
+        const usersData =
+          transformChatUsersGetResponseToChatsUsersData(responseChatUsers);
+
+        usersList.forEach((userID) => {
+          window.store.setStateByPath(
+            `chatsUsers.${userID}`,
+            usersData[userID]
+          );
+        });
+      }
+    } catch (error) {
+      console.error(`ADD USERS TO CHAT(${chatID}) REQUEST ERROR: ${error}`);
+      throw error;
     }
 
     return response;
@@ -147,23 +201,33 @@ export class ChatsServiceClass {
     avatarPutForm: FormData,
     afterRequestCallback?: TAfterRequestCallback
   ) {
-    const request = await ChatsAPI.changeAvatar(avatarPutForm);
-    const { status, response } = request;
-    const chatID = avatarPutForm.get("chatId");
+    let status;
+    let response;
+    let chatID;
 
-    console.log(
-      `CHANGE CHAT(${chatID}) AVATAR REQUEST: status ${status}; response ${JSON.stringify(
-        response
-      )}`
-    );
+    try {
+      const request = await ChatsAPI.changeAvatar(avatarPutForm);
+      status = request.status;
+      response = request.response;
+      chatID = avatarPutForm.get("chatId");
 
-    if (afterRequestCallback) {
-      await afterRequestCallback(response);
-    }
+      console.log(
+        `CHANGE CHAT(${chatID}) AVATAR REQUEST: status ${status}; response ${JSON.stringify(
+          response
+        )}`
+      );
 
-    if (!APIResponseHasError(response)) {
-      const avatar = transformAvatarURL(response.avatar);
-      window.store.setStateByPath(`chats.${chatID}.avatar`, avatar);
+      if (afterRequestCallback) {
+        await afterRequestCallback(response);
+      }
+
+      if (!APIResponseHasError(response)) {
+        const avatar = transformAvatarURL(response.avatar);
+        window.store.setStateByPath(`chats.${chatID}.avatar`, avatar);
+      }
+    } catch (error) {
+      console.error(`CHANGE CHAT(${chatID}) AVATAR REQUEST ERROR: ${error}`);
+      throw error;
     }
 
     return response;
