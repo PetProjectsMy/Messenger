@@ -1,5 +1,5 @@
 import { Button } from "components/buttons";
-import { Block } from "core/dom/block";
+import { Block } from "core/dom";
 import template from "./template";
 
 export class ModalWindow extends Block {

@@ -1,4 +1,4 @@
-import { Block } from "core/dom/block";
+import { Block } from "core/dom";
 import { Link } from "components/link";
 import { TextComponent } from "components/text-component";
 import { ImageComponent } from "components/image";

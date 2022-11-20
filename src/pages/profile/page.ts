@@ -1,4 +1,4 @@
-import { Block } from "core/dom/block";
+import { Block } from "core/dom";
 import avatarImagePlaceholder from "static/avatar-placeholder-profile.png";
 import { Input } from "components/inputs";
 import { ImageComponent } from "components/image";

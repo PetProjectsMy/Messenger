@@ -1,4 +1,4 @@
-import { type Block } from "core/dom/block";
+import { type Block } from "core/dom";
 import { Button } from "components/buttons";
 import { type Input } from "components/inputs";
 import { formSubmitButtonCallback } from "components/inputs/input-form";

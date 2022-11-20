@@ -1,4 +1,4 @@
-import { type Block } from "core/dom/block";
+import { type Block } from "core/dom";
 import type { TEventHandler } from "core/event-bus";
 
 declare global {

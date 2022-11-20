@@ -1,4 +1,4 @@
-import { Block } from "core/dom/block";
+import { Block } from "core/dom";
 import template from "./template";
 
 export type TInputProps = WithComponentCommonProps<{
