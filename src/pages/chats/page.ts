@@ -1,32 +1,76 @@
-import Block from "core/block";
-import { HomeButton, ImageElement } from "components";
-import avatarImagePlaceholder from "static/avatar-placeholder-chats.svg";
-import { chatsPageTemplate } from "./template";
-import ChatComponent from "./chat-component";
+import { WithStoreBlock } from "hocs/components";
+import { getDescendantByPath } from "utils/pages";
+import { ModalWindow } from "./components/modals";
+import template from "./template";
+import {
+  ChatsPageMainSection,
+  ChatsPageNavigationSection,
+  ChatsPageSideMenu,
+} from "./components";
 
-export class ChatsPage extends Block {
+export class ChatsPage extends WithStoreBlock {
   constructor() {
-    const children: { chats: ChatComponent[] } & ComponentChildren = {
-      chats: [],
-    };
+    const children = {} as TComponentChildren;
+    children.navigationSection = new ChatsPageNavigationSection();
+    children.chatSection = new ChatsPageMainSection();
+    children.sideMenu = new ChatsPageSideMenu();
+    children.modalWindow = ModalWindow;
 
-    for (let i = 1; i <= 10; ++i) {
-      children.chats.push(new ChatComponent());
-    }
-
-    children.homeButton = new HomeButton();
-    children.avatarImage = new ImageElement({
-      props: {
-        src: avatarImagePlaceholder,
-        alt: "avatar placeholder",
-        componentName: "Avatar Image",
-      },
+    super({
+      componentName: "Chats Page",
+      children,
     });
+  }
 
-    super({ children, props: { componentName: "Chats Page" } });
+  protected _afterPropsAssignHook() {
+    super._afterPropsAssignHook();
+
+    const functionalButton = this.getChildByPath(
+      "chatSection.headerSection.functionalButton"
+    );
+    functionalButton.refs.sideMenu = this.getChildByPath("sideMenu");
+
+    this.refs.messagesDisplaySection = this.getChildByPath(
+      "chatSection.messagesDisplaySection"
+    );
+
+    this.refs.attachmentButton = this.getChildByPath(
+      "chatSection.messageInputSection.attachmentButton"
+    );
+
+    this.refs.messageInput = this.getChildByPath(
+      "chatSection.messageInputSection.messageInput"
+    );
+
+    this.refs.sendMessageButton = this.getChildByPath(
+      "chatSection.messageInputSection.sendMessageButton"
+    );
+
+    this.refs.chooseChatAvatarButton = this.getChildByPath(
+      "sideMenu.avatarChooseButton.chooseButton"
+    );
+
+    this.refs.addChatUsersButton = this.getChildByPath(
+      "sideMenu.addChatUsersButton"
+    );
+
+    this.refs.deleteChatButton = this.getChildByPath(
+      "sideMenu.deleteChatButton"
+    );
+
+    const chatsList = this.getChildByPath("navigationSection.chatsList");
+    this.refs.chatsList = chatsList;
+
+    const chats = getDescendantByPath<TComponentChildArray>(
+      chatsList.children,
+      "chats"
+    );
+    chats.forEach((chat: any) => {
+      this.refs[`chat-${chat.chatID}`] = chat;
+    });
   }
 
   protected render(): string {
-    return chatsPageTemplate;
+    return template;
   }
 }

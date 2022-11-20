@@ -1,0 +1,1 @@
+export { ChatsPageNavigationSection } from "./component";

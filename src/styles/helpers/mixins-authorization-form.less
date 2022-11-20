@@ -1,7 +1,13 @@
 @import "mixins-common";
 @import "variables";
 
-.mixin-form-container(@flex-form, @flex-fieldset, @fields-num, @fields-total-margin: 7%) {
+.mixin-form-container(
+  @flex-form, 
+  @flex-fieldset, 
+  @fields-num, 
+  @fields-total-margin: 7%, 
+  @submit-button-section-flex: 1
+) {
   &:extend(.centered-container);
   &:extend(.vertical-block);
   .mixin-width-by-device(0.9, 0.5, 500px);
@@ -23,7 +29,7 @@
       flex: 100% - @flex-fieldset;
     }
 
-    @margin: calc(@fields-total-margin / (2 * @fields-num + 1));
+    @margin: calc(@fields-total-margin / (@fields-num + 2));
     fieldset {
       flex: @flex-fieldset;
       justify-content: space-evenly;
@@ -31,18 +37,23 @@
       & > * {
         width: 100%;
         &:extend(.vertical-block);
-        flex: 1;
-        margin-top: @margin;
       }
 
-      .form-field {
+      span.api-error {
+        flex: 0.5;
+      }
+
+      .input-with-validation-block {
+        flex: 1;
+        margin-top: @margin;
+
         & > * {
           width: 95%;
           text-align: center;
         }
 
         input {
-          height: 80%;
+          height: 100%;
         }
 
         span {
@@ -51,8 +62,23 @@
         }
       }
 
+      span.api-success {
+        color: green;
+      }
+
+      span.api-error {
+        color: red;
+      }
+
+      span.api-success,
+      span.api-error {
+        font-size: 1.2em;
+        margin: 0;
+      }
+
       .submit-button-section {
-        margin-bottom: @margin;
+        flex: @submit-button-section-flex;
+        margin: @margin 0;
 
         .submit-button {
           height: 100%;

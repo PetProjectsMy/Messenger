@@ -1,23 +1,19 @@
-import Block from "core/block";
+import { Block } from "core/dom";
 import template from "./template";
 
-type LinkProps = {
+export type TLinkProps = WithComponentCommonProps<{
   label: string;
-  href?: string;
-} & ComponentCommonProps;
+  htmlAttributes?: {
+    href?: string;
+  };
+}>;
 
-export class Link extends Block {
-  protected props: LinkProps;
+export class Link extends Block<TLinkProps> {
+  protected _afterPropsAssignHook(): void {
+    super._afterPropsAssignHook();
 
-  constructor({
-    props,
-    refs = {},
-  }: {
-    props: LinkProps;
-    refs?: ComponentRefs;
-  }) {
-    props.componentName = props.componentName ?? "Link";
-    super({ props, refs });
+    //  eslint-disable-next-line no-script-url
+    this.props.htmlAttributes!.href ??= "javascript:void(0);";
   }
 
   protected render(): string {

@@ -1,6 +1,5 @@
-import { MainPage } from "core/renderDOM";
-import { NavigationPage } from "pages";
+import { initApp } from "services/init-app";
 
 document.addEventListener("DOMContentLoaded", () => {
-  MainPage.component = new NavigationPage();
+  initApp();
 });

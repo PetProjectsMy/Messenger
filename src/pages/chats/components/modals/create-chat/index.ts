@@ -1,0 +1,1 @@
+export { CreateChatModalWindow } from "./component";

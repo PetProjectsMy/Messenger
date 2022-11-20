@@ -1,0 +1,1 @@
+export { ChatSectionHeader } from "./component";

@@ -1,102 +1,74 @@
-import Block from "core/block";
+import { Block } from "core/dom";
 import avatarImagePlaceholder from "static/avatar-placeholder-profile.png";
-import { Button, HomeButton, ImageElement, Input } from "components";
-import { dataFieldTemplate, pageTemplate } from "./template";
+import { ImageComponent, Input } from "components";
+import { HomeButton } from "components/buttons";
+import { WithStore } from "hocs";
+import template from "./template";
+import { DataChangeButton, ProfilePageInputForm } from "./components";
+import { EnumInputFields } from "./components/data-form";
+import { MapInputFieldToUserDataRecord } from "./components/data-form/fields";
+import { AvatarUploadForm } from "./components/avatar-upload-form";
 
-type DataFieldProps = {
-  dataType: string;
-  inputPlaceholder: string;
-} & ComponentCommonProps;
+type TProfilePageProps = WithComponentCommonProps<{ userID: number }>;
+const ProfilePageBlock = WithStore(Block<TProfilePageProps>);
 
-class DataField extends Block {
-  constructor(props: DataFieldProps) {
-    const children: ComponentChildren = {};
-    const { dataType, inputPlaceholder } = props;
-    children.dataInput = new Input({
-      props: {
-        value: inputPlaceholder,
-        htmlClass: "data-input",
-        disabledAttr: true,
-      },
-    });
-
-    super({ props: { dataType }, children });
-  }
-
-  protected render(): string {
-    return dataFieldTemplate;
-  }
-}
-
-export class ProfilePage extends Block {
+export class ProfilePage extends ProfilePageBlock {
   constructor() {
-    const children: ComponentChildren = {};
+    const children: TComponentChildren = {};
 
-    children.avatarImage = new ImageElement({
+    const storeAvatar = window.store.getUserDataByPath("avatar");
+    const imageSource = storeAvatar || avatarImagePlaceholder;
+    const avatarImage = new ImageComponent({
       props: {
-        src: avatarImagePlaceholder,
-        alt: "avatar placeholder",
-        componentName: "Avatar Image",
-      },
-    });
-
-    const changeButtonRefs: ComponentRefs = {};
-    children.profileDataFields = [];
-    [
-      ["email", "email", "email@example.com"],
-      ["login", "login", "ExampleLogin"],
-      ["first name", "first_name", "Name"],
-      ["second name", "second_name", "Surname"],
-      ["chat nickname", "display_name", "Chat Nickname"],
-      ["phone", "phone", "8 (777) 888 77 88"],
-    ].forEach(([dataType, htmlName, inputPlaceholder]) => {
-      const dataField: DataField = new DataField({
-        componentName: `${dataType} field`,
-        htmlName,
-        inputPlaceholder,
-        dataType,
-      });
-      (children.profileDataFields as DataField[]).push(dataField);
-
-      changeButtonRefs[htmlName] = dataField;
-    });
-
-    children.homeButton = new HomeButton();
-
-    children.changeDataButton = new Button({
-      state: {
-        mode: "save",
-      },
-      refs: changeButtonRefs,
-      props: {
-        componentName: "change/save data button",
-        label: "change data",
-        htmlClass: "change-data-button",
-        events: {
-          click: [
-            function changeMode() {
-              if (this.state.mode === "save") {
-                this.props.label = "save data";
-                this.state.mode = "change";
-              } else {
-                this.props.label = "change data";
-                this.state.mode = "save";
-              }
-
-              Object.values(this.refs).forEach((inputField: Input) => {
-                const inputProps = inputField.children.dataInput.props;
-                inputProps.disabledAttr = !inputProps.disabledAttr;
-              });
-            },
-          ],
+        htmlAttributes: {
+          src: imageSource,
+          alt: "Profile Avatar",
         },
       },
     });
+    children.avatarImage = avatarImage;
+    children.avatarUploadForm = new AvatarUploadForm(avatarImage);
 
-    super({ children });
+    children.profileDataForm = new ProfilePageInputForm();
+    children.homeButton = new HomeButton();
+
+    const refs = {} as TComponentRefs;
+
+    super({ children, refs });
   }
 
   protected render(): string {
-    return pageTemplate;
+    return template;
+  }
+
+  protected _afterPropsAssignHook(): void {
+    super._afterPropsAssignHook();
+
+    this.children.changeDataButton = new DataChangeButton({
+      form: this.children.profileDataForm as Block,
+    });
+    this.props.userID = this.store.getUserDataByPath("id") as number;
+  }
+
+  public updateUserInfo() {
+    const userData = this.store.getUserDataByPath() as TAppUserData;
+
+    Object.entries((this.children.profileDataForm as Block).refs).forEach(
+      ([inputName, inputBlock]: [EnumInputFields, Input]) => {
+        const recordName = MapInputFieldToUserDataRecord[inputName];
+        inputBlock.setPropByPath(
+          "htmlAttributes.value",
+          `${userData[recordName]}`
+        );
+      }
+    );
+  }
+
+  public updateUserAvatar() {
+    const newAvatar = this.store.getUserDataByPath("avatar") as string;
+    (this.children.avatarImage as ImageComponent).setPropByPath(
+      "htmlAttributes.src",
+      newAvatar
+    );
   }
 }

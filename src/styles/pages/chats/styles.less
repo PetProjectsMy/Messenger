@@ -1,0 +1,44 @@
+@import "../../helpers/common.less";
+@import "./navigation-section.less";
+@import "./main-section.less";
+@import "./side-menu.less";
+@import "./modal-inputs.less";
+
+@navigation-section-flex: 28%;
+@navigation-section-header-flex: 12%;
+
+@main-section-flex: 100% - @navigation-section-flex;
+@main-section-header-flex: @navigation-section-header-flex * 0.5;
+@message-input-section-flex: @navigation-section-header-flex;
+
+.chats-page {
+  width: 100%;
+  height: 100vh;
+  &:extend(.horizontal-block);
+
+  & > * {
+    height: 100%;
+  }
+
+  .navigation-section-mixin(
+      @flex: @navigation-section-flex, 
+      @header-section-flex: @navigation-section-header-flex
+  );
+
+  @main-section-background-color: aliceblue;
+  .main-section-mixin(
+      @flex: @main-section-flex,
+      @header-section-flex: @main-section-header-flex,
+      @message-input-section-flex: @message-input-section-flex,
+      @background-color: @main-section-background-color
+  );
+
+  @button-height: 100vh * (@main-section-header-flex / 100%);
+  @side-menu-background-color: darken(@main-section-background-color, 20%);
+  .side-menu-mixin(
+      @button-height: @button-height,
+      @background-color: @side-menu-background-color
+  );
+
+  .add-chat-modal-mixin();
+}

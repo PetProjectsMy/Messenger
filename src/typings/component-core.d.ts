@@ -1,49 +1,55 @@
-import { InputValidator } from "components";
-import Block from "core/block";
+import { Block } from "core/dom";
+import type { EventHandler } from "core/event-bus";
 
 declare global {
-  export type ComponentEventListener = EventListener | InputValidator;
+  export type ComponentEventHandler = EventHandler;
 
-  export type ComponentWrapper = {
+  export type TComponentWrapper = {
     componentAlias: string;
     htmlWrapperTemplate: string;
   };
 
   export type ComponentOptionalProps = {
-    componentName?: string;
-    htmlWrapper?: ComponentWrapper;
-    hmtlWrapped?: boolean;
-    events?: Record<string, ComponentEventListener[]>;
-    refs?: ComponentRefs;
-    state?: ComponentState;
+    events?: Record<string, ComponentEventHandler[]>;
+    htmlClasses?: string[];
+    htmlStyle?: {
+      "background-image"?: any;
+      display?: "none" | "block";
+    };
+    htmlWrapper?: TComponentWrapper;
   };
 
-  type HTMLElementProps = {
-    htmlClass?: string;
-    htmlId?: string;
-    htmlName?: string;
-  };
-  type WithHTMLProps<PropsType> = PropsType & HTMLElementProps;
-
-  export type ComponentCommonProps = WithHTMLProps<ComponentOptionalProps>;
-
-  export type ComponentProps = {
-    [prop: string]:
-      | string
-      | boolean
-      | Record<string, Function[] | Function>
-      | ComponentRefs
-      | ComponentState
-      | ComponentProps;
+  type TCommonHtmlAtrributes = {
+    htmlAttributes?: {
+      name?: string;
+      id?: string;
+    };
   };
 
-  export type ComponentChildren = Record<string, Block | Block[]>;
+  export type WithCommonHtmlAttributes<THtmlAttrs> = TCommonHtmlAtrributes &
+    THtmlAttrs;
 
-  export type ComponentRefs = Record<string, Block>;
+  export type TComponentCommonProps = TCommonHtmlAtrributes &
+    ComponentOptionalProps;
 
-  export type ComponentState = Record<string, unknown>;
+  export type WithComponentCommonProps<Tprops> = Tprops & TComponentCommonProps;
 
-  export type PageProxy = { component: Nullable<Block> };
+  export type TComponentChild = Block;
+
+  export type TComponentChildArray = TComponentChild[];
+
+  export type TComponentChildren = Record<
+    string,
+    TComponentChild | TComponentChildArray
+  >;
+
+  export type TComponentRefs = Record<string, Block>;
+
+  export type TComponentState = Record<string, unknown>;
+
+  export type TComponentHelpers = Record<string, unknown>;
+
+  export type TEventListener = EventListener;
 }
 
 export {};

@@ -1,7 +1,12 @@
 @import "../helpers/mixins-authorization-form";
 
 .login-page {
-  .mixin-form-container(@flex-form: 85%, @flex-fieldset: 80%, @fields-num: 3);
+  .mixin-form-container(
+    @flex-form: 85%, 
+    @flex-fieldset: 80%, 
+    @fields-num: 2, 
+    @submit-button-section-flex: 0.7
+  );
   .mixin-height-by-device(0.5, 0.5, 0.5, 350px);
 
   & legend h1 {

@@ -1,57 +1,59 @@
-import Block from "core/block";
-import { Link } from "components";
-import { LoginPage, SignUpPage, ChatsPage, ProfilePage } from "pages";
-
-import { MainPage } from "core/renderDOM";
+import { LogoutButton } from "components/buttons";
+import { WithStoreBlock, WithRouterLink } from "hocs/components";
 import template from "./template";
+import { EnumNavigationPageLinks, MapNavigationLinkToProps } from "./links";
 
-export class NavigationPage extends Block {
-  static readonly linkIDToPageMap: Record<string, typeof Block> = {
-    login: LoginPage,
-    register_account: SignUpPage,
-    chats: ChatsPage,
-    profile: ProfilePage,
-  };
-
+export class NavigationPage extends WithStoreBlock {
   constructor() {
-    const linkNames = [
-      "login",
-      "register_account",
-      "chats",
-      "profile",
-      "change_password",
-      "error_404",
-      "error_500",
-    ];
-    const linkElements = linkNames.reduce((acc: Link[], linkName) => {
-      acc.push(
-        new Link({
-          props: {
-            label: linkName,
-            htmlId: `${linkName}_link`,
-            events: {
-              click: [
-                () => {
-                  const Component = NavigationPage.linkIDToPageMap[linkName];
+    const children: TComponentChildren = {};
 
-                  if (Component) {
-                    MainPage.component = new Component({
-                      props: { componentName: linkName },
-                    });
-                  }
-                },
-              ],
-            },
-          },
-        })
-      );
-      return acc;
-    }, []);
+    children.logoutButton = new LogoutButton();
 
     super({
-      children: { links: linkElements },
-      props: { componentName: "Navigation Page" },
+      children,
+      componentName: "Navigation Page",
     });
+  }
+
+  protected _afterPropsAssignHook() {
+    super._afterPropsAssignHook();
+
+    this.createLinks();
+  }
+
+  public createLinks() {
+    const isUserAuthorized = this.store.isUserAuthorized();
+    let linksList = Object.values(EnumNavigationPageLinks);
+    if (isUserAuthorized) {
+      linksList = linksList.filter(
+        (link) =>
+          link !== EnumNavigationPageLinks.SignUp &&
+          link !== EnumNavigationPageLinks.Login
+      );
+    }
+
+    this.children.links = linksList.reduce(
+      (acc: any[], linkName: EnumNavigationPageLinks) => {
+        const props = MapNavigationLinkToProps[linkName];
+        acc.push(
+          new WithRouterLink({
+            props: {
+              ...props,
+              htmlWrapper: {
+                componentAlias: "wrapped",
+                htmlWrapperTemplate: `
+                <div class="naviagtion-link">
+                  {{{ wrapped }}}
+                </div>
+                `,
+              },
+            },
+          })
+        );
+        return acc;
+      },
+      []
+    );
   }
 
   render(): string {

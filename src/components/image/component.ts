@@ -1,25 +1,14 @@
-import Block from "core/block";
+import { Block } from "core/dom";
 import template from "./template";
 
-type ImageProps = {
-  src: string;
-  alt: string;
-} & ComponentCommonProps;
+export type TImageProps = WithComponentCommonProps<{
+  htmlAttributes: {
+    src: string;
+    alt: string;
+  };
+}>;
 
-export class ImageElement extends Block {
-  protected props: ImageProps;
-
-  constructor({
-    props,
-    refs = {},
-  }: {
-    props: ImageProps;
-    refs?: ComponentRefs;
-  }) {
-    props.componentName = props.componentName ?? "Image";
-    super({ props, refs });
-  }
-
+export class ImageComponent extends Block<TImageProps> {
   protected render(): string {
     return template;
   }

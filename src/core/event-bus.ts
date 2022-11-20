@@ -1,31 +1,43 @@
-type EventBusEventListener = (...args: unknown[]) => void;
-export default class EventBus {
-  private listeners: Record<string, EventBusEventListener[]> = {};
+export type EventHandler<Args extends any[] = unknown[]> = (
+  ...args: Args
+) => void;
+export class EventBus<
+  Events extends Record<string, string>,
+  Args extends Record<Values<Events>, unknown[]>
+> {
+  private readonly listeners: {
+    [Event in Values<Events>]?: EventHandler<Args[Event]>[];
+  } = {};
 
-  public on(event: string, callback: ComponentEventListener): void {
+  public on<Event extends Values<Events>>(
+    event: Event,
+    callback: EventHandler<Args[Event]>
+  ): void {
     if (!this.listeners[event]) {
       this.listeners[event] = [];
     }
 
-    this.listeners[event].push(callback);
+    this.listeners[event]!.push(callback);
   }
 
-  off(event: string, callback: ComponentEventListener): void {
+  public off<Event extends Values<Events>>(
+    event: Event,
+    callback: EventHandler<Args[Event]>
+  ): void {
     if (!this.listeners[event]) {
       throw new Error(`Нет события: ${event}`);
     }
 
-    this.listeners[event] = this.listeners[event].filter(
+    this.listeners[event] = this.listeners[event]!.filter(
       (listener) => listener !== callback
     );
   }
 
-  emit(event: string, ...args: unknown[]): void {
+  emit<Event extends Values<Events>>(event: Event, ...args: Args[Event]): void {
     if (!this.listeners[event]) {
       return;
     }
-
-    this.listeners[event].forEach((listener) => {
+    this.listeners[event]!.forEach((listener) => {
       listener(...args);
     });
   }

@@ -1,0 +1,1 @@
+export { AvatarUploadForm } from "./component";

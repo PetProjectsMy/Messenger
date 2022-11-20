@@ -1,0 +1,1 @@
+export { ChatsPageSideMenu } from "./component";
