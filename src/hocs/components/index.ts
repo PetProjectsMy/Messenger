@@ -1,5 +1,7 @@
-import { Block } from "core/dom";
-import { TextComponent, Link, ImageComponent } from "components";
+import { Block } from "core/dom/block";
+import { Link } from "components/link";
+import { TextComponent } from "components/text-component";
+import { ImageComponent } from "components/image";
 import { Button } from "components/buttons";
 import { Input, FileInput, InputWithValidation } from "components/inputs";
 import { WithStore } from "../with-store";

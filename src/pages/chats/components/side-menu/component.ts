@@ -1,4 +1,4 @@
-import { Block } from "core/dom";
+import { Block } from "core/dom/block";
 import * as Buttons from "./buttons";
 import template from "./template";
 

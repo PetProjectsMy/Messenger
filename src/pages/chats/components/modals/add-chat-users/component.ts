@@ -1,5 +1,6 @@
-import { Block } from "core/dom";
-import { Button, Input } from "components";
+import { Block } from "core/dom/block";
+import { Button } from "components/buttons";
+import { Input } from "components/inputs";
 import { APIResponseHasError } from "utils/api";
 import { ChatsService } from "services";
 import { transformAddUsersFormDataToAPI } from "utils/api/to-api-data-transformers";

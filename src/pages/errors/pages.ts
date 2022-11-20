@@ -1,5 +1,5 @@
 import { HomeButton } from "components/buttons";
-import { Block } from "core/dom";
+import { Block } from "core/dom/block";
 import template from "./template";
 
 type ErrorPageProps = WithComponentCommonProps<{

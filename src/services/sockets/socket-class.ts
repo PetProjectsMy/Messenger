@@ -15,7 +15,7 @@ export class ChatWebSocket {
 
   protected socket: WebSocket;
 
-  protected messagesArrayHander: Nullable<
+  protected messagesArrayHandler: Nullable<
     (messagesBatch: TWebsocketMessageDTO[]) => void
   > = null;
 
@@ -70,8 +70,8 @@ export class ChatWebSocket {
         if (message.type === "pong" || message.type === "user connected") {
           return;
         }
-        if (Array.isArray(message) && this.messagesArrayHander) {
-          this.messagesArrayHander(message);
+        if (Array.isArray(message) && this.messagesArrayHandler) {
+          this.messagesArrayHandler(message);
           return;
         }
 

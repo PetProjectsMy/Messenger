@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 import { deepMerge } from "utils/objects-handle";
 import { type Store } from "core/store";
 import { type PathRouter } from "core/router";
+import { getDescendantByPath } from "utils/pages/get-descendant-by-path";
 import BlockBase, { BlockCommonEvents } from "./block-base";
 
 export class Block<
@@ -134,6 +135,12 @@ export class Block<
     this._replaceStubs(fragment);
 
     return fragment.content;
+  }
+
+  public getChildByPath<TChild = TComponentChild>(
+    pathString: string = ""
+  ): TChild {
+    return getDescendantByPath<TChild>(this.children, pathString);
   }
 
   private _init() {

@@ -1,4 +1,4 @@
-import { Block } from "core/dom";
+import { Block } from "core/dom/block";
 import { HomeButton } from "components/buttons";
 import { WithRouterLink } from "hocs/components";
 import { EnumAppRoutes } from "core/router";

@@ -1,4 +1,4 @@
-import { Block } from "core/dom";
+import { Block } from "core/dom/block";
 import templator from "./template";
 
 type TTextComponentProps = WithComponentCommonProps<{

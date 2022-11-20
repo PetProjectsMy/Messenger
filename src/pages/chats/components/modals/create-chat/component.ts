@@ -1,5 +1,6 @@
-import { Block } from "core/dom";
-import { Button, Input } from "components";
+import { Block } from "core/dom/block";
+import { Button } from "components/buttons";
+import { Input } from "components/inputs";
 import { ChatsService } from "services/chats";
 import { APIResponseHasError } from "utils/api";
 import template from "./template";

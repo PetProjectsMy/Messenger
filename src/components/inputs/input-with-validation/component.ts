@@ -1,4 +1,4 @@
-import { Block } from "core/dom";
+import { Block } from "core/dom/block";
 import { TInputProps, Input } from "../basic-input";
 
 export type TInputValidator = () => boolean;

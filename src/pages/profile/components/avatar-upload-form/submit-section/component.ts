@@ -1,5 +1,5 @@
-import { Block } from "core/dom";
-import { Button } from "components";
+import { Block } from "core/dom/block";
+import { Button } from "components/buttons";
 import { ProfileService } from "services";
 import {
   APIResponseHasError,

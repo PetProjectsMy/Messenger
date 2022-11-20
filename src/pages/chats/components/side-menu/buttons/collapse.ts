@@ -1,4 +1,4 @@
-import { Button } from "components";
+import { Button } from "components/buttons";
 import collapseButtonImage from "./collapse-button-image.png";
 
 export class CollapseButton extends Button {

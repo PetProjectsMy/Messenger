@@ -1,4 +1,4 @@
-import { Block } from "core/dom";
+import { Block } from "core/dom/block";
 import template from "./template";
 
 export type TButtonProps = WithComponentCommonProps<{

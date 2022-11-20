@@ -1,4 +1,4 @@
-import { FileInput } from "components";
+import { FileInput } from "components/inputs";
 import { EnumFileUploadingStatus } from "components/inputs/file-input";
 
 export class AvatarInput extends FileInput {

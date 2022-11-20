@@ -1,5 +1,4 @@
 import { WithStoreBlock } from "hocs/components";
-import { getDescendantByPath } from "utils/pages";
 import { ModalWindow } from "./components/modals";
 import template from "./template";
 import {
@@ -61,10 +60,7 @@ export class ChatsPage extends WithStoreBlock {
     const chatsList = this.getChildByPath("navigationSection.chatsList");
     this.refs.chatsList = chatsList;
 
-    const chats = getDescendantByPath<TComponentChildArray>(
-      chatsList.children,
-      "chats"
-    );
+    const chats = chatsList.getChildByPath<TComponentChildArray>("chats");
     chats.forEach((chat: any) => {
       this.refs[`chat-${chat.chatID}`] = chat;
     });

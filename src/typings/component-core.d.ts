@@ -1,8 +1,13 @@
-import { Block } from "core/dom";
-import type { EventHandler } from "core/event-bus";
+import { type Block } from "core/dom/block";
+import type { TEventHandler } from "core/event-bus";
 
 declare global {
-  export type ComponentEventHandler = EventHandler;
+  export type BlockClass<
+    P extends TComponentCommonProps,
+    S extends TComponentState
+  > = typeof Block<P, S>;
+
+  export type ComponentEventHandler = TEventHandler;
 
   export type TComponentWrapper = {
     componentAlias: string;

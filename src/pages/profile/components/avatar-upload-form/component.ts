@@ -1,5 +1,5 @@
-import { Block } from "core/dom";
-import { type ImageComponent } from "components";
+import { Block } from "core/dom/block";
+import { type ImageComponent } from "components/image";
 import { SubmitSection } from "./submit-section";
 import { AvatarInput } from "./avatar-input";
 import template from "./template";

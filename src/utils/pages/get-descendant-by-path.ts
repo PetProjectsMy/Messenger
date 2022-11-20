@@ -1,9 +1,10 @@
 export function getDescendantByPath<TDescendant = TComponentChild>(
-  blockChildren: TComponentChildren,
+  block: TComponentChildren,
   pathString: string
 ): TDescendant {
   const path = pathString.split(".").join(".children.").split(".");
-  let result = blockChildren as any;
+
+  let result = block as any;
 
   for (let i = 0; i < path.length; i++) {
     if (!result[path[i]]) {

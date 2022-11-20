@@ -1,4 +1,4 @@
-import { InputForm } from "components";
+import { InputForm } from "components/inputs";
 import { afterValidationCallback } from "./after-validation-callback";
 import { EnumInputFields, MapInputFieldsProps } from "./fields";
 

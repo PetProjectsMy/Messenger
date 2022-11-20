@@ -7,7 +7,6 @@ import {
 } from "utils/objects-handle";
 import { EventBus } from "core/event-bus";
 import { toggleHtmlClassToList } from "utils/components";
-import { getDescendantByPath } from "utils/pages";
 
 export const enum BlockCommonEvents {
   INIT = "init",
@@ -107,10 +106,6 @@ export default class BlockBase<
 
   public getElement(): Nullable<HTMLElement> {
     return this._element;
-  }
-
-  public getChildByPath<TChild = TComponentChild>(pathString: string = "") {
-    return getDescendantByPath<TChild>(this.children, pathString);
   }
 
   public getStateByPath(pathString: string = "") {

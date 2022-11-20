@@ -1,4 +1,4 @@
-import { type Input } from "components";
+import { type Input } from "components/inputs";
 import { WithStoreButton } from "hocs/components";
 import { isNullish } from "utils/objects-handle";
 import backgorundImage from "./icon.png";

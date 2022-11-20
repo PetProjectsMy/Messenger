@@ -1,4 +1,4 @@
-export type EventHandler<Args extends any[] = unknown[]> = (
+export type TEventHandler<Args extends any[] = unknown[]> = (
   ...args: Args
 ) => void;
 export class EventBus<
@@ -6,12 +6,12 @@ export class EventBus<
   Args extends Record<Values<Events>, unknown[]>
 > {
   private readonly listeners: {
-    [Event in Values<Events>]?: EventHandler<Args[Event]>[];
+    [Event in Values<Events>]?: TEventHandler<Args[Event]>[];
   } = {};
 
   public on<Event extends Values<Events>>(
     event: Event,
-    callback: EventHandler<Args[Event]>
+    callback: TEventHandler<Args[Event]>
   ): void {
     if (!this.listeners[event]) {
       this.listeners[event] = [];
@@ -22,7 +22,7 @@ export class EventBus<
 
   public off<Event extends Values<Events>>(
     event: Event,
-    callback: EventHandler<Args[Event]>
+    callback: TEventHandler<Args[Event]>
   ): void {
     if (!this.listeners[event]) {
       throw new Error(`Нет события: ${event}`);

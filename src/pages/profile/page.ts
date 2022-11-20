@@ -1,6 +1,7 @@
-import { Block } from "core/dom";
+import { Block } from "core/dom/block";
 import avatarImagePlaceholder from "static/avatar-placeholder-profile.png";
-import { ImageComponent, Input } from "components";
+import { Input } from "components/inputs";
+import { ImageComponent } from "components/image";
 import { HomeButton } from "components/buttons";
 import { WithStore } from "hocs";
 import template from "./template";
