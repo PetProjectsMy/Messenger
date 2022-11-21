@@ -7,7 +7,7 @@ import {
 import { transformChatUsersGetResponseToChatsUsersData } from "utils/api/from-api-data-transformers";
 import { transformChatIDToDeleteAPI } from "utils/api/to-api-data-transformers";
 import { objectWithoutKey } from "utils/objects-handle";
-import { SocketsCreator } from "services";
+import { SocketsCreator } from "services/sockets";
 
 export class ChatsServiceClass {
   async getChats(afterRequestCallback?: TAfterRequestCallback) {

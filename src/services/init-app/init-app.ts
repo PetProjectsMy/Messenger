@@ -1,13 +1,11 @@
 // import { Store } from "core/store";
 // import { PathRouter } from "core/router";
-// import { AuthorizationService } from "services";
+// import { AuthorizationService } from "services/authorization";
 // import { APIResponseHasError } from "utils/api";
-import { setAppHtml } from "core/dom";
 // import { initAppData } from "./init-app-data";
 
 export async function initApp() {
   console.log(`INIT APP STATRTING`);
-  setAppHtml();
 
   // const store = new Store();
   // const router = new PathRouter();

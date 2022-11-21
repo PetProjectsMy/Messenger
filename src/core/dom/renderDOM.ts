@@ -1,11 +1,5 @@
 import { Block } from "./block";
 
-export function setAppHtml() {
-  const body = document.querySelector("body");
-  const appBlock = new Block({ props: { htmlAttributes: { id: "app" } } });
-  body!.append(appBlock.getElement()!);
-}
-
 export function renderDOM({
   rootSelector = "#app",
   component,

@@ -3,4 +3,4 @@ export {
   BlockCommonEvents,
   TBlockCommonEventsHandlersArgs,
 } from "./block-base";
-export { renderDOM, setAppHtml } from "./renderDOM";
+export { renderDOM } from "./renderDOM";
