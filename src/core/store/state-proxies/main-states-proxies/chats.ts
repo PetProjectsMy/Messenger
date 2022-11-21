@@ -1,4 +1,4 @@
-import { EnumAppPages } from "pages";
+import { EnumAppPages } from "pages/enum-app-pages";
 
 export function chatsSetter() {
   const { page } = this.state;

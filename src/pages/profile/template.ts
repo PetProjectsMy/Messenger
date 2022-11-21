@@ -1,13 +1,6 @@
 export default `
       <main class="profile-page">
-        <header class="profile-form-header">
-          <div class="image-section">
-            {{{ avatarImage }}}
-          </div>
-          <div class="name-section">
-            <span class="user-id">ID: {{ userID }}</span>
-          </div>
-        </header>
+        {{{ header }}}
         {{{ profileDataForm }}}
         <nav class="profile-nav-section">
           <section class="data-change-section">

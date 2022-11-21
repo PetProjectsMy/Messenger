@@ -2,7 +2,7 @@ import { AuthorizationAPI } from "api";
 
 import { EnumAppRoutes } from "core/router";
 import { APIResponseHasError } from "utils/api";
-import { initAppData } from "services/init-app";
+import { initAppData } from "services/init-app/init-app-data";
 
 export const enum EnumLoginAPIErrors {
   AlreadyInSystem = "User already in system",

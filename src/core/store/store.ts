@@ -1,5 +1,5 @@
 import { getPageComponent } from "utils/pages";
-import { EnumAppPages } from "pages";
+import { EnumAppPages } from "pages/enum-app-pages";
 import { renderDOM } from "core/dom";
 import {
   comparePropByPath,

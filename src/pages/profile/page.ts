@@ -1,11 +1,14 @@
 import { Block } from "core/dom";
-import avatarImagePlaceholder from "static/avatar-placeholder-profile.png";
 import { Input } from "components/inputs";
-import { ImageComponent } from "components/image";
-import { HomeButton } from "components/buttons";
+import { HomeButton } from "components/buttons/home-button";
 import { WithStore } from "hocs";
+import { type ImageComponent } from "components/image";
 import template from "./template";
-import { DataChangeButton, ProfilePageInputForm } from "./components";
+import {
+  DataChangeButton,
+  ProfilePageInputForm,
+  ProfileHeader,
+} from "./components";
 import { EnumInputFields } from "./components/data-form";
 import { MapInputFieldToUserDataRecord } from "./components/data-form/fields";
 import { AvatarUploadForm } from "./components/avatar-upload-form";
@@ -17,17 +20,9 @@ export class ProfilePage extends ProfilePageBlock {
   constructor() {
     const children: TComponentChildren = {};
 
-    const storeAvatar = window.store.getUserDataByPath("avatar");
-    const imageSource = storeAvatar || avatarImagePlaceholder;
-    const avatarImage = new ImageComponent({
-      props: {
-        htmlAttributes: {
-          src: imageSource,
-          alt: "Profile Avatar",
-        },
-      },
-    });
-    children.avatarImage = avatarImage;
+    const header = new ProfileHeader();
+    const avatarImage = header.getChildByPath<ImageComponent>("avatarImage");
+
     children.avatarUploadForm = new AvatarUploadForm(avatarImage);
 
     children.profileDataForm = new ProfilePageInputForm();
@@ -48,7 +43,6 @@ export class ProfilePage extends ProfilePageBlock {
     this.children.changeDataButton = new DataChangeButton({
       form: this.children.profileDataForm as Block,
     });
-    this.props.userID = this.store.getUserDataByPath("id") as number;
   }
 
   public updateUserInfo() {

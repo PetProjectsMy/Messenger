@@ -1,4 +1,4 @@
-import { EnumAppPages } from "pages";
+import { EnumAppPages } from "pages/enum-app-pages";
 import { isNullish, isObject } from "utils/objects-handle";
 
 export function userSetter(

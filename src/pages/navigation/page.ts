@@ -1,4 +1,4 @@
-import { LogoutButton } from "components/buttons";
+import { LogoutButton } from "components/buttons/logout-button";
 import { WithStoreBlock, WithRouterLink } from "hocs/components";
 import template from "./template";
 import { EnumNavigationPageLinks, MapNavigationLinkToProps } from "./links";

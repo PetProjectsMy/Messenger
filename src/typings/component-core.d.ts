@@ -3,19 +3,19 @@ import type { TEventHandler } from "core/event-bus";
 
 declare global {
   export type BlockClass<
-    P extends TComponentCommonProps,
-    S extends TComponentState
+    P extends TComponentCommonProps = TComponentCommonProps,
+    S extends TComponentState = TComponentState
   > = typeof Block<P, S>;
 
-  export type ComponentEventHandler = TEventHandler;
+  export type TComponentEventHandler = TEventHandler;
 
   export type TComponentWrapper = {
     componentAlias: string;
     htmlWrapperTemplate: string;
   };
 
-  export type ComponentOptionalProps = {
-    events?: Record<string, ComponentEventHandler[]>;
+  export type TComponentOptionalProps = {
+    events?: Record<string, TComponentEventHandler[]>;
     htmlClasses?: string[];
     htmlStyle?: {
       "background-image"?: any;
@@ -35,7 +35,7 @@ declare global {
     THtmlAttrs;
 
   export type TComponentCommonProps = TCommonHtmlAtrributes &
-    ComponentOptionalProps;
+    TComponentOptionalProps;
 
   export type WithComponentCommonProps<Tprops> = Tprops & TComponentCommonProps;
 

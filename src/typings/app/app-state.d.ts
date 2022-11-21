@@ -1,4 +1,4 @@
-import { EnumAppPages } from "pages";
+import { EnumAppPages } from "pages/enum-app-pages";
 import { type Store } from "core/store";
 import { type ChatMessagesHandler } from "services/sockets";
 import { PathRouter } from "core/router/path-router";

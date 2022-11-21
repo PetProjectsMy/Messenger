@@ -3,7 +3,9 @@ import { Link } from "components/link";
 import { TextComponent } from "components/text-component";
 import { ImageComponent } from "components/image";
 import { Button } from "components/buttons";
-import { Input, FileInput, InputWithValidation } from "components/inputs";
+import { Input } from "components/inputs";
+import { InputWithValidation } from "components/inputs/input-with-validation";
+import { FileInput } from "components/inputs/file-input";
 import { WithStore } from "../with-store";
 import { WithRouter } from "../with-router";
 

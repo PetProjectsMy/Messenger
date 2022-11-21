@@ -1,1 +1,1 @@
-export { TInputProps, Input } from "./component";
+export { type TInputProps, Input } from "./component";

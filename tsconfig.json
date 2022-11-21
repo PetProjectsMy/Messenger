@@ -1,5 +1,9 @@
 {
-  "include": ["src/**/*.ts", "src/pages/chats/components/side-menu/buttons"],
+  "include": [
+    "src/**/*.ts",
+    "src/pages/chats/components/side-menu/buttons",
+    "src/pages/chats/components/chat-section/header-section/functional-button"
+  ],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "lib": ["es2022", "dom"],

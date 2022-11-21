@@ -1,14 +1,22 @@
-import * as Pages from "pages";
-import { EnumAppPages } from "pages";
+import { NavigationPage } from "pages/navigation";
+import { SignUpPage } from "pages/sign-up";
+import { LoginPage } from "pages/login";
+import { ChatsPage } from "pages/chats";
+import { ProfilePage } from "pages/profile";
+import { EnumAppPages } from "pages/enum-app-pages";
+import {
+  NotFoundErrorPage,
+  AuthorizationRequiredErrorPage,
+} from "pages/errors";
 
 const map = {
-  [EnumAppPages.Navigation]: Pages.NavigationPage,
-  [EnumAppPages.SignUp]: Pages.SignUpPage,
-  [EnumAppPages.Login]: Pages.LoginPage,
-  [EnumAppPages.Chats]: Pages.ChatsPage,
-  [EnumAppPages.Profile]: Pages.ProfilePage,
-  [EnumAppPages.NotFound]: Pages.NotFoundErrorPage,
-  [EnumAppPages.Forbidden]: Pages.AuthorizationRequiredErrorPage,
+  [EnumAppPages.Navigation]: NavigationPage,
+  [EnumAppPages.SignUp]: SignUpPage,
+  [EnumAppPages.Login]: LoginPage,
+  [EnumAppPages.Chats]: ChatsPage,
+  [EnumAppPages.Profile]: ProfilePage,
+  [EnumAppPages.NotFound]: NotFoundErrorPage,
+  [EnumAppPages.Forbidden]: AuthorizationRequiredErrorPage,
 };
 
 export const getPageComponent = (page: EnumAppPages): TAppPageClass => {

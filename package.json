@@ -20,6 +20,7 @@
     "circular-dependency-plugin": "5.2.2",
     "clean-webpack-plugin": "4.0.0",
     "copy-webpack-plugin": "11.0.0",
+    "cross-env": "7.0.3",
     "css-loader": "6.7.2",
     "eslint": "8.27.0",
     "eslint-config-airbnb": "19.0.4",
@@ -46,9 +47,10 @@
   "repository": "git@github.com:Issayev/middle.messenger.praktikum.yandex.git",
   "scripts": {
     "compile-check": "tsc --noEmit",
-    "dev": "webpack-dev-server --mode development --open",
-    "watch": "webpack --mode development --watch",
-    "build": "webpack --mode production"
+    "dev": "cross-env NODE_ENV=development webpack --mode development",
+    "dev-start": "cross-env NODE_ENV=development webpack-dev-server --mode development --open",
+    "watch": "cross-env NODE_ENV=development webpack --mode development --watch",
+    "build": "cross-env NODE_ENV=production webpack --mode production"
   },
   "version": "1.0.0"
 }
