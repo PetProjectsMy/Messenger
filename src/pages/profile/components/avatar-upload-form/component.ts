@@ -5,9 +5,8 @@ import { AvatarInput } from "./avatar-input";
 import template from "./template";
 
 export class AvatarUploadForm extends Block {
-  constructor(profilePageImageRef: ImageComponent) {
+  constructor() {
     super({
-      refs: { profileImage: profilePageImageRef },
       state: { uploadingStatus: "" },
     });
   }

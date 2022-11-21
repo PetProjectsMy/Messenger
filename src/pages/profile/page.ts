@@ -23,14 +23,12 @@ export class ProfilePage extends ProfilePageBlock {
     const header = new ProfileHeader();
     const avatarImage = header.getChildByPath<ImageComponent>("avatarImage");
 
-    children.avatarUploadForm = new AvatarUploadForm(avatarImage);
-
+    children.header = header;
     children.profileDataForm = new ProfilePageInputForm();
+    children.avatarUploadForm = new AvatarUploadForm();
     children.homeButton = new HomeButton();
 
-    const refs = {} as TComponentRefs;
-
-    super({ children, refs });
+    super({ children, refs: { avatarImage } });
   }
 
   protected render(): string {
@@ -61,7 +59,7 @@ export class ProfilePage extends ProfilePageBlock {
 
   public updateUserAvatar() {
     const newAvatar = this.store.getUserDataByPath("avatar") as string;
-    (this.children.avatarImage as ImageComponent).setPropByPath(
+    (this.refs.avatarImage as ImageComponent).setPropByPath(
       "htmlAttributes.src",
       newAvatar
     );
