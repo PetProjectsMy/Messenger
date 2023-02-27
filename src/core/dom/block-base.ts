@@ -7,6 +7,7 @@ import {
 } from "utils/objects-handle";
 import { EventBus } from "core/event-bus";
 import { toggleHtmlClassToList } from "utils/components";
+import Typings = ComponentTypings;
 
 export const enum BlockCommonEvents {
   INIT = "init",
@@ -15,8 +16,8 @@ export const enum BlockCommonEvents {
 }
 
 export type TBlockCommonEventsHandlersArgs<
-  TProps extends TComponentCommonProps,
-  TState extends TComponentState
+  TProps extends Typings.CommonProps,
+  TState extends Typings.State
 > = {
   [BlockCommonEvents.INIT]: [];
   [BlockCommonEvents.FLOW_CDU]:
@@ -26,8 +27,8 @@ export type TBlockCommonEventsHandlersArgs<
 };
 
 export default class BlockBase<
-  TProps extends TComponentCommonProps,
-  TState extends TComponentState
+  TProps extends Typings.CommonProps,
+  TState extends Typings.State
 > {
   static EVENTS = {
     INIT: "init",
@@ -46,7 +47,7 @@ export default class BlockBase<
 
   public componentName: string;
 
-  public children: TComponentChildren;
+  public children: Typings.Children;
 
   protected props: TProps;
 
@@ -96,7 +97,7 @@ export default class BlockBase<
     });
   }
 
-  public dispatchEventListener(event: string, listener: TEventListener) {
+  public dispatchEventListener(event: string, listener: Typings.EventListener) {
     const events = this.props.events!;
 
     events[event] ??= [];
@@ -160,7 +161,7 @@ export default class BlockBase<
 
   public setChildByPath(
     childPath: string,
-    newChild: TComponentChild | TComponentChildArray,
+    newChild: Typings.Child | Typings.ChildArray,
     forceUpdate: boolean = false,
     doLog: boolean = false
   ) {

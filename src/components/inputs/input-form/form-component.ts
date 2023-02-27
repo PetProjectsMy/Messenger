@@ -4,7 +4,7 @@ import { type Input, TInputProps } from "../basic-input";
 import { FormSubmitButton } from "./submit-button";
 import template from "./form-template";
 
-type TInputFormProps = WithComponentCommonProps<{
+type TInputFormProps = ComponentTypings.WithCommonProps<{
   formTitle?: string;
   isSubmitButtonNeeded?: Boolean;
   afterValidationCallback?: () => void;
@@ -35,13 +35,13 @@ export class InputForm<
   }: {
     enumInputFieldsNames: TEnumInputFieldsNames;
     mapInputToProps?: Record<string, TInputProps>;
-    mapInputToHelpers?: Record<string, TComponentHelpers>;
+    mapInputToHelpers?: Record<string, ComponentTypings.Helpers>;
     InputClass?: TInputClass;
     props?: TInputFormProps;
-    helpers?: TComponentHelpers;
+    helpers?: ComponentTypings.Helpers;
   }) {
-    const children: TComponentChildren = {};
-    const refs: TComponentRefs = {};
+    const children: ComponentTypings.Children = {};
+    const refs: ComponentTypings.Refs = {};
 
     Object.values(enumInputFieldsNames).forEach((fieldName) => {
       const inputField = new InputClass({

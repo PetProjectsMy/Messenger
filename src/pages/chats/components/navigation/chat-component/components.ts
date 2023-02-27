@@ -8,7 +8,7 @@ export class ChatComponent extends WithStoreBlock {
   public readonly chatID: string;
 
   constructor(chatID: string) {
-    const children = {} as TComponentChildren;
+    const children = {} as ComponentTypings.Children;
     children.avatarImage = new ChatAvatar(chatID);
     children.chatTitle = new ChatTitle(chatID);
 

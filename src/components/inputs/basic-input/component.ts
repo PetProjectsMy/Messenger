@@ -1,7 +1,7 @@
 import { Block } from "core/dom";
 import template from "./template";
 
-export type TInputProps = WithComponentCommonProps<{
+export type TInputProps = ComponentTypings.WithCommonProps<{
   htmlAttributes?: {
     value?: string;
     placeholder?: string;

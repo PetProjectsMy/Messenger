@@ -2,7 +2,7 @@ import { HomeButton } from "components/buttons/home-button";
 import { Block } from "core/dom";
 import template from "./template";
 
-type ErrorPageProps = WithComponentCommonProps<{
+type ErrorPageProps = ComponentTypings.WithCommonProps<{
   errorCode: number;
   errorDescription: string;
 }>;
@@ -12,7 +12,7 @@ export type TErrorPageClass = typeof Block<ErrorPageProps>;
 function getErrorPageClass(initProps: ErrorPageProps): TErrorPageClass {
   class ErrorPage extends Block<ErrorPageProps> {
     constructor() {
-      const children: TComponentChildren = {};
+      const children: ComponentTypings.Children = {};
       children.homeButton = new HomeButton({ htmlClasses: ["return-link"] });
       super({ props: initProps, children });
     }

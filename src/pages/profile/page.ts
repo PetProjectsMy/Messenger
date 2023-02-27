@@ -13,12 +13,12 @@ import { EnumInputFields } from "./components/data-form";
 import { MapInputFieldToUserDataRecord } from "./components/data-form/fields";
 import { AvatarUploadForm } from "./components/avatar-upload-form";
 
-type TProfilePageProps = WithComponentCommonProps<{ userID: number }>;
+type TProfilePageProps = ComponentTypings.WithCommonProps<{ userID: number }>;
 const ProfilePageBlock = WithStore(Block<TProfilePageProps>);
 
 export class ProfilePage extends ProfilePageBlock {
   constructor() {
-    const children: TComponentChildren = {};
+    const children: ComponentTypings.Children = {};
 
     const header = new ProfileHeader();
     const avatarImage = header.getChildByPath<ImageComponent>("avatarImage");

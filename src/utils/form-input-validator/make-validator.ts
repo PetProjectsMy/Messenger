@@ -4,7 +4,7 @@ export function makeValidator({
   validatorsList,
 }: {
   validatorsList: TInputSingleValidator[];
-}): TypingsComponent.InputValidator {
+}): ComponentTypings.InputValidator {
   return function validate() {
     let error = "";
     const value = this.getValue();

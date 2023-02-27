@@ -10,7 +10,7 @@ type TInputWithValidationState = {
   inputError: string;
 };
 
-const InputExtended = Input as any as BlockClass<
+const InputExtended = Input as any as ComponentTypings.BlockClass<
   TInputWithValidationProps,
   TInputWithValidationState
 >;
@@ -44,7 +44,7 @@ export class InputWithValidation extends InputExtended {
     Object.entries(this.props.validators!).forEach(([event, validators]) => {
       const events = this.props.events as Record<
         string,
-        TComponentEventHandler[]
+        ComponentTypings.EventHandler[]
       >;
 
       if (!events[event]) {

@@ -13,13 +13,13 @@ export const enum EnumFileUploadingStatus {
 type TFileInputProps = TInputProps & {
   htmlAttributes: { name: string; type?: "file"; accept?: string };
   events?: {
-    change: TEventListener[];
+    change: ComponentTypings.EventListener[];
   };
 };
 
 type TChooseButtonProps = TButtonProps & {
   events?: {
-    click?: TEventListener[];
+    click?: ComponentTypings.EventListener[];
   };
 };
 
@@ -32,10 +32,10 @@ export class FileInput extends Block {
   }: {
     fileInputProps: TFileInputProps;
     chooseButtonProps?: TChooseButtonProps;
-    props?: TComponentCommonProps;
-    helpers?: TComponentHelpers;
+    props?: ComponentTypings.CommonProps;
+    helpers?: ComponentTypings.Helpers;
   }) {
-    const children = {} as TComponentChildren;
+    const children = {} as ComponentTypings.Children;
 
     const fileInput = FileInput._createFileInput(fileInputProps);
     children.fileInput = fileInput;

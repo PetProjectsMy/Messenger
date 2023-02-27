@@ -1,7 +1,7 @@
 import { Block } from "core/dom";
 import template from "./template";
 
-export type TLinkProps = WithComponentCommonProps<{
+export type TLinkProps = ComponentTypings.WithCommonProps<{
   label: string;
   htmlAttributes?: {
     href?: string;

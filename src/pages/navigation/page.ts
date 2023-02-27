@@ -5,7 +5,7 @@ import { EnumNavigationPageLinks, MapNavigationLinkToProps } from "./links";
 
 export class NavigationPage extends WithStoreBlock {
   constructor() {
-    const children: TComponentChildren = {};
+    const children: ComponentTypings.Children = {};
 
     children.logoutButton = new LogoutButton();
 

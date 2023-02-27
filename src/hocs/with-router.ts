@@ -1,9 +1,9 @@
 import { type PathRouter } from "core/router/path-router";
 
 export function WithRouter<
-  P extends TComponentCommonProps,
-  S extends TComponentState
->(ComponentClass: BlockClass<P, S>) {
+  P extends ComponentTypings.CommonProps,
+  S extends ComponentTypings.State
+>(ComponentClass: ComponentTypings.BlockClass<P, S>) {
   return class WrappedComponent extends ComponentClass {
     public router: PathRouter;
 

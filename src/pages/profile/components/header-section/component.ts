@@ -3,9 +3,9 @@ import { ImageComponent } from "components/image";
 import avatarPlaceholder from "./avatar-placeholder.png";
 import template from "./template";
 
-type TProfileHeaderProps = WithComponentCommonProps<{ userID: string }>;
+type TProfileHeaderProps = ComponentTypings.WithCommonProps<{ userID: string }>;
 
-export class ProfileHeader extends (WithStoreBlock as any as BlockClass<TProfileHeaderProps>) {
+export class ProfileHeader extends (WithStoreBlock as any as ComponentTypings.BlockClass<TProfileHeaderProps>) {
   protected _afterPropsAssignHook(): void {
     const userID = this.store!.getUserID();
     this.props.userID = userID;

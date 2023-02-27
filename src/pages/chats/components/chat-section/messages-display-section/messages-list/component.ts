@@ -24,7 +24,7 @@ export class MessagesList extends WithStoreBlock {
     }
 
     const messages = this.store.getStateValueByPath(`chatsMessages.${chatID}`);
-    const messagesList = [] as TComponentChildArray;
+    const messagesList = [] as ComponentTypings.ChildArray;
 
     for (const { content } of messages) {
       messagesList.push(new MessageComponent(content));

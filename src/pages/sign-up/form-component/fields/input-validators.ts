@@ -51,4 +51,4 @@ export const FormValidators = [
   });
   acc[field] = { blur: [validator] };
   return acc;
-}, {} as TypingsComponent.FormValidators<EnumInputFields>);
+}, {} as ComponentTypings.FormValidators<EnumInputFields>);

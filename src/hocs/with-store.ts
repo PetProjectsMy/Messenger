@@ -1,9 +1,9 @@
 import { Store } from "core/store";
 
 export function WithStore<
-  P extends TComponentCommonProps,
-  S extends TComponentState
->(ComponentClass: BlockClass<P, S>) {
+  P extends ComponentTypings.CommonProps,
+  S extends ComponentTypings.State
+>(ComponentClass: ComponentTypings.BlockClass<P, S>) {
   class WithStoreComponent extends ComponentClass {
     public store: Store;
 

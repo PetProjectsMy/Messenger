@@ -4,7 +4,7 @@ import template from "./template";
 
 export class HeaderSection extends Block {
   constructor() {
-    const children = {} as TComponentChildren;
+    const children = {} as ComponentTypings.Children;
 
     children.homeButton = new HomeButton();
 

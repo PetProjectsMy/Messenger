@@ -6,7 +6,7 @@ import template from "./template";
 
 export class MessageInputSection extends WithStoreBlock {
   constructor() {
-    const children = {} as TComponentChildren;
+    const children = {} as ComponentTypings.Children;
 
     children.attachmentButton = new AttachmentButton();
     const messageInput = new MessageInput();

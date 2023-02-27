@@ -7,8 +7,8 @@ import template from "./template";
 
 export class SignUpPage extends Block {
   constructor() {
-    const children: TComponentChildren = {};
-    const refs: TComponentRefs = {};
+    const children: ComponentTypings.Children = {};
+    const refs: ComponentTypings.Refs = {};
 
     children.signInLink = new WithRouterLink({
       props: {

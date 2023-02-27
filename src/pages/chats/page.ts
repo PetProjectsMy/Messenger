@@ -9,7 +9,7 @@ import {
 
 export class ChatsPage extends WithStoreBlock {
   constructor() {
-    const children = {} as TComponentChildren;
+    const children = {} as ComponentTypings.Children;
     children.navigationSection = new ChatsPageNavigationSection();
     children.chatSection = new ChatsPageMainSection();
     children.sideMenu = new ChatsPageSideMenu();
@@ -60,7 +60,8 @@ export class ChatsPage extends WithStoreBlock {
     const chatsList = this.getChildByPath("navigationSection.chatsList");
     this.refs.chatsList = chatsList;
 
-    const chats = chatsList.getChildByPath<TComponentChildArray>("chats");
+    const chats =
+      chatsList.getChildByPath<ComponentTypings.ChildArray>("chats");
     chats.forEach((chat: any) => {
       this.refs[`chat-${chat.chatID}`] = chat;
     });

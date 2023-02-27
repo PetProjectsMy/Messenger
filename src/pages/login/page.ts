@@ -9,8 +9,8 @@ import { LoginPageForm } from "./form-component";
 const LinkWithRouter = WithRouter(Link);
 export class LoginPage extends Block {
   constructor() {
-    const children: TComponentChildren = {};
-    const refs: TComponentRefs = {};
+    const children: ComponentTypings.Children = {};
+    const refs: ComponentTypings.Refs = {};
 
     children.loginForm = new LoginPageForm();
     children.signUpLink = new LinkWithRouter({

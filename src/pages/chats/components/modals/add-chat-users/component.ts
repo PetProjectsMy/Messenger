@@ -21,7 +21,7 @@ export class AddChatUsersModalWindow extends Block {
       apiResponseError: "",
     };
 
-    const children = {} as TComponentChildren;
+    const children = {} as ComponentTypings.Children;
     children.usersIdenifiersInput =
       AddChatUsersModalWindow._createUsersIdenifiersInput();
 

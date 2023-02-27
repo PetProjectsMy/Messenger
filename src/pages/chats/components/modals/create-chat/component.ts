@@ -11,7 +11,7 @@ export class CreateChatModalWindow extends Block {
       apiResponseSuccess: "",
       apiResponseError: "",
     };
-    const children = {} as TComponentChildren;
+    const children = {} as ComponentTypings.Children;
 
     children.chatTitleInput = CreateChatModalWindow._createChatTitleInput();
 

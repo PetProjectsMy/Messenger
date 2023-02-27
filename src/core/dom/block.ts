@@ -5,18 +5,19 @@ import { type Store } from "core/store";
 import { type PathRouter } from "core/router";
 import { getDescendantByPath } from "utils/pages/get-descendant-by-path";
 import BlockBase, { BlockCommonEvents } from "./block-base";
+import Typings = ComponentTypings;
 
 export class Block<
-  TProps extends TComponentCommonProps = TComponentCommonProps,
-  TState extends TComponentState = TComponentState
+  TProps extends Typings.CommonProps = Typings.CommonProps,
+  TState extends Typings.State = Typings.State
 > extends BlockBase<TProps, TState> {
-  protected helpers: TComponentHelpers;
+  protected helpers: Typings.Helpers;
 
   private htmlWrapped: boolean;
 
   protected props: TProps;
 
-  public refs: TComponentRefs;
+  public refs: Typings.Refs;
 
   public router?: PathRouter;
 
@@ -36,10 +37,10 @@ export class Block<
   }: {
     componentName?: string;
     props?: TProps;
-    children?: TComponentChildren;
-    refs?: TComponentRefs;
-    state?: TComponentState;
-    helpers?: TComponentHelpers;
+    children?: Typings.Children;
+    refs?: Typings.Refs;
+    state?: Typings.State;
+    helpers?: Typings.Helpers;
   } = {}) {
     super();
 
@@ -115,7 +116,7 @@ export class Block<
 
     let templateString = this.render();
     if (this.htmlWrapped) {
-      const htmlWrapper = this.props.htmlWrapper as TComponentWrapper;
+      const htmlWrapper = this.props.htmlWrapper as Typings.HTMLWrapper;
       templateString = Handlebars.compile(htmlWrapper.htmlWrapperTemplate)({
         [`${htmlWrapper.componentAlias}`]: templateString,
       });
@@ -137,7 +138,7 @@ export class Block<
     return fragment.content;
   }
 
-  public getChildByPath<TChild = TComponentChild>(
+  public getChildByPath<TChild = Typings.Child>(
     pathString: string = ""
   ): TChild {
     return getDescendantByPath<TChild>(this, pathString);
@@ -296,7 +297,7 @@ export class Block<
     }
   }
 
-  static isChildArray(child: any): child is TComponentChildArray {
+  static isChildArray(child: any): child is Typings.ChildArray {
     return Array.isArray(child) && child.every((el) => el instanceof Block);
   }
 }
