@@ -16,7 +16,7 @@ export default function getInputFormTemplate(
   Object.values(enumFormFieldsNames).forEach((fieldName) => {
     content = `
       ${content}
-      {{{ ${fieldName}_child }}}
+      {{{ ${fieldName} }}}
     `;
   });
   content = `

@@ -4,13 +4,9 @@ import {
   validateLoginRegex,
   validatePasswordRegex,
 } from "utils/form-input-validator";
-import { TInputValidator } from "components/inputs/input-with-validation";
 import { EnumInputFields } from "./enum-input-fields";
 
-export const FormValidators: Record<
-  EnumInputFields,
-  Record<string, TInputValidator[]>
-> = [
+export const FormValidators = [
   {
     field: EnumInputFields.Login,
     validatorsList: [validateLoginRegex],
@@ -26,4 +22,4 @@ export const FormValidators: Record<
   });
   acc[field] = { blur: [validator] };
   return acc;
-}, {} as any);
+}, {} as TypingsComponent.FormValidators<EnumInputFields>);

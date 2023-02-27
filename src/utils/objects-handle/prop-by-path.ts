@@ -1,4 +1,4 @@
-import { Indexed, deepMerge as merge } from "./objects-merge";
+import { deepMerge as merge } from "./objects-merge";
 import { deepEqual } from "./objects-compare";
 import { isObject } from "./is-object";
 

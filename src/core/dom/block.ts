@@ -140,7 +140,7 @@ export class Block<
   public getChildByPath<TChild = TComponentChild>(
     pathString: string = ""
   ): TChild {
-    return getDescendantByPath<TChild>(this.children, pathString);
+    return getDescendantByPath<TChild>(this, pathString);
   }
 
   private _init() {
@@ -166,7 +166,7 @@ export class Block<
   private _makeStubs(): Record<string, string | string[]> {
     const stubs: Record<string, string> = {};
     Object.entries(this.children).forEach(([name, child]) => {
-      if (Array.isArray(child)) {
+      if (Block.isChildArray(child)) {
         stubs[name] = child
           .map((ch) => `<div data-id="${ch.id}"></div>`)
           .join("");
@@ -294,6 +294,10 @@ export class Block<
     } else {
       this._unwrappedElement = element;
     }
+  }
+
+  static isChildArray(child: any): child is TComponentChildArray {
+    return Array.isArray(child) && child.every((el) => el instanceof Block);
   }
 }
 

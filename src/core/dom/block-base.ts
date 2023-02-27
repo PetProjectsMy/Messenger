@@ -46,7 +46,7 @@ export default class BlockBase<
 
   public componentName: string;
 
-  protected children: TComponentChildren;
+  public children: TComponentChildren;
 
   protected props: TProps;
 
@@ -160,16 +160,16 @@ export default class BlockBase<
 
   public setChildByPath(
     childPath: string,
-    newValue: TComponentChild | TComponentChildArray,
+    newChild: TComponentChild | TComponentChildArray,
     forceUpdate: boolean = false,
     doLog: boolean = false
   ) {
     const didUpdate =
       forceUpdate ||
-      !comparePropByPath(this.children, childPath, newValue, doLog);
+      !comparePropByPath(this.children, childPath, newChild, doLog);
 
     if (didUpdate) {
-      setPropByPath(this.children, childPath, newValue, doLog);
+      setPropByPath(this.children, childPath, newChild, doLog);
       this._componentDidUpdate("" as any, "" as any, true);
     }
   }

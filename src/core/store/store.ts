@@ -62,7 +62,7 @@ export class Store {
     return getPropByPath(this.state, pathString, doLog);
   }
 
-  public getUserDataByPath(pathString: string = "", doLog = false) {
+  public getUserDataByPath(pathString: string = "", doLog: boolean = false) {
     const path = `user${pathString ? "." : ""}${pathString}`;
     return this.getStateValueByPath(path, doLog);
   }
@@ -77,7 +77,7 @@ export class Store {
   }
 
   public getCurrentChatID() {
-    return this.getStateValueByPath("currentChatID");
+    return this.getStateValueByPath("currentChatID") as string;
   }
 
   public getPageType(): Nullable<string> {

@@ -1,5 +1,4 @@
 import { AuthorizationAPI } from "api";
-
 import { EnumAppRoutes } from "core/router";
 import { APIResponseHasError } from "utils/api";
 import { initAppData } from "services/init-app/init-app-data";

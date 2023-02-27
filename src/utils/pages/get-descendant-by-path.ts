@@ -1,17 +1,17 @@
-export function getDescendantByPath<TDescendant = TComponentChild>(
-  block: TComponentChildren,
-  pathString: string
-): TDescendant {
-  const path = pathString.split(".").join(".children.").split(".");
+import { type Block } from "core/dom";
 
-  let result = block as any;
+export function getDescendantByPath<
+  TDescendant = TComponentChild | TComponentChildArray
+>(block: Block, pathString: string): TDescendant {
+  let child: TComponentChild | TComponentChildArray = block;
+  let { children } = block;
 
-  for (let i = 0; i < path.length; i++) {
-    if (!result[path[i]]) {
+  for (const childName of pathString.split(".")) {
+    if (!children[childName]) {
       break;
     }
-
-    result = result[path[i]];
+    child = children[childName] as TComponentChild;
+    children = child.children;
   }
-  return result as TDescendant;
+  return child as TDescendant;
 }

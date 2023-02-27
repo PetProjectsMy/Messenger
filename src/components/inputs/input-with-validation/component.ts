@@ -1,9 +1,9 @@
 import { TInputProps, Input } from "components/inputs";
 
 export type TInputValidator = () => boolean;
-export type TInputValidatorsByEvents = Record<string, TInputValidator[]>;
+export type TMapEventToValidators = Record<string, TInputValidator[]>;
 export type TInputWithValidationProps = TInputProps & {
-  validators?: TInputValidatorsByEvents;
+  validators?: TMapEventToValidators;
 };
 
 type TInputWithValidationState = {
@@ -40,7 +40,7 @@ export class InputWithValidation extends InputExtended {
   }
 
   protected _bindValidators() {
-    const bindedValidators = {} as Record<string, TInputValidator[]>;
+    const boundValidators = {} as Record<string, TInputValidator[]>;
     Object.entries(this.props.validators!).forEach(([event, validators]) => {
       const events = this.props.events as Record<
         string,
@@ -50,19 +50,19 @@ export class InputWithValidation extends InputExtended {
       if (!events[event]) {
         events[event] = [];
       }
-      bindedValidators[event] = [];
+      boundValidators[event] = [];
 
       validators.forEach((validator) => {
-        const bindedValidator = validator.bind(this);
-        bindedValidators[event].push(bindedValidator);
-        events[event].push(bindedValidator);
+        const boundValidator = validator.bind(this);
+        boundValidators[event].push(boundValidator);
+        events[event].push(boundValidator);
       });
     });
 
-    this.props.validators = bindedValidators;
+    this.props.validators = boundValidators;
   }
 
   public getValidators() {
-    return this.props.validators as Record<string, TInputValidator[]>;
+    return this.props.validators as TMapEventToValidators;
   }
 }

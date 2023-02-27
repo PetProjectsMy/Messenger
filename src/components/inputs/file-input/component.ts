@@ -17,7 +17,7 @@ type TFileInputProps = TInputProps & {
   };
 };
 
-type TchooseButtonProps = TButtonProps & {
+type TChooseButtonProps = TButtonProps & {
   events?: {
     click?: TEventListener[];
   };
@@ -31,7 +31,7 @@ export class FileInput extends Block {
     helpers,
   }: {
     fileInputProps: TFileInputProps;
-    chooseButtonProps?: TchooseButtonProps;
+    chooseButtonProps?: TChooseButtonProps;
     props?: TComponentCommonProps;
     helpers?: TComponentHelpers;
   }) {
@@ -76,10 +76,10 @@ export class FileInput extends Block {
   }
 
   private static _createChooseButton(
-    props: TchooseButtonProps,
+    props: TChooseButtonProps,
     fileInputRef: Input
   ) {
-    const chooseButtonDefaultProps: TchooseButtonProps = {
+    const chooseButtonDefaultProps: TChooseButtonProps = {
       events: {
         click: [
           function () {

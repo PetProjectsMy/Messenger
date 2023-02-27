@@ -1,12 +1,10 @@
-import { TInputValidator } from "components/inputs/input-with-validation";
-
 export type TInputSingleValidator = (value: string) => string;
 
 export function makeValidator({
   validatorsList,
 }: {
   validatorsList: TInputSingleValidator[];
-}): TInputValidator {
+}): TypingsComponent.InputValidator {
   return function validate() {
     let error = "";
     const value = this.getValue();

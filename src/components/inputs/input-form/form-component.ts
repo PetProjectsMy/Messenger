@@ -16,11 +16,11 @@ type TInputFormState = {
 };
 
 export class InputForm<
-  TEnumInputFiledsNames extends Record<string, string> = {},
+  TEnumInputFieldsNames extends Record<string, string> = {},
   TInputClass extends typeof InputWithValidation = typeof InputWithValidation
 > extends Block<TInputFormProps, TInputFormState> {
   protected helpers: {
-    enumInputFieldsNames: TEnumInputFiledsNames;
+    enumInputFieldsNames: TEnumInputFieldsNames;
   };
 
   static readonly validationFailedError = "Form has input errors";
@@ -33,7 +33,7 @@ export class InputForm<
     props = {},
     helpers = {},
   }: {
-    enumInputFieldsNames: TEnumInputFiledsNames;
+    enumInputFieldsNames: TEnumInputFieldsNames;
     mapInputToProps?: Record<string, TInputProps>;
     mapInputToHelpers?: Record<string, TComponentHelpers>;
     InputClass?: TInputClass;
@@ -50,7 +50,7 @@ export class InputForm<
         helpers: mapInputToHelpers[fieldName] ?? {},
       });
 
-      children[`${fieldName}_child`] = inputField;
+      children[fieldName] = inputField;
       refs[fieldName] = inputField;
     });
 

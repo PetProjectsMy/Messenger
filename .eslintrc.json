@@ -39,13 +39,9 @@
       },
       "rules": {
         "no-underscore-dangle": "off",
+        "no-continue": "off",
         "no-unused-vars": ["error", { "args": "after-used" }],
-        "no-restricted-syntax": [
-          "error",
-          "ForInStatement",
-          "LabeledStatement",
-          "WithStatement"
-        ],
+        "no-restricted-syntax": ["warn", { "selector": "ForInStatement" }],
         "import/no-extraneous-dependencies": [
           "error",
           { "devDependencies": true }

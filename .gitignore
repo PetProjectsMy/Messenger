@@ -10,4 +10,5 @@ dist
 !webpack.config.js
 *.txt
 netlify.toml
-package copy.json
+package.copy.json
+cspell.json
