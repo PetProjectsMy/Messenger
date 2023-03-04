@@ -1,23 +1,22 @@
+import { type PathRouter } from "core/router";
+import { type Store } from "core/store";
 import Handlebars from "handlebars";
 import { nanoid } from "nanoid";
 import { deepMerge } from "utils/objects-handle";
-import { type Store } from "core/store";
-import { type PathRouter } from "core/router";
 import { getDescendantByPath } from "utils/pages/get-descendant-by-path";
 import BlockBase, { BlockCommonEvents } from "./block-base";
-import Typings = ComponentTypings;
 
 export class Block<
-  TProps extends Typings.CommonProps = Typings.CommonProps,
-  TState extends Typings.State = Typings.State
+  TProps extends ComponentTypings.CommonProps = ComponentTypings.CommonProps,
+  TState extends ComponentTypings.State = ComponentTypings.State
 > extends BlockBase<TProps, TState> {
-  protected helpers: Typings.Helpers;
+  protected helpers: ComponentTypings.Helpers;
 
   private htmlWrapped: boolean;
 
   protected props: TProps;
 
-  public refs: Typings.Refs;
+  public refs: ComponentTypings.Refs;
 
   public router?: PathRouter;
 
@@ -37,10 +36,10 @@ export class Block<
   }: {
     componentName?: string;
     props?: TProps;
-    children?: Typings.Children;
-    refs?: Typings.Refs;
-    state?: Typings.State;
-    helpers?: Typings.Helpers;
+    children?: ComponentTypings.Children;
+    refs?: ComponentTypings.Refs;
+    state?: ComponentTypings.State;
+    helpers?: ComponentTypings.Helpers;
   } = {}) {
     super();
 
@@ -116,7 +115,8 @@ export class Block<
 
     let templateString = this.render();
     if (this.htmlWrapped) {
-      const htmlWrapper = this.props.htmlWrapper as Typings.HTMLWrapper;
+      const htmlWrapper = this.props
+        .htmlWrapper as ComponentTypings.HTMLWrapper;
       templateString = Handlebars.compile(htmlWrapper.htmlWrapperTemplate)({
         [`${htmlWrapper.componentAlias}`]: templateString,
       });
@@ -138,7 +138,7 @@ export class Block<
     return fragment.content;
   }
 
-  public getChildByPath<TChild = Typings.Child>(
+  public getChildByPath<TChild = ComponentTypings.Child>(
     pathString: string = ""
   ): TChild {
     return getDescendantByPath<TChild>(this, pathString);
@@ -297,7 +297,7 @@ export class Block<
     }
   }
 
-  static isChildArray(child: any): child is Typings.ChildArray {
+  static isChildArray(child: any): child is ComponentTypings.ChildArray {
     return Array.isArray(child) && child.every((el) => el instanceof Block);
   }
 }

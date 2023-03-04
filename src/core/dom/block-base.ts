@@ -1,13 +1,12 @@
+import { EventBus } from "core/event-bus";
 import { nanoid } from "nanoid";
+import { toggleHtmlClassToList } from "utils/components";
 import {
+  comparePropByPath,
   deepEqual,
   getPropByPath,
   setPropByPath,
-  comparePropByPath,
 } from "utils/objects-handle";
-import { EventBus } from "core/event-bus";
-import { toggleHtmlClassToList } from "utils/components";
-import Typings = ComponentTypings;
 
 export const enum BlockCommonEvents {
   INIT = "init",
@@ -16,8 +15,8 @@ export const enum BlockCommonEvents {
 }
 
 export type TBlockCommonEventsHandlersArgs<
-  TProps extends Typings.CommonProps,
-  TState extends Typings.State
+  TProps extends ComponentTypings.CommonProps,
+  TState extends ComponentTypings.State
 > = {
   [BlockCommonEvents.INIT]: [];
   [BlockCommonEvents.FLOW_CDU]:
@@ -27,8 +26,8 @@ export type TBlockCommonEventsHandlersArgs<
 };
 
 export default class BlockBase<
-  TProps extends Typings.CommonProps,
-  TState extends Typings.State
+  TProps extends ComponentTypings.CommonProps,
+  TState extends ComponentTypings.State
 > {
   static EVENTS = {
     INIT: "init",
@@ -47,7 +46,7 @@ export default class BlockBase<
 
   public componentName: string;
 
-  public children: Typings.Children;
+  public children: ComponentTypings.Children;
 
   protected props: TProps;
 
@@ -97,7 +96,10 @@ export default class BlockBase<
     });
   }
 
-  public dispatchEventListener(event: string, listener: Typings.EventListener) {
+  public dispatchEventListener(
+    event: string,
+    listener: ComponentTypings.EventListener
+  ) {
     const events = this.props.events!;
 
     events[event] ??= [];
@@ -161,7 +163,7 @@ export default class BlockBase<
 
   public setChildByPath(
     childPath: string,
-    newChild: Typings.Child | Typings.ChildArray,
+    newChild: ComponentTypings.Child | ComponentTypings.ChildArray,
     forceUpdate: boolean = false,
     doLog: boolean = false
   ) {
