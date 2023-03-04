@@ -24,10 +24,6 @@ export class EventBus<
     event: Event,
     callback: TEventHandler<Args[Event]>
   ): void {
-    if (!this.listeners[event]) {
-      throw new Error(`Нет события: ${event}`);
-    }
-
     this.listeners[event] = this.listeners[event]!.filter(
       (listener) => listener !== callback
     );

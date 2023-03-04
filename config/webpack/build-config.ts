@@ -1,17 +1,19 @@
 import { type Configuration as webpackConfiguration } from "webpack";
 import { type Configuration as DevServerConfiguration } from "webpack-dev-server";
 import { buildLoaders } from "./build-loaders";
+import { buildMinimizer } from "./build-minimizer";
 import { buildPlugins } from "./build-plugins";
 import { buildResolvers } from "./build-resolvers";
 import { EnumBuildModes, IConfigBuildOptions } from "./types/config";
 
-export function buildConfig(
-  options: IConfigBuildOptions
-): webpackConfiguration & DevServerConfiguration {
+type TConfig = webpackConfiguration & DevServerConfiguration;
+
+export function buildConfig(options: IConfigBuildOptions): TConfig {
   const { paths, mode, port } = options;
   const isDevMode = mode === EnumBuildModes.Development;
 
-  return {
+  const config: TConfig = {
+    mode,
     context: paths.context,
     entry: {
       app: paths.entry,
@@ -27,5 +29,15 @@ export function buildConfig(
       rules: buildLoaders(),
     },
     plugins: buildPlugins({ mode }),
+    optimization: {
+      minimize: true,
+      minimizer: [buildMinimizer(mode)],
+    },
   };
+
+  if (isDevMode) {
+    config.devtool = "source-map";
+  }
+
+  return config;
 }
