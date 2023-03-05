@@ -1,6 +1,6 @@
-import { getPageComponent } from "utils/pages";
-import { EnumAppPages } from "pages/enum-app-pages";
 import { renderDOM } from "core/dom";
+import { EnumAppPages } from "pages/enum-app-pages";
+import { type ChatMessagesHandler } from "services/sockets";
 import {
   comparePropByPath,
   deepEqual,
@@ -8,14 +8,14 @@ import {
   isNullish,
   setPropByPath,
 } from "utils/objects-handle";
-import { type ChatMessagesHandler } from "services/sockets";
-import { EnumStoreEvents } from "./enum-store-events";
+import { getPageComponent } from "utils/pages";
 import { EventBus } from "../event-bus";
-import * as StateProxies from "./state-proxies/main-states-proxies";
+import { EnumStoreEvents } from "./enum-store-events";
 import {
   stateByPathSetter,
   statePathRegex,
 } from "./state-proxies/by-path-proxies";
+import * as StateProxies from "./state-proxies/main-states-proxies";
 
 export const defaultState: TAppState = {
   page: null,
@@ -50,12 +50,19 @@ export class Store {
     return !isNullish(messages) && Object.hasOwn(messages!, chatID);
   }
 
-  dispatch(nextStateOrAction: Partial<TAppState> | Function) {
+  public dispatch(nextStateOrAction: Partial<TAppState> | Function) {
     if (typeof nextStateOrAction === "function") {
       nextStateOrAction();
     } else {
       this._setState(nextStateOrAction);
     }
+  }
+
+  public emitEvent(
+    event: EnumStoreEvents,
+    ...args: TStoreEventsHandlersArgs[typeof event]
+  ) {
+    this.eventBus.emit(event, ...args);
   }
 
   public getStateValueByPath(pathString: string = "", doLog: boolean = false) {
@@ -120,6 +127,8 @@ export class Store {
   }
 
   protected _makeStateProxy(state: TAppState) {
+    const self = this;
+
     return new Proxy(state, {
       set: function (
         target: TAppState,
@@ -140,22 +149,22 @@ export class Store {
 
         switch (prop) {
           case "page":
-            StateProxies.pageSetter.call(this, newValue);
+            StateProxies.pageSetter.call(self, newValue);
             break;
           case "user":
-            StateProxies.userSetter.call(this, oldValue, newValue);
+            StateProxies.userSetter.call(self, oldValue, newValue);
             break;
           case "chats":
-            StateProxies.chatsSetter.call(this, oldValue, newValue);
+            StateProxies.chatsSetter.call(self, oldValue, newValue);
             break;
           case "currentChatID":
-            StateProxies.currentChatSetter.call(this, oldValue, newValue);
+            StateProxies.currentChatSetter.call(self, oldValue, newValue);
             break;
           default:
         }
 
         return true;
-      }.bind(this),
+      },
     });
   }
 

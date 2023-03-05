@@ -1,4 +1,4 @@
-import { type PathRouter } from "core/router/path-router";
+import { type PathRouter } from "core/router";
 
 export function WithRouter<
   P extends ComponentTypings.CommonProps,

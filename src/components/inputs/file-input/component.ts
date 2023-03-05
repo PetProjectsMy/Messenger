@@ -1,7 +1,7 @@
+import { Button, TButtonProps } from "components/buttons";
+import { Input, TInputProps } from "components/inputs";
 import { Block } from "core/dom";
 import { deepMerge } from "utils/objects-handle";
-import { Input, TInputProps } from "components/inputs";
-import { Button, TButtonProps } from "components/buttons";
 import template from "./template";
 
 export const enum EnumFileUploadingStatus {
@@ -82,9 +82,9 @@ export class FileInput extends Block {
     const chooseButtonDefaultProps: TChooseButtonProps = {
       events: {
         click: [
-          function () {
+          function (this: Input) {
             const { fileInput } = this.refs;
-            fileInput._unwrappedElement.click();
+            fileInput.getUnwrappedElement()?.click();
           },
         ],
       },

@@ -29,12 +29,6 @@ export default class BlockBase<
   TProps extends ComponentTypings.CommonProps,
   TState extends ComponentTypings.State
 > {
-  static EVENTS = {
-    INIT: "init",
-    FLOW_CDU: "flow:component-did-update",
-    FLOW_RENDER: "flow:render",
-  };
-
   protected _element: Nullable<HTMLElement> = null;
 
   protected _unwrappedElement: Nullable<HTMLElement> = null;
@@ -109,6 +103,10 @@ export default class BlockBase<
 
   public getElement(): Nullable<HTMLElement> {
     return this._element;
+  }
+
+  public getUnwrappedElement(): Nullable<HTMLElement> {
+    return this._unwrappedElement;
   }
 
   public getStateByPath(pathString: string = "") {

@@ -1,7 +1,7 @@
-import { CoreRouter } from "./router-core";
 import { AppRoutesData, EnumAppRoutes, MapPathToRoute } from "./app-routes";
+import { IRouter } from "./router";
 
-export class PathRouter implements CoreRouter<EnumAppRoutes> {
+export class PathRouter implements IRouter<EnumAppRoutes> {
   private routes: Record<EnumAppRoutes, Function> = {} as any;
 
   private routesData: Record<EnumAppRoutes, TAppRouteData>;

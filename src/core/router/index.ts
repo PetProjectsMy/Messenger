@@ -1,3 +1,3 @@
+export { AppRoutesData, EnumAppRoutes } from "./app-routes";
 export { PathRouter } from "./path-router";
-export { type CoreRouter } from "./router-core";
-export { EnumAppRoutes, AppRoutesData } from "./app-routes";
+export { type IRouter } from "./router";

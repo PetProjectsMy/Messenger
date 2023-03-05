@@ -1,7 +1,7 @@
-import { Block } from "core/dom";
 import { HomeButton } from "components/buttons/home-button";
-import { WithRouterLink } from "hocs/components";
+import { Block } from "core/dom";
 import { EnumAppRoutes } from "core/router";
+import { WithRouterLink } from "hocs/components";
 import { SignUpPageForm } from "./form-component";
 import template from "./template";
 

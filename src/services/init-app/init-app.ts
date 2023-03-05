@@ -5,7 +5,7 @@ import { APIResponseHasError } from "utils/api";
 import { initAppData } from "./init-app-data";
 
 export async function initApp() {
-  console.log(`INIT APP STATRTING`);
+  console.log(`INIT APP STARTING`);
 
   const store = new Store();
   const router = new PathRouter();

@@ -6,6 +6,10 @@ import { deepMerge } from "utils/objects-handle";
 import { getDescendantByPath } from "utils/pages/get-descendant-by-path";
 import BlockBase, { BlockCommonEvents } from "./block-base";
 
+function isChildArray(child: unknown): child is ComponentTypings.ChildArray {
+  return Array.isArray(child) && child.every((el) => el instanceof Block);
+}
+
 export class Block<
   TProps extends ComponentTypings.CommonProps = ComponentTypings.CommonProps,
   TState extends ComponentTypings.State = ComponentTypings.State
@@ -167,7 +171,7 @@ export class Block<
   private _makeStubs(): Record<string, string | string[]> {
     const stubs: Record<string, string> = {};
     Object.entries(this.children).forEach(([name, child]) => {
-      if (Block.isChildArray(child)) {
+      if (isChildArray(child)) {
         stubs[name] = child
           .map((ch) => `<div data-id="${ch.id}"></div>`)
           .join("");
@@ -295,10 +299,6 @@ export class Block<
     } else {
       this._unwrappedElement = element;
     }
-  }
-
-  static isChildArray(child: any): child is ComponentTypings.ChildArray {
-    return Array.isArray(child) && child.every((el) => el instanceof Block);
   }
 }
 

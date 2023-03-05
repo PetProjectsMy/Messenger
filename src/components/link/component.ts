@@ -12,7 +12,6 @@ export class Link extends Block<TLinkProps> {
   protected _afterPropsAssignHook(): void {
     super._afterPropsAssignHook();
 
-    //  eslint-disable-next-line no-script-url
     this.props.htmlAttributes!.href ??= "javascript:void(0);";
   }
 

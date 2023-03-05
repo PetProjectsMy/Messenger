@@ -1,12 +1,9 @@
-export interface CoreRouter<EnumAppRoutes> {
+export interface IRouter<EnumAppRoutes> {
   init(...args: unknown[]): void;
 
   start(...args: unknown[]): void;
 
-  use(
-    route: EnumAppRoutes,
-    renderFunction: Function
-  ): CoreRouter<EnumAppRoutes>;
+  use(route: EnumAppRoutes, renderFunction: Function): IRouter<EnumAppRoutes>;
 
   go(route: EnumAppRoutes): void;
 

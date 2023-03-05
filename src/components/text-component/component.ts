@@ -1,5 +1,5 @@
 import { Block } from "core/dom";
-import templator from "./template";
+import templateMaker from "./template";
 
 type TTextComponentProps = ComponentTypings.WithCommonProps<{
   text?: string;
@@ -16,6 +16,6 @@ export class TextComponent extends Block<TTextComponentProps> {
   }
 
   protected render(): string {
-    return templator(this.props.htmlTag as string);
+    return templateMaker(this.props.htmlTag as string);
   }
 }
