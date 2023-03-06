@@ -1,11 +1,10 @@
 import { WithStoreTextComponent } from "hocs/components";
 
 export class ChatTitle extends WithStoreTextComponent {
-  // @ts-ignore 'chatID' is declared but its value is never read
   private chatID: string;
 
   constructor(chatID: string) {
-    const beforePropsAssignHook = function () {
+    const beforePropsAssignHook = function (this: ChatTitle) {
       this.chatID = chatID;
       const title = this.store!.getChatsDataByPath(`${this.chatID}.title`);
       this.props = {

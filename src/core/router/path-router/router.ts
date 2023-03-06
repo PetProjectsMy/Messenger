@@ -1,8 +1,8 @@
-import { AppRoutesData, EnumAppRoutes, MapPathToRoute } from "./app-routes";
-import { IRouter } from "./router";
+import { AppRoutesData, EnumAppRoutes, MapPathToRoute } from "../app-routes";
+import { IRouter } from "../router";
 
 export class PathRouter implements IRouter<EnumAppRoutes> {
-  private routes: Record<EnumAppRoutes, Function> = {} as any;
+  private routes: Record<EnumAppRoutes, TFunction> = {} as any;
 
   private routesData: Record<EnumAppRoutes, TAppRouteData>;
 
@@ -57,7 +57,7 @@ export class PathRouter implements IRouter<EnumAppRoutes> {
     renderFunction();
   }
 
-  use(route: EnumAppRoutes, renderFunction: Function) {
+  use(route: EnumAppRoutes, renderFunction: TFunction) {
     this.routes[route] = renderFunction;
     return this;
   }

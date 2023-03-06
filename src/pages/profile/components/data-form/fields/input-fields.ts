@@ -68,7 +68,7 @@ Object.entries(MapInputFieldToProps).forEach(
 
 export const MapInputFieldToUserDataRecord: Record<
   EnumInputFields,
-  Keys<TAppUserData>
+  Keys<StoreTypings.UserData>
 > = {
   [EnumInputFields.FirstName]: "firstName",
   [EnumInputFields.SecondName]: "secondName",

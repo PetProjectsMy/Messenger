@@ -1,8 +1,6 @@
-import { type Block } from "core/dom";
-
 export function getDescendantByPath<
   TDescendant = ComponentTypings.Child | ComponentTypings.ChildArray
->(block: Block, pathString: string): TDescendant {
+>(block: ComponentTypings.Block, pathString: string): TDescendant {
   let child: ComponentTypings.Child | ComponentTypings.ChildArray = block;
   let { children } = block;
 

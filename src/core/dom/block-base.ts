@@ -51,7 +51,7 @@ export default class BlockBase<
   protected _componentDidUpdate(
     oldPropsOrState: Partial<TProps> | Partial<TState>,
     newPropsOrState: Partial<TProps> | Partial<TState>,
-    forceUpdate: boolean = false
+    forceUpdate = false
   ): void {
     if (
       forceUpdate ||
@@ -109,7 +109,7 @@ export default class BlockBase<
     return this._unwrappedElement;
   }
 
-  public getStateByPath(pathString: string = "") {
+  public getStateByPath(pathString = "") {
     return getPropByPath(this.state, pathString);
   }
 
@@ -147,8 +147,8 @@ export default class BlockBase<
   public setPropByPath(
     propPath: string,
     newValue: unknown,
-    forceUpdate: boolean = false,
-    doLog: boolean = false
+    forceUpdate = false,
+    doLog = false
   ): void {
     const didUpdate =
       forceUpdate || !comparePropByPath(this.props, propPath, newValue, doLog);
@@ -162,8 +162,8 @@ export default class BlockBase<
   public setChildByPath(
     childPath: string,
     newChild: ComponentTypings.Child | ComponentTypings.ChildArray,
-    forceUpdate: boolean = false,
-    doLog: boolean = false
+    forceUpdate = false,
+    doLog = false
   ) {
     const didUpdate =
       forceUpdate ||

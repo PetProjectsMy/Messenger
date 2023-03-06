@@ -1,15 +1,14 @@
-import { type Input } from "components/inputs";
 import { WithStoreButton } from "hocs/components";
 import { isNullish } from "utils/objects-handle";
-import backgorundImage from "./icon.png";
+import backgroundImage from "./icon.png";
 
 export class SendMessageButton extends WithStoreButton {
-  constructor(messageInputRef: Input) {
+  constructor(messageInputRef: ComponentTypings.Input) {
     super({
       props: {
         htmlClasses: ["send-message-button"],
         htmlStyle: {
-          "background-image": backgorundImage,
+          "background-image": backgroundImage,
         },
       },
       refs: {
@@ -30,7 +29,7 @@ export class SendMessageButton extends WithStoreButton {
     const currentChatID = store.getCurrentChatID();
     const isChatSelected = !isNullish(currentChatID);
 
-    const messageInput = this.refs.messageInput as Input;
+    const messageInput = this.refs.messageInput as ComponentTypings.Input;
     const webSocket = store.getSocketByChatID(currentChatID, true);
     console.log(
       `CHAT(${currentChatID}) Websocket: ${JSON.stringify(webSocket)}`

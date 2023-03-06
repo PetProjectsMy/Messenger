@@ -20,7 +20,7 @@
     "typeRoots": ["src/typings", "./node_modules/@types/"],
     "types": ["node", "jest"]
   },
-  "exclude": ["node_modules", "build"],
+  "exclude": ["node_modules/", "build/", "config/eslint/"],
   "ts-node": {
     "compilerOptions": {
       "module": "CommonJS"

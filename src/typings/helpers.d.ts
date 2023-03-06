@@ -1,4 +1,6 @@
 declare global {
+  export type TFunction = (...args: unknown[]) => unknown;
+
   export type Nullable<T> = T | null | undefined;
 
   export type Keys<T extends Record<string, unknown>> = keyof T;

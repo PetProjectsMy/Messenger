@@ -1,10 +1,9 @@
 import { WithStoreBlock } from "hocs/components";
 import { ChatAvatar } from "./avatar";
-import { ChatTitle } from "./title";
 import template from "./template";
+import { ChatTitle } from "./title";
 
 export class ChatComponent extends WithStoreBlock {
-  // @ts-ignore
   public readonly chatID: string;
 
   constructor(chatID: string) {

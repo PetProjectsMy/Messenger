@@ -3,7 +3,7 @@ export interface IRouter<EnumAppRoutes> {
 
   start(...args: unknown[]): void;
 
-  use(route: EnumAppRoutes, renderFunction: Function): IRouter<EnumAppRoutes>;
+  use(route: EnumAppRoutes, renderFunction: TFunction): IRouter<EnumAppRoutes>;
 
   go(route: EnumAppRoutes): void;
 

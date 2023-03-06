@@ -5,7 +5,7 @@ const enum METHODS {
   DELETE = "DELETE",
 }
 
-const DefualtHeaders = {
+const DefaultHeaders = {
   [METHODS.GET]: { accept: "application/json" },
   [METHODS.POST]: {
     "Content-Type": "application/json",
@@ -47,7 +47,7 @@ type THttpMethod = (
 ) => Promise<any>;
 
 class HTTPTransport {
-  baseURL: string = "";
+  baseURL = "";
 
   constructor({ baseURL }: { baseURL: string }) {
     this.baseURL = baseURL;
@@ -76,7 +76,7 @@ class HTTPTransport {
 
   request = (apiURL: string, options: TRequestOptions) => {
     const { method, data, timeout = 5000 } = options;
-    const headers = { ...DefualtHeaders[method], ...options.headers };
+    const headers = { ...DefaultHeaders[method], ...options.headers };
 
     return new Promise((resolve, reject) => {
       if (!method) {

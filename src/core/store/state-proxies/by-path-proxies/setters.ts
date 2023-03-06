@@ -1,25 +1,31 @@
+import { type ImageComponent } from "components/image";
+import { type MessagesDisplayArea } from "pages/chats/components/chat-section/messages-display-section";
 import { EnumAppPages } from "pages/enum-app-pages";
 
-export function ChatAvatar(chatID: string | number, newAvatar: string) {
-  const pageType = this.state.page;
+export function setChatAvatar(
+  this: StoreTypings.Store,
+  chatID: string | number,
+  newAvatar: string
+) {
+  const pageType = this.getCurrentPageType();
   if (pageType !== EnumAppPages.Chats) {
     return;
   }
 
-  const { page } = this;
-  const chatComponent = page.refs[`chat-${chatID}`];
-  const { avatarImage } = chatComponent.children;
+  const refs = this.getCurrentPageRefs();
+  const chatComponent = refs[`chat-${chatID}`];
+  const avatarImage = chatComponent.children.avatarImage as ImageComponent;
   avatarImage.setPropByPath("htmlAttributes.src", newAvatar);
 }
 
-export function ChatNewMessage(chatID: string) {
-  const pageType = this.state.page;
+export function setChatNewMessage(this: StoreTypings.Store, chatID: string) {
+  const pageType = this.getCurrentPageType();
   if (pageType !== EnumAppPages.Chats) {
     return;
   }
 
-  const { page } = this;
+  const refs = this.getCurrentPageRefs();
   if (chatID === window.store.getCurrentChatID())
-    page.refs.messagesDisplaySection.createMessagesList();
-  page.refs.messagesDisplaySection.setChatAbsenceWarning();
+    (refs.messagesDisplaySection as MessagesDisplayArea).createMessagesList();
+  (refs.messagesDisplaySection as MessagesDisplayArea).setChatAbsenceWarning();
 }

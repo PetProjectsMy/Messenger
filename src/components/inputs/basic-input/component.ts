@@ -27,18 +27,17 @@ export class Input extends Block<TInputProps> {
   }
 
   public toggleDisabledState(state: boolean | undefined = undefined) {
-    const element = this._unwrappedElement as HTMLInputElement;
+    const element = this.getUnwrappedElement() as HTMLInputElement;
 
     if (state !== undefined) {
       element.disabled = state;
-      return;
+    } else {
+      element.disabled = !element.disabled;
     }
-
-    element.disabled = !element.disabled;
   }
 
   public setValue(value: string) {
-    const element = this._unwrappedElement! as HTMLInputElement;
+    const element = this.getUnwrappedElement() as HTMLInputElement;
     element.value = value;
   }
 }

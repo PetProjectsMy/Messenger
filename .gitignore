@@ -9,6 +9,7 @@ build
 *.css.map
 
 *.js
+!.eslintrc.js
 !config/**/*.js
 
 *.log

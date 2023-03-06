@@ -1,7 +1,7 @@
 import { AuthorizationAPI } from "api";
 import { EnumAppRoutes } from "core/router";
-import { APIResponseHasError } from "utils/api";
 import { initAppData } from "services/init-app/init-app-data";
+import { APIResponseHasError } from "utils/api";
 
 export const enum EnumLoginAPIErrors {
   AlreadyInSystem = "User already in system",
@@ -32,7 +32,7 @@ class AuthorizationServiceClass {
 
   async login(
     data: TLoginFormDTO,
-    afterRequestCallback: TAfterRequestCallback = () => {}
+    afterRequestCallback?: TAfterRequestCallback
   ) {
     let response;
     let status;
@@ -59,7 +59,7 @@ class AuthorizationServiceClass {
           await initAppData(userResponse.id);
         } else {
           throw new Error(
-            `Unexpecter User Response After Login: ${userResponse.reason}`
+            `Unexpected User Response After Login: ${userResponse.reason}`
           );
         }
         window.router.go(EnumAppRoutes.Chats);

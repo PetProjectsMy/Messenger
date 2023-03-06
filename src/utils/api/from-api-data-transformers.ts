@@ -7,7 +7,7 @@ export function transformAvatarURL(url: Nullable<string>) {
 
 export function transformProfileAPIResponseToUserData(
   response: TProfileAPIResponse
-): TAppUserData {
+): StoreTypings.UserData {
   return {
     id: response.id,
     firstName: response.first_name,
@@ -56,7 +56,7 @@ export function transformChatGetTokenResponseToToken(
 }
 
 export function transformWebsocketMessageDTOtoAppMessage(
-  message: TWebsocketMessageDTO
+  message: WebSocketTypings.MessageDTO
 ): TAppChatMessage {
   return {
     userID: message.user_id.toString(),

@@ -1,6 +1,7 @@
 import { transformWebsocketMessageDTOtoAppMessage } from "utils/api";
+import { EnumMessageType } from "./enum-message-types";
 
-type TChatWebSocketContructorArgs = {
+type TConstructorArgs = {
   userID: string;
   chatID: string;
   chatToken: string;
@@ -15,11 +16,11 @@ export class ChatWebSocket {
 
   protected socket: WebSocket;
 
-  protected messagesArrayHandler: Nullable<
-    (messagesBatch: TWebsocketMessageDTO[]) => void
-  > = null;
+  protected _handleMessagesArray(messagesBatch: WebSocketTypings.MessageDTO[]) {
+    return;
+  }
 
-  constructor(argsObject: TChatWebSocketContructorArgs) {
+  constructor(argsObject: TConstructorArgs) {
     Object.assign(this, argsObject);
     this._createSocket();
   }
@@ -35,7 +36,7 @@ export class ChatWebSocket {
     const ping = setInterval(function () {
       socket.send(
         JSON.stringify({
-          type: "ping",
+          type: EnumMessageType.Ping,
         })
       );
     }, 30000);
@@ -53,7 +54,7 @@ export class ChatWebSocket {
 
     socket.addEventListener(
       "message",
-      function (event: any) {
+      function (this: ChatWebSocket, event: MessageEvent) {
         let message;
 
         try {
@@ -67,11 +68,14 @@ export class ChatWebSocket {
           return;
         }
 
-        if (message.type === "pong" || message.type === "user connected") {
+        if (
+          message.type === EnumMessageType.Pong ||
+          message.type === EnumMessageType.UserConnected
+        ) {
           return;
         }
-        if (Array.isArray(message) && this.messagesArrayHandler) {
-          this.messagesArrayHandler(message);
+        if (Array.isArray(message)) {
+          this._handleMessagesArray(message);
           return;
         }
 
@@ -101,7 +105,7 @@ export class ChatWebSocket {
     });
   }
 
-  public send(content: string, type: string = "message") {
+  public send(content: string, type = EnumMessageType.Message) {
     this.socket.send(JSON.stringify({ content, type }));
   }
 
@@ -109,7 +113,7 @@ export class ChatWebSocket {
     return this.socket.send(
       JSON.stringify({
         content: offset.toString(),
-        type: "get old",
+        type: EnumMessageType.GetOld,
       })
     );
   }

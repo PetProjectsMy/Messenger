@@ -1,21 +1,19 @@
 import { transformWebsocketMessageDTOtoAppMessage } from "utils/api";
 import { ChatWebSocket } from "./socket-class";
 
-const allMessagesReceiver = function (messagesBatch: TWebsocketMessageDTO[]) {
-  this._setMessagesBatch(messagesBatch);
-};
-
 export class ChatMessagesHandler extends ChatWebSocket {
   static readonly messagesGetLimit = 20;
 
-  private currentBatch: number = -1;
+  protected _handleMessagesArray(messagesBatch: WebSocketTypings.MessageDTO[]) {
+    this._setMessagesBatch(messagesBatch);
+  }
+  private currentBatch = -1;
 
-  private allMessagesReceivedStatus: boolean = false;
+  private allMessagesReceivedStatus = false;
 
   private allMessages = [] as TAppChatMessage[];
 
-  // @ts-ignore '_setMessagesBatch' is declared but its value is never read.
-  private _setMessagesBatch(messagesBatch: TWebsocketMessageDTO[]) {
+  private _setMessagesBatch(messagesBatch: WebSocketTypings.MessageDTO[]) {
     if (messagesBatch.length === 0) {
       this.allMessagesReceivedStatus = true;
       return;
@@ -55,7 +53,7 @@ export class ChatMessagesHandler extends ChatWebSocket {
     })
       .catch((error: TypeError) => {
         console.error(
-          `ERROR OCCURED ON BATCH ${currentBatch} WHILE RECEIVING ALL MESSAGES: ${error}`
+          `ERROR OCCURRED ON BATCH ${currentBatch} WHILE RECEIVING ALL MESSAGES: ${error}`
         );
         this._resetAllMessageReceivingStatus();
       })
@@ -69,8 +67,6 @@ export class ChatMessagesHandler extends ChatWebSocket {
   }
 
   public async getAllMessages() {
-    this.messagesArrayHandler = allMessagesReceiver.bind(this);
-
     await this._getAllMessagesFromBatch(0);
     if (this.allMessagesReceivedStatus) {
       console.log(`CHAT(${this.chatID}) ALL MESSAGES RECEIVED SUCCESSFULLY`);
@@ -82,7 +78,6 @@ export class ChatMessagesHandler extends ChatWebSocket {
   }
 
   private _resetAllMessageReceivingStatus() {
-    this.messagesArrayHandler = null;
     this.allMessages = [];
     this.allMessagesReceivedStatus = false;
     this.currentBatch = -1;

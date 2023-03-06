@@ -11,7 +11,7 @@ export function transformSignUpFormDatatoAPI(
   };
 }
 
-export function transformLoginFormDatatoAPI(
+export function transformLoginFormDataToAPI(
   data: TLoginFormData
 ): TLoginFormDTO {
   return {
@@ -20,7 +20,7 @@ export function transformLoginFormDatatoAPI(
   };
 }
 
-export function transformProfileFormDatatoAPI(
+export function transformProfileFormDataToAPI(
   data: TProfileFormData
 ): TProfileChangeDTO {
   return {

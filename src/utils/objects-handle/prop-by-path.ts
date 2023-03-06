@@ -1,12 +1,12 @@
-import { deepMerge as merge } from "./objects-merge";
-import { deepEqual } from "./objects-compare";
 import { isObject } from "./is-object";
+import { deepEqual } from "./objects-compare";
+import { deepMerge as merge } from "./objects-merge";
 
 export function setPropByPath(
   object: Indexed | unknown,
   pathString: string,
   value: unknown,
-  doLog: boolean = false
+  doLog = false
 ): Indexed | unknown {
   if (!isObject(object)) {
     return object;
@@ -40,7 +40,7 @@ export function comparePropByPath(
   object: Indexed | unknown,
   pathString: string,
   valueToCompare: unknown,
-  doLog: boolean = false
+  doLog = false
 ): Indexed | unknown {
   if (!isObject(object)) {
     throw new Error(
@@ -82,7 +82,7 @@ export function comparePropByPath(
 export function getPropByPath(
   object: Indexed | unknown,
   pathString: string,
-  doLog: boolean = false
+  doLog = false
 ): any {
   if (!isObject(object)) {
     throw new Error(

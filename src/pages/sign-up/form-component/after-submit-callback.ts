@@ -1,8 +1,8 @@
-import { SignUpService, ProfileService } from "services";
+import { ProfileService, SignUpService } from "services";
 import {
-  transformSignUpFormDatatoAPI,
-  transformProfileAPIResponseToUserData,
   APIResponseHasError,
+  transformProfileAPIResponseToUserData,
+  transformSignUpFormDatatoAPI,
 } from "utils/api";
 
 async function afterRequestCallback(response: any) {
@@ -19,7 +19,7 @@ async function afterRequestCallback(response: any) {
   window.store.dispatch({ user });
 }
 
-export async function afterValidationCallback() {
+export async function afterSubmitCallback() {
   const formData = this.collectFormData();
   const apiData = transformSignUpFormDatatoAPI(formData);
   console.log(`API data: ${JSON.stringify(apiData)}`);

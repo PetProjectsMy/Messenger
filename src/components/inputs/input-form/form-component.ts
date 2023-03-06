@@ -1,13 +1,13 @@
 import { Block } from "core/dom";
+import { TInputProps } from "../basic-input";
 import { InputWithValidation } from "../input-with-validation";
-import { type Input, TInputProps } from "../basic-input";
-import { FormSubmitButton } from "./submit-button";
 import template from "./form-template";
+import { FormSubmitButton } from "./submit-button";
 
 type TInputFormProps = ComponentTypings.WithCommonProps<{
   formTitle?: string;
-  isSubmitButtonNeeded?: Boolean;
-  afterValidationCallback?: () => void;
+  hasSubmitButton?: boolean;
+  afterSubmitCallback?: () => void;
 }>;
 
 type TInputFormState = {
@@ -15,15 +15,15 @@ type TInputFormState = {
   apiResponseError: string;
 };
 
+export const FORM_VALIDATION_ERROR = "Form has input errors";
+
 export class InputForm<
-  TEnumInputFieldsNames extends Record<string, string> = {},
+  TEnumInputFieldsNames extends Record<string, string> = Record<string, never>,
   TInputClass extends typeof InputWithValidation = typeof InputWithValidation
 > extends Block<TInputFormProps, TInputFormState> {
   protected helpers: {
     enumInputFieldsNames: TEnumInputFieldsNames;
   };
-
-  static readonly validationFailedError = "Form has input errors";
 
   constructor({
     enumInputFieldsNames,
@@ -46,7 +46,7 @@ export class InputForm<
     Object.values(enumInputFieldsNames).forEach((fieldName) => {
       const inputField = new InputClass({
         componentName: `${fieldName} input with validation`,
-        props: mapInputToProps![fieldName] ?? {},
+        props: mapInputToProps[fieldName] ?? {},
         helpers: mapInputToHelpers[fieldName] ?? {},
       });
 
@@ -63,8 +63,7 @@ export class InputForm<
       children,
       props: {
         formTitle: "",
-        isSubmitButtonNeeded: true,
-        afterValidationCallback: () => {},
+        hasSubmitButton: true,
         ...props,
       },
       refs,
@@ -91,13 +90,12 @@ export class InputForm<
   protected _beforeRenderHook(): void {
     super._beforeRenderHook();
 
-    if (this.props.isSubmitButtonNeeded && !this.children.submitButton) {
+    if (this.props.hasSubmitButton && !this.children.submitButton) {
       this.children.submitButton = new FormSubmitButton({ form: this });
     }
   }
 
-  // @ts-ignore '_validateForm' is declared but its value is never read
-  private _validateForm(): void {
+  public validateForm(): void {
     let formHasInputErrors = false;
 
     Object.values(this.refs).forEach((inputField: InputWithValidation) => {
@@ -117,15 +115,22 @@ export class InputForm<
 
     if (formHasInputErrors) {
       console.log(`Form has input errors: ${JSON.stringify(this.state)}`);
-      this.state.apiResponseError = InputForm.validationFailedError;
+      this.state.apiResponseError = FORM_VALIDATION_ERROR;
     } else {
       this.state.apiResponseError = "";
     }
   }
 
+  public async callAfterSubmitCallback() {
+    const { afterSubmitCallback } = this.props;
+    if (afterSubmitCallback) {
+      await afterSubmitCallback.call(this);
+    }
+  }
+
   public collectFormData(): Record<string, string> {
     return Object.entries(this.refs).reduce(
-      (acc, [fieldName, inputField]: [string, Input]) => {
+      (acc, [fieldName, inputField]: [string, ComponentTypings.Input]) => {
         acc[fieldName] = inputField.getValue();
         return acc;
       },
@@ -133,7 +138,7 @@ export class InputForm<
     );
   }
 
-  getAPIResponseError() {
+  public getAPIResponseError() {
     return this.state.apiResponseError;
   }
 }

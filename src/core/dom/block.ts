@@ -1,5 +1,4 @@
 import { type PathRouter } from "core/router";
-import { type Store } from "core/store";
 import Handlebars from "handlebars";
 import { nanoid } from "nanoid";
 import { deepMerge } from "utils/objects-handle";
@@ -24,9 +23,9 @@ export class Block<
 
   public router?: PathRouter;
 
-  public store?: Store;
+  public store?: StoreTypings.Store;
 
-  private wasRendered: Boolean = false;
+  private wasRendered = false;
 
   protected wrappedId?: string;
 
@@ -84,19 +83,19 @@ export class Block<
 
   protected _afterPropsAssignHook() {
     if (this.helpers.afterPropsAssignHook) {
-      (this.helpers.afterPropsAssignHook as Function).call(this);
+      (this.helpers.afterPropsAssignHook as TFunction).call(this);
     }
   }
 
   protected _afterRenderHook() {
     if (this.helpers.afterRenderHook) {
-      (this.helpers.afterRenderHook as Function).call(this);
+      (this.helpers.afterRenderHook as TFunction).call(this);
     }
   }
 
   protected _beforePropsAssignHook() {
     if (this.helpers.beforePropsAssignHook) {
-      (this.helpers.beforePropsAssignHook as Function).call(this);
+      (this.helpers.beforePropsAssignHook as TFunction).call(this);
     }
   }
 
@@ -104,13 +103,17 @@ export class Block<
     this._bindEventListenersToBlock();
 
     if (this.helpers.beforePropsProxyHook) {
-      (this.helpers.beforePropsProxyHook as Function).call(this);
+      (this.helpers.beforePropsProxyHook as TFunction).call(this);
     }
   }
 
-  protected _beforeRegisterEventsHook() {}
+  protected _beforeRegisterEventsHook() {
+    return;
+  }
 
-  protected _beforeRenderHook() {}
+  protected _beforeRenderHook() {
+    return;
+  }
 
   private _compile(): DocumentFragment {
     const fragment = document.createElement("template") as HTMLTemplateElement;
@@ -143,7 +146,7 @@ export class Block<
   }
 
   public getChildByPath<TChild = ComponentTypings.Child>(
-    pathString: string = ""
+    pathString = ""
   ): TChild {
     return getDescendantByPath<TChild>(this, pathString);
   }
@@ -256,7 +259,7 @@ export class Block<
 
   private _setHtmlAttributes() {
     Object.entries(this.props.htmlAttributes!).forEach(([attrName, value]) => {
-      this._unwrappedElement!.setAttribute(attrName, value);
+      this._unwrappedElement?.setAttribute(attrName, value);
     });
   }
 
@@ -275,12 +278,12 @@ export class Block<
     this._setHtmlClasses();
     this._setHtmlAttributes();
     this._setElementStyle();
-    this._unwrappedElement!.removeAttribute("wrapped-id");
+    this._unwrappedElement?.removeAttribute("wrapped-id");
   }
 
   private _setHtmlClasses() {
-    if (this.props.htmlClasses!.length) {
-      this._unwrappedElement!.classList.add(...this.props.htmlClasses!);
+    if (this.props.htmlClasses?.length) {
+      this._unwrappedElement?.classList.add(...this.props.htmlClasses!);
     }
   }
 

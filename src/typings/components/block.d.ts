@@ -1,14 +1,15 @@
-import { type Block } from "core/dom";
+import { type Block as TBlock } from "core/dom";
 import type { TEventHandler } from "core/event-bus";
 
 type TEventListener = EventListener;
 
 declare global {
   export namespace ComponentTypings {
+    export type Block = TBlock;
     export type BlockClass<
       P extends CommonProps = CommonProps,
       S extends State = State
-    > = typeof Block<P, S>;
+    > = typeof TBlock<P, S>;
 
     export type EventHandler = TEventHandler;
     export type EventListener = TEventListener;
@@ -47,5 +48,3 @@ declare global {
     };
   }
 }
-
-export {};

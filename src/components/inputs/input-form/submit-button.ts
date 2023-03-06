@@ -1,17 +1,17 @@
 import { Button } from "components/buttons";
-import { type Block } from "core/dom";
 
-export async function formSubmitButtonCallback() {
-  const { form } = this.refs;
+export async function formSubmitButtonCallback(this: Button) {
+  const form = this.refs.form as ComponentTypings.InputForm;
   this.state.apiResponseSuccess = "";
-  form._validateForm();
-  if (form.state.apiResponseError !== form.constructor.validationFailedError) {
-    await form.props.afterValidationCallback!.call(form);
+
+  form.validateForm();
+  if (form.getAPIResponseError() === "") {
+    await form.callAfterSubmitCallback();
   }
 }
 
 export class FormSubmitButton extends Button {
-  constructor(refs: { form: Block }) {
+  constructor(refs: { form: ComponentTypings.InputForm }) {
     super({
       refs,
       props: {

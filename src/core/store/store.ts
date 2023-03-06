@@ -3,7 +3,6 @@ import { EnumAppPages } from "pages/enum-app-pages";
 import { type ChatMessagesHandler } from "services/sockets";
 import {
   comparePropByPath,
-  deepEqual,
   getPropByPath,
   isNullish,
   setPropByPath,
@@ -12,12 +11,12 @@ import { getPageComponent } from "utils/pages";
 import { EventBus } from "../event-bus";
 import { EnumStoreEvents } from "./enum-store-events";
 import {
-  stateByPathSetter,
+  stateByPathSetters,
   statePathRegex,
 } from "./state-proxies/by-path-proxies";
-import * as StateProxies from "./state-proxies/main-states-proxies";
+import { stateMainPropsSetter } from "./state-proxies/props-setter";
 
-export const defaultState: TAppState = {
+export const defaultState: StoreTypings.AppState = {
   page: null,
   user: null,
   chats: null,
@@ -36,21 +35,22 @@ type TStoreEventsHandlersArgs = {
 export class Store {
   private eventBus = new EventBus<TStoreEvents, TStoreEventsHandlersArgs>();
 
-  private state: TAppState;
+  private state: StoreTypings.AppState;
 
-  // @ts-ignore 'page' is declared but its value is never read
-  private page: TAppPage;
+  private _currentPageObject: PagesTypings.AppPage;
 
-  constructor(state: TAppState = defaultState) {
+  constructor(state: StoreTypings.AppState = defaultState) {
     this.state = this._makeStateProxy(state);
   }
 
   public chatHasMessages(chatID: string): boolean {
     const messages = this.state.chatsMessages;
-    return !isNullish(messages) && Object.hasOwn(messages!, chatID);
+    return !isNullish(messages) && Object.hasOwn(messages, chatID);
   }
 
-  public dispatch(nextStateOrAction: Partial<TAppState> | Function) {
+  public dispatch(
+    nextStateOrAction: Partial<StoreTypings.AppState> | TFunction
+  ) {
     if (typeof nextStateOrAction === "function") {
       nextStateOrAction();
     } else {
@@ -65,11 +65,11 @@ export class Store {
     this.eventBus.emit(event, ...args);
   }
 
-  public getStateValueByPath(pathString: string = "", doLog: boolean = false) {
+  public getStateValueByPath(pathString = "", doLog = false) {
     return getPropByPath(this.state, pathString, doLog);
   }
 
-  public getUserDataByPath(pathString: string = "", doLog: boolean = false) {
+  public getUserDataByPath(pathString = "", doLog = false) {
     const path = `user${pathString ? "." : ""}${pathString}`;
     return this.getStateValueByPath(path, doLog);
   }
@@ -78,7 +78,7 @@ export class Store {
     return this.getStateValueByPath("user.id");
   }
 
-  public getChatsDataByPath(pathString: string = "", doLog = false) {
+  public getChatsDataByPath(pathString = "", doLog = false) {
     const path = `chats${pathString ? "." : ""}${pathString}`;
     return this.getStateValueByPath(path, doLog);
   }
@@ -87,13 +87,16 @@ export class Store {
     return this.getStateValueByPath("currentChatID") as string;
   }
 
-  public getPageType(): Nullable<string> {
-    const { page } = this.state;
-    if (!page) {
-      return page;
-    }
+  public getCurrentPageObject() {
+    return this._currentPageObject;
+  }
 
-    return page.constructor.name;
+  public getCurrentPageRefs() {
+    return this._currentPageObject.refs;
+  }
+
+  public getCurrentPageType(): Nullable<string> {
+    return this.state.page;
   }
 
   public getSocketByChatID(chatID?: string, doLog = false) {
@@ -107,64 +110,30 @@ export class Store {
   init() {
     this.eventBus.on(
       EnumStoreEvents.PageChanged,
-      function (newPage: EnumAppPages) {
-        const PageComponent = getPageComponent(newPage);
-        const page = new PageComponent();
-        this.page = page;
-        renderDOM({ component: page });
-        document.title = `App / ${page.componentName}`;
+      function (this: Store, newPageType: EnumAppPages) {
+        const PageComponent = getPageComponent(newPageType);
+        const newPageObject = new PageComponent();
+        this._currentPageObject = newPageObject;
+        renderDOM({ component: newPageObject });
+        document.title = `App / ${newPageObject.componentName}`;
         console.log(`Store event '${EnumStoreEvents.PageChanged}' emitted`);
       }.bind(this)
     );
   }
 
-  public isPageSet(): Boolean {
+  public isPageSet(): boolean {
     return Boolean(this.state.page);
   }
 
-  public isUserAuthorized(): Boolean {
+  public isUserAuthorized(): boolean {
     return Boolean(this.state.user);
   }
 
-  protected _makeStateProxy(state: TAppState) {
-    const self = this;
+  protected _makeStateProxy(state: StoreTypings.AppState) {
+    const propsSetter = stateMainPropsSetter.bind(this);
 
     return new Proxy(state, {
-      set: function (
-        target: TAppState,
-        prop: Keys<TAppState>,
-        newValue: unknown
-      ) {
-        const oldValue = target[prop];
-        if (deepEqual(oldValue, newValue)) {
-          return true;
-        }
-
-        (target as Record<string, unknown>)[prop] = newValue;
-        console.log(
-          `STORE ${prop}: ${JSON.stringify(oldValue)} -> ${JSON.stringify(
-            newValue
-          )}`
-        );
-
-        switch (prop) {
-          case "page":
-            StateProxies.pageSetter.call(self, newValue);
-            break;
-          case "user":
-            StateProxies.userSetter.call(self, oldValue, newValue);
-            break;
-          case "chats":
-            StateProxies.chatsSetter.call(self, oldValue, newValue);
-            break;
-          case "currentChatID":
-            StateProxies.currentChatSetter.call(self, oldValue, newValue);
-            break;
-          default:
-        }
-
-        return true;
-      },
+      set: propsSetter,
     });
   }
 
@@ -172,15 +141,11 @@ export class Store {
     return this.setStateByPath(`chatsSockets.${chatID}`, socket, true);
   }
 
-  private _setState(nextState: Partial<TAppState>) {
+  private _setState(nextState: Partial<StoreTypings.AppState>) {
     Object.assign(this.state, nextState);
   }
 
-  public setStateByPath(
-    pathString: string,
-    newValue: unknown,
-    doLog: boolean = false
-  ) {
+  public setStateByPath(pathString: string, newValue: unknown, doLog = false) {
     const isValueChanged = !comparePropByPath(
       this.state,
       pathString,
@@ -197,23 +162,23 @@ export class Store {
     let match = [...pathString.matchAll(statePathRegex.ChatAvatarChange)];
     if (match.length === 1) {
       const chatID = match[0][1];
-      stateByPathSetter.ChatAvatar.call(this, chatID, newValue);
+      stateByPathSetters.setChatAvatar.call(this, chatID, newValue);
       return;
     }
 
     match = [...pathString.matchAll(statePathRegex.ChatNewMessage)];
     if (match.length === 1) {
       const chatID = match[0][1];
-      stateByPathSetter.ChatNewMessage.call(this, chatID);
+      stateByPathSetters.setChatNewMessage.call(this, chatID);
     }
   }
 
-  public userHasAnyChats(): Boolean {
+  public userHasAnyChats(): boolean {
     const { chats } = this.state;
     if (isNullish(chats)) {
       return false;
     }
 
-    return Object.keys(chats!).length > 0;
+    return Object.keys(chats).length > 0;
   }
 }

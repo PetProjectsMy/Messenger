@@ -1,17 +1,17 @@
-import { Block } from "core/dom";
-import { Input } from "components/inputs";
 import { HomeButton } from "components/buttons/home-button";
-import { WithStore } from "hocs";
 import { type ImageComponent } from "components/image";
-import template from "./template";
+import { Input } from "components/inputs";
+import { Block } from "core/dom";
+import { WithStore } from "hocs";
 import {
   DataChangeButton,
-  ProfilePageInputForm,
   ProfileHeader,
+  ProfilePageInputForm,
 } from "./components";
+import { AvatarUploadForm } from "./components/avatar-upload-form";
 import { EnumInputFields } from "./components/data-form";
 import { MapInputFieldToUserDataRecord } from "./components/data-form/fields";
-import { AvatarUploadForm } from "./components/avatar-upload-form";
+import template from "./template";
 
 type TProfilePageProps = ComponentTypings.WithCommonProps<{ userID: number }>;
 const ProfilePageBlock = WithStore(Block<TProfilePageProps>);
@@ -44,7 +44,7 @@ export class ProfilePage extends ProfilePageBlock {
   }
 
   public updateUserInfo() {
-    const userData = this.store.getUserDataByPath() as TAppUserData;
+    const userData = this.store.getUserDataByPath() as StoreTypings.UserData;
 
     Object.entries((this.children.profileDataForm as Block).refs).forEach(
       ([inputName, inputBlock]: [EnumInputFields, Input]) => {
