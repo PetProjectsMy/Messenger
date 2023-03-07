@@ -1,4 +1,7 @@
-.parcel-cache
-node_modules
-modules.txt
-package copy.json
+* 
+
+!dockerfile
+!.dockerignore
+
+!build/
+!build/**
