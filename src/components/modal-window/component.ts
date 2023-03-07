@@ -46,7 +46,7 @@ export class ModalWindow extends Block {
     const newContentType = newContentBlock.componentName;
     console.log(`MODAL CONTENT: ${oldContentType} -> ${newContentType}`);
 
-    this.setChildByPath("content", newContentBlock);
+    this.setChild({ childName: "content", value: newContentBlock });
   }
 
   toggleVisibility(state?: Nullable<"on" | "off">) {

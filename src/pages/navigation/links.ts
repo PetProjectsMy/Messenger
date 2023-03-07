@@ -31,7 +31,7 @@ export const MapNavigationLinkToProps: Record<string, TLinkProps> = {
   },
   [EnumNavigationPageLinks.Profile]: {
     label: "Profile",
-    htmlAttributes: { id: `pforile_link` },
+    htmlAttributes: { id: `profile_link` },
   },
 };
 

@@ -2,25 +2,22 @@ import { isObject } from "./is-object";
 import { deepEqual } from "./objects-compare";
 import { deepMerge as merge } from "./objects-merge";
 
-export function setPropByPath(
-  object: Indexed | unknown,
-  pathString: string,
-  value: unknown,
-  doLog = false
-): Indexed | unknown {
+type TPropActionArgs = {
+  object: object;
+  pathString: string;
+  value: unknown;
+  isLogNeeded?: boolean;
+};
+export function setPropByPath({
+  object,
+  pathString,
+  value,
+  isLogNeeded = false,
+}: TPropActionArgs) {
   if (!isObject(object)) {
     return object;
   }
-
-  if (typeof pathString !== "string") {
-    throw new Error("path must be string");
-  }
-
   const path = pathString.split(".");
-  if (path.length === 1 && path[0] === "") {
-    return value;
-  }
-
   const result = path.reduceRight<Indexed>(
     (acc, key) => ({
       [key]: acc,
@@ -28,7 +25,7 @@ export function setPropByPath(
     value as any
   );
 
-  if (doLog) {
+  if (isLogNeeded) {
     console.log(
       `SET PROP BY PATH '${pathString}': value ${JSON.stringify(value)}`
     );
@@ -36,12 +33,12 @@ export function setPropByPath(
   return merge(object as Indexed, result);
 }
 
-export function comparePropByPath(
-  object: Indexed | unknown,
-  pathString: string,
-  valueToCompare: unknown,
-  doLog = false
-): Indexed | unknown {
+export function comparePropByPath({
+  object,
+  pathString,
+  value,
+  isLogNeeded = false,
+}: TPropActionArgs): boolean {
   if (!isObject(object)) {
     throw new Error(
       `Incorrect target ${object} of type ${typeof object} to compare prop by path`
@@ -53,37 +50,37 @@ export function comparePropByPath(
 
   const path = pathString.split(".");
   let pathExisting = path;
-  let value = object as any;
+  let currentValue = object as any;
 
   for (let i = 0; i < path.length; i++) {
-    if (!isObject(value) || !Object.hasOwn(value, path[i])) {
+    if (!isObject(currentValue) || !Object.hasOwn(currentValue, path[i])) {
       pathExisting = path.slice(0, i);
       break;
     }
 
-    value = value[path[i]];
+    currentValue = currentValue[path[i]];
   }
 
-  if (doLog) {
+  if (isLogNeeded) {
     console.log(
       `PATH COMPARE'${pathString}' EXISTING PART: ` +
         `${pathExisting.join(".")}\n` +
-        `OLD VALUE ${JSON.stringify(value)}, TO COMPARE ${JSON.stringify(
-          valueToCompare
-        )}`
+        `CURRENT VALUE ${JSON.stringify(
+          currentValue
+        )}, TO COMPARE ${JSON.stringify(value)}`
     );
   }
 
   return pathExisting.length < path.length
     ? false
-    : deepEqual(value, valueToCompare);
+    : deepEqual(currentValue, value);
 }
 
-export function getPropByPath(
-  object: Indexed | unknown,
-  pathString: string,
-  doLog = false
-): any {
+export function getPropByPath({
+  object,
+  pathString,
+  isLogNeeded = false,
+}: Omit<TPropActionArgs, "value">): any {
   if (!isObject(object)) {
     throw new Error(
       `Incorrect target ${object} of type ${typeof object} to get prop by path`
@@ -106,13 +103,13 @@ export function getPropByPath(
     value = value[path[i]];
   }
 
-  if (doLog) {
+  if (isLogNeeded) {
     console.log(
       `PATH GET '${pathString}' EXISTING PART: ` +
         `${pathExisting.join(".")}\n` +
         `value: ${JSON.stringify(value)}`
     );
   }
-  const result = setPropByPath({}, "", value);
-  return result;
+
+  return isObject(value) ? merge({}, value) : value;
 }

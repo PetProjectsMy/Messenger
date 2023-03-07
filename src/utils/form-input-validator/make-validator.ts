@@ -5,7 +5,7 @@ export function makeValidator({
 }: {
   validatorsList: TInputSingleValidator[];
 }): ComponentTypings.InputValidator {
-  return function validate() {
+  return function validate(this: ComponentTypings.Input) {
     let error = "";
     const value = this.getValue();
 
@@ -18,7 +18,7 @@ export function makeValidator({
     }
 
     this.state.inputError = error;
-    this.setPropByPath("htmlAttributes.value", value);
+    this.setPropByPath({ pathString: "htmlAttributes.value", value });
 
     return !error;
   };

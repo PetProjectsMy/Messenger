@@ -82,11 +82,11 @@ export const MapInputFieldToHelpers = Object.entries(
   MapInputFieldToUserDataRecord
 ).reduce((acc, [fieldName, recordName]) => {
   acc[fieldName] = {
-    beforePropsProxyHook() {
-      this.setPropByPath(
-        "htmlAttributes.value",
-        this.store.getUserDataByPath(recordName)
-      );
+    beforePropsProxyHook(this: ComponentTypings.Input) {
+      this.setPropByPath({
+        pathString: "htmlAttributes.value",
+        value: this.store!.getUserDataByPath(recordName),
+      });
     },
 
     afterRenderHook() {

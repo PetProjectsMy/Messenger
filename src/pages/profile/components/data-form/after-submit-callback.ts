@@ -1,4 +1,4 @@
-import { ProfileService } from "services";
+import { ProfileService } from "services/api/profile";
 import {
   APIResponseHasError,
   transformProfileAPIResponseToUserData,

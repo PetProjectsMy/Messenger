@@ -11,7 +11,9 @@ export async function formSubmitButtonCallback(this: Button) {
 }
 
 export class FormSubmitButton extends Button {
-  constructor(refs: { form: ComponentTypings.InputForm }) {
+  constructor(refs: {
+    form: ComponentTypings.InputForm<Record<string, string>>;
+  }) {
     super({
       refs,
       props: {

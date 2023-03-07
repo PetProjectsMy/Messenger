@@ -157,14 +157,14 @@ export class Block<
   }
 
   protected _makeProxy(object: Record<string, any>) {
-    const self = this;
+    const { eventBus } = this;
 
     return new Proxy(object, {
       set(target, prop: string, value) {
         const oldValue = target[prop];
         target[prop] = value;
 
-        self.eventBus.emit(BlockCommonEvents.FLOW_CDU, oldValue, value);
+        eventBus.emit(BlockCommonEvents.FLOW_CDU, oldValue, value);
 
         return true;
       },
@@ -189,10 +189,7 @@ export class Block<
   private _registerEvents() {
     const { eventBus } = this;
     eventBus.on(BlockCommonEvents.INIT, this._init.bind(this));
-    eventBus.on(
-      BlockCommonEvents.FLOW_CDU,
-      this._componentDidUpdate.bind(this)
-    );
+    eventBus.on(BlockCommonEvents.FLOW_CDU, this._updateComponent.bind(this));
     eventBus.on(BlockCommonEvents.FLOW_RENDER, this._render.bind(this));
   }
 

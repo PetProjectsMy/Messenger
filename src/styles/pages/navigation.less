@@ -6,16 +6,17 @@
   height: 30%;
   width: 100%;
 
-  & > * {
-    flex: 1;
-  }
-
-  .naviagtion-link a {
-    margin: 1vh 0;
-    font-size: 1.4em;
+  .navigation-link {
+    flex: 1.5;
+    &:extend(.vertical-block);
+    a {
+      margin: 1vh 0;
+      font-size: 1.4em;
+    }
   }
 
   .logout-button {
+    flex: 1;
     font-size: 1.2em;
     width: fit-content;
     padding: 0 0.7%;

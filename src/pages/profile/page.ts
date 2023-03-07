@@ -49,19 +49,19 @@ export class ProfilePage extends ProfilePageBlock {
     Object.entries((this.children.profileDataForm as Block).refs).forEach(
       ([inputName, inputBlock]: [EnumInputFields, Input]) => {
         const recordName = MapInputFieldToUserDataRecord[inputName];
-        inputBlock.setPropByPath(
-          "htmlAttributes.value",
-          `${userData[recordName]}`
-        );
+        inputBlock.setPropByPath({
+          pathString: "htmlAttributes.value",
+          value: `${userData[recordName]}`,
+        });
       }
     );
   }
 
   public updateUserAvatar() {
     const newAvatar = this.store.getUserDataByPath("avatar") as string;
-    (this.refs.avatarImage as ImageComponent).setPropByPath(
-      "htmlAttributes.src",
-      newAvatar
-    );
+    (this.refs.avatarImage as ImageComponent).setPropByPath({
+      pathString: "htmlAttributes.src",
+      value: newAvatar,
+    });
   }
 }

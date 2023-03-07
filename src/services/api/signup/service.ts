@@ -1,4 +1,4 @@
-import { SignUpAPI } from "api";
+import { SignUpAPI } from "./requests";
 
 export class SignUpServiceClass {
   async signup(

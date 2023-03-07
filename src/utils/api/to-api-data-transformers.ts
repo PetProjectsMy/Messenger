@@ -1,4 +1,4 @@
-export function transformSignUpFormDatatoAPI(
+export function transformSignUpFormDataToAPI(
   data: TSignupFormData
 ): TSignUpFormDTO {
   return {

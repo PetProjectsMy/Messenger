@@ -21,6 +21,7 @@ export function buildResolvers() {
       pages: resolvedPathFromSrc("pages"),
       services: resolvedPathFromSrc("services"),
       styles: resolvedPathFromSrc("styles"),
+      typings: resolvedPathFromSrc("typings"),
       utils: resolvedPathFromSrc("utils"),
       handlebars: resolvedPathFromRoot(
         "node_modules/handlebars/dist/handlebars.js"

@@ -38,6 +38,7 @@ export function currentChatSetter(
   (refs.messageInput as MessageInput).assignCurrentChat();
   (refs.sendMessageButton as SendMessageButton).assignCurrentChat();
   (refs.chooseChatAvatarButton as Button).toggleDisabledState(newValueIsNull);
+  (refs.deleteChatButton as Button).toggleDisabledState(newValueIsNull);
 
   if (!isNullish(oldValue)) {
     refs[`chat-${oldValue}`].toggleHtmlClass("current-chat", "off");

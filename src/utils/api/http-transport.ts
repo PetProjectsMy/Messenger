@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "typings/constants";
+
 const enum METHODS {
   GET = "GET",
   POST = "POST",
@@ -118,8 +120,6 @@ class HTTPTransport {
   };
 }
 
-export const baseURL = "https://ya-praktikum.tech/api/v2";
-
 export default new HTTPTransport({
-  baseURL,
+  baseURL: API_BASE_URL,
 });

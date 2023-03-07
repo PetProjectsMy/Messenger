@@ -1,6 +1,6 @@
-import { Store } from "core/store";
 import { PathRouter } from "core/router";
-import { AuthorizationService } from "services/authorization";
+import { Store } from "core/store";
+import { AuthorizationService } from "services/api/authorization";
 import { APIResponseHasError } from "utils/api";
 import { initAppData } from "./init-app-data";
 

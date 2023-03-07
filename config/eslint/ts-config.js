@@ -3,7 +3,6 @@ const rules = {
   "no-console": "off",
   "no-continue": "off",
   "no-unused-vars": "off",
-  "no-restricted-syntax": ["warn", { selector: "ForInStatement" }],
   "import/no-import-module-exports": "off",
   "import/prefer-default-export": "off",
   "class-methods-use-this": "off",

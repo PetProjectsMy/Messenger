@@ -15,7 +15,10 @@ export function setChatAvatar(
   const refs = this.getCurrentPageRefs();
   const chatComponent = refs[`chat-${chatID}`];
   const avatarImage = chatComponent.children.avatarImage as ImageComponent;
-  avatarImage.setPropByPath("htmlAttributes.src", newAvatar);
+  avatarImage.setPropByPath({
+    pathString: "htmlAttributes.src",
+    value: newAvatar,
+  });
 }
 
 export function setChatNewMessage(this: StoreTypings.Store, chatID: string) {

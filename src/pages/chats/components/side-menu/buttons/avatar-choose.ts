@@ -1,5 +1,5 @@
 import { WithStoreFileInput } from "hocs/components";
-import { ChatsService } from "services";
+import { ChatsService } from "services/api/chats";
 
 export class AvatarChooseButton extends WithStoreFileInput {
   constructor() {

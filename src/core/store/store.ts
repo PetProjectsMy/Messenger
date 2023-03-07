@@ -65,26 +65,26 @@ export class Store {
     this.eventBus.emit(event, ...args);
   }
 
-  public getStateValueByPath(pathString = "", doLog = false) {
-    return getPropByPath(this.state, pathString, doLog);
+  public getStateByPath(pathString = "", isLogNeeded = false) {
+    return getPropByPath({ object: this.state, pathString, isLogNeeded });
   }
 
-  public getUserDataByPath(pathString = "", doLog = false) {
+  public getUserDataByPath(pathString = "", isLogNeeded = false) {
     const path = `user${pathString ? "." : ""}${pathString}`;
-    return this.getStateValueByPath(path, doLog);
+    return this.getStateByPath(path, isLogNeeded);
   }
 
   public getUserID() {
-    return this.getStateValueByPath("user.id");
+    return this.getStateByPath("user.id");
   }
 
-  public getChatsDataByPath(pathString = "", doLog = false) {
+  public getChatsDataByPath(pathString = "", isLogNeeded = false) {
     const path = `chats${pathString ? "." : ""}${pathString}`;
-    return this.getStateValueByPath(path, doLog);
+    return this.getStateByPath(path, isLogNeeded);
   }
 
   public getCurrentChatID() {
-    return this.getStateValueByPath("currentChatID") as string;
+    return this.getStateByPath("currentChatID") as string;
   }
 
   public getCurrentPageObject() {
@@ -99,12 +99,12 @@ export class Store {
     return this.state.page;
   }
 
-  public getSocketByChatID(chatID?: string, doLog = false) {
+  public getSocketByChatID(chatID?: string, isLogNeeded = false) {
     if (chatID === undefined) {
-      return this.getStateValueByPath(`chatsSockets`, doLog);
+      return this.getStateByPath(`chatsSockets`, isLogNeeded);
     }
 
-    return this.getStateValueByPath(`chatsSockets.${chatID}`, doLog);
+    return this.getStateByPath(`chatsSockets.${chatID}`, isLogNeeded);
   }
 
   init() {
@@ -145,24 +145,29 @@ export class Store {
     Object.assign(this.state, nextState);
   }
 
-  public setStateByPath(pathString: string, newValue: unknown, doLog = false) {
-    const isValueChanged = !comparePropByPath(
-      this.state,
+  // TODO: move all regex setters to distinct module
+  public setStateByPath(
+    pathString: string,
+    value: unknown,
+    isLogNeeded = false
+  ) {
+    const isValueChanged = !comparePropByPath({
+      object: this.state,
       pathString,
-      newValue,
-      doLog
-    );
+      value,
+      isLogNeeded,
+    });
 
     if (!isValueChanged) {
       return;
     }
 
-    setPropByPath(this.state, pathString, newValue, doLog);
+    setPropByPath({ object: this.state, pathString, value, isLogNeeded });
 
     let match = [...pathString.matchAll(statePathRegex.ChatAvatarChange)];
     if (match.length === 1) {
       const chatID = match[0][1];
-      stateByPathSetters.setChatAvatar.call(this, chatID, newValue);
+      stateByPathSetters.setChatAvatar.call(this, chatID, value);
       return;
     }
 

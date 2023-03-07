@@ -1,6 +1,6 @@
+import { ChatsAPI } from "services/api/chats/requests";
 import { transformChatGetTokenResponseToToken } from "utils/api/from-api-data-transformers";
-import { ChatsAPI } from "api";
-import { ChatMessagesHandler } from "./chat-messages-handler";
+import { ChatMessagesHandler } from "./messages-handler/handler";
 
 export class SocketsCreatorClass {
   async getChatToken(

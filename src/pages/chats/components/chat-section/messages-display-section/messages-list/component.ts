@@ -23,7 +23,7 @@ export class MessagesList extends WithStoreBlock {
       return;
     }
 
-    const messages = this.store.getStateValueByPath(`chatsMessages.${chatID}`);
+    const messages = this.store.getStateByPath(`chatsMessages.${chatID}`);
     const messagesList = [] as ComponentTypings.ChildArray;
 
     for (const { content } of messages) {

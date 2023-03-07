@@ -1,35 +1,43 @@
 import { LogoutButton } from "components/buttons/logout-button";
-import { WithStoreBlock, WithRouterLink } from "hocs/components";
-import template from "./template";
+import { WithRouterLink, WithStoreBlock } from "hocs/components";
 import { EnumNavigationPageLinks, MapNavigationLinkToProps } from "./links";
+import template from "./template";
 
 export class NavigationPage extends WithStoreBlock {
   constructor() {
-    const children: ComponentTypings.Children = {};
-
-    children.logoutButton = new LogoutButton();
-
     super({
-      children,
       componentName: "Navigation Page",
     });
   }
 
-  protected _afterPropsAssignHook() {
-    super._afterPropsAssignHook();
-
-    this.createLinks();
+  public init() {
+    this._createLogoutButton();
+    this._createLinks();
   }
 
-  public createLinks() {
-    const isUserAuthorized = this.store.isUserAuthorized();
-    let linksList = Object.values(EnumNavigationPageLinks);
-    if (isUserAuthorized) {
-      linksList = linksList.filter(
-        (link) =>
-          link !== EnumNavigationPageLinks.SignUp &&
-          link !== EnumNavigationPageLinks.Login
-      );
+  protected _afterPropsAssignHook() {
+    super._afterPropsAssignHook();
+    this.init();
+  }
+
+  private _createLogoutButton() {
+    if (this.store.isUserAuthorized()) {
+      this.children.logoutButton = new LogoutButton();
+    }
+  }
+
+  private _createLinks() {
+    let linksList: EnumNavigationPageLinks[];
+    if (this.store.isUserAuthorized()) {
+      linksList = [
+        EnumNavigationPageLinks.Chats,
+        EnumNavigationPageLinks.Profile,
+      ];
+    } else {
+      linksList = [
+        EnumNavigationPageLinks.SignUp,
+        EnumNavigationPageLinks.Login,
+      ];
     }
 
     this.children.links = linksList.reduce(
@@ -42,7 +50,7 @@ export class NavigationPage extends WithStoreBlock {
               htmlWrapper: {
                 componentAlias: "wrapped",
                 htmlWrapperTemplate: `
-                <div class="naviagtion-link">
+                <div class="navigation-link">
                   {{{ wrapped }}}
                 </div>
                 `,

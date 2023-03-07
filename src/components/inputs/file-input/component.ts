@@ -60,12 +60,9 @@ export class FileInput extends Block {
 
   private static _createFileInput(props: TFileInputProps) {
     const FileInputDefaultProps = {
-      htmlAttributes: { type: "file", accept: "image/*" },
+      htmlAttributes: { type: "file" },
       htmlStyle: {
         display: "none",
-      },
-      events: {
-        change: [() => {}],
       },
     };
 

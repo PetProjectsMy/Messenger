@@ -38,19 +38,19 @@ export class PathRouter implements IRouter<EnumAppRoutes> {
       window.history.replaceState({}, "", startPathname);
       console.log(`Router Start: replace state to '${startPathname}'`);
     }
-    this.onRouteChange(startRoute);
+    this._onRouteChange(startRoute);
 
     window.onpopstate = function () {
       const currentPath = this.getCurrentPath();
       console.log(`ONPOPSTATE: ${currentPath}`);
       const { route } = this.matchRouteByPath(currentPath);
-      this.onRouteChange.call(this, route);
+      this._onRouteChange.call(this, route);
     }.bind(this);
 
     this.isStarted = true;
   }
 
-  private onRouteChange(route: EnumAppRoutes) {
+  private _onRouteChange(route: EnumAppRoutes) {
     console.log(`onRouteChange ('${route}' route)`);
     const renderFunction =
       this.routes[route] ?? this.routes[EnumAppRoutes.NotFound];
@@ -67,7 +67,7 @@ export class PathRouter implements IRouter<EnumAppRoutes> {
     const { path } = this.routesData[route];
     window.history.pushState({}, "", path);
     console.log(`Go: state pushed to ${path}'`);
-    this.onRouteChange(route);
+    this._onRouteChange(route);
   }
 
   back() {

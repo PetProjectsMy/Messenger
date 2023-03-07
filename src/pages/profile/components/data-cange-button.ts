@@ -10,7 +10,11 @@ export class DataChangeButton extends Button {
     async function onClickCallback(this: DataChangeButton) {
       const form = this.refs.form as ComponentTypings.InputForm;
 
-      form.state.apiResponseSuccess = "";
+      form.setStateByPath({
+        pathString: "apiResponseSuccess",
+        value: "",
+        isLogNeeded: true,
+      });
 
       if (this.state.mode === FormMode.DataSaved) {
         this.state.mode = FormMode.DataChanging;

@@ -28,9 +28,7 @@ export class MessagesDisplayArea extends WithStoreBlock {
       if (isNullish(chatID)) {
         warning = EnumChatAbsenceWarnings.NoChatSelected;
       } else if (!this.store.chatHasMessages(chatID)) {
-        const messages = this.store.getStateValueByPath(
-          `chatMessages.${chatID}`
-        );
+        const messages = this.store.getStateByPath(`chatMessages.${chatID}`);
         console.log(`CHAT(${chatID}): ${JSON.stringify(messages)}`);
         warning = EnumChatAbsenceWarnings.NoMessagesWritten;
       }

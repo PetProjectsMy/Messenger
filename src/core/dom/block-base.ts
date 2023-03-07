@@ -7,6 +7,7 @@ import {
   getPropByPath,
   setPropByPath,
 } from "utils/objects-handle";
+import type { TPropSetArgs } from "./typings";
 
 export const enum BlockCommonEvents {
   INIT = "init",
@@ -48,20 +49,20 @@ export default class BlockBase<
 
   readonly id: string = `${this.constructor.name}-${nanoid(7)}`;
 
-  protected _componentDidUpdate(
+  protected _updateComponent(
     oldPropsOrState: Partial<TProps> | Partial<TState>,
-    newPropsOrState: Partial<TProps> | Partial<TState>,
-    forceUpdate = false
+    newPropsOrState: Partial<TProps> | Partial<TState>
   ): void {
-    if (
-      forceUpdate ||
-      this.componentDidUpdate(oldPropsOrState, newPropsOrState)
-    ) {
+    if (this._hasComponentUpdated(oldPropsOrState, newPropsOrState)) {
       this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
     }
   }
 
-  protected componentDidUpdate(
+  protected _forceUpdateComponent() {
+    this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
+  }
+
+  protected _hasComponentUpdated(
     oldPropsOrState: Partial<TProps> | Partial<TState>,
     newPropsOrState: Partial<TProps> | Partial<TState>
   ): boolean {
@@ -110,7 +111,7 @@ export default class BlockBase<
   }
 
   public getStateByPath(pathString = "") {
-    return getPropByPath(this.state, pathString);
+    return getPropByPath({ object: this.state, pathString });
   }
 
   public hide(): void {
@@ -144,35 +145,60 @@ export default class BlockBase<
     return "<div></div>";
   }
 
-  public setPropByPath(
-    propPath: string,
-    newValue: unknown,
-    forceUpdate = false,
-    doLog = false
-  ): void {
-    const didUpdate =
-      forceUpdate || !comparePropByPath(this.props, propPath, newValue, doLog);
+  public setPropByPath({
+    pathString,
+    value,
+    isLogNeeded = false,
+  }: TPropSetArgs) {
+    const isUpdated = !comparePropByPath({
+      object: this.props,
+      pathString,
+      value,
+      isLogNeeded,
+    });
 
-    if (didUpdate) {
-      setPropByPath(this.props, propPath, newValue, doLog);
-      this._componentDidUpdate("" as any, "" as any, true);
+    if (isUpdated) {
+      setPropByPath({
+        object: this.props,
+        pathString,
+        value,
+        isLogNeeded,
+      });
+      this._forceUpdateComponent();
     }
   }
 
-  public setChildByPath(
-    childPath: string,
-    newChild: ComponentTypings.Child | ComponentTypings.ChildArray,
-    forceUpdate = false,
-    doLog = false
-  ) {
-    const didUpdate =
-      forceUpdate ||
-      !comparePropByPath(this.children, childPath, newChild, doLog);
+  public setStateByPath({
+    pathString,
+    value,
+    isLogNeeded = false,
+  }: TPropSetArgs) {
+    const isUpdated = !comparePropByPath({
+      object: this.state,
+      pathString,
+      value,
+      isLogNeeded,
+    });
 
-    if (didUpdate) {
-      setPropByPath(this.children, childPath, newChild, doLog);
-      this._componentDidUpdate("" as any, "" as any, true);
+    if (isUpdated) {
+      setPropByPath({
+        object: this.state,
+        pathString,
+        value,
+        isLogNeeded,
+      });
+      this._forceUpdateComponent();
     }
+  }
+
+  public setChild({
+    childName,
+    value,
+  }: {
+    childName: string;
+    value: ComponentTypings.Child | ComponentTypings.ChildArray;
+  }) {
+    this.children[childName] = value;
   }
 
   public toggleHtmlClass(className: string, state: Nullable<"on" | "off">) {

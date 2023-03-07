@@ -36,19 +36,22 @@ export class SendMessageButton extends WithStoreButton {
     );
 
     if (isChatSelected) {
-      this.setPropByPath("events.click", [
-        function () {
-          const message = messageInput.getValue();
-          if (message === "") {
-            return;
-          }
+      this.setPropByPath({
+        pathString: "events.click",
+        value: [
+          function () {
+            const message = messageInput.getValue();
+            if (message === "") {
+              return;
+            }
 
-          webSocket.send(message);
-          messageInput.setValue("");
-        },
-      ]);
+            webSocket.send(message);
+            messageInput.setValue("");
+          },
+        ],
+      });
     } else {
-      this.setPropByPath("events.click", []);
+      this.setPropByPath({ pathString: "events.click", value: [] });
     }
 
     this.toggleDisabledState(!isChatSelected);

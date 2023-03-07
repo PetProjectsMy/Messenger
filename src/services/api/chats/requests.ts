@@ -1,4 +1,4 @@
-import request from "./http-trasnport";
+import { request } from "utils/api";
 
 class ChatsAPIClass {
   getChats() {

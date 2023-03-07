@@ -1,8 +1,9 @@
-import { ProfileService, SignUpService } from "services";
+import { ProfileService } from "services/api/profile";
+import { SignUpService } from "services/api/signup";
 import {
   APIResponseHasError,
   transformProfileAPIResponseToUserData,
-  transformSignUpFormDatatoAPI,
+  transformSignUpFormDataToAPI,
 } from "utils/api";
 
 async function afterRequestCallback(response: any) {
@@ -12,7 +13,7 @@ async function afterRequestCallback(response: any) {
     return;
   }
 
-  this.state.apiResponseSuccess = "Sign Up Successfull";
+  this.state.apiResponseSuccess = "Sign Up Successful";
   const user = transformProfileAPIResponseToUserData(
     await ProfileService.getUserProfile(response.id)
   );
@@ -21,7 +22,7 @@ async function afterRequestCallback(response: any) {
 
 export async function afterSubmitCallback() {
   const formData = this.collectFormData();
-  const apiData = transformSignUpFormDatatoAPI(formData);
+  const apiData = transformSignUpFormDataToAPI(formData);
   console.log(`API data: ${JSON.stringify(apiData)}`);
 
   SignUpService.signup(apiData, afterRequestCallback.bind(this));

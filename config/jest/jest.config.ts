@@ -1,8 +1,9 @@
 import type { Config as jestConfig } from "jest";
 
 const config: jestConfig = {
+  preset: "ts-jest",
+  testEnvironment: "node",
   clearMocks: true,
-  testEnvironment: "jsdom",
   rootDir: "../../",
   coveragePathIgnorePatterns: ["<rootDir>/build/", "<rootDir>/node_modules/"],
 };

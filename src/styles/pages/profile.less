@@ -42,8 +42,10 @@ main.profile-page {
       img {
         border-radius: 50%;
         @h: ~"min(90%, calc(0.9 * @{image-max-height}))";
-        max-height: @h;
-        max-width: @h;
+        // max-height: @h;
+        // max-width: @h;
+        height: @h;
+        width: @h;
         padding: calc(0.05 * @h);
         font-size: 1.5em;
       }

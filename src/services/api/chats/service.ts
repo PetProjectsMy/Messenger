@@ -1,4 +1,4 @@
-import { ChatsAPI } from "api";
+import { SocketsCreator } from "services/sockets/sockets-creator";
 import {
   APIResponseHasError,
   transformAvatarURL,
@@ -7,7 +7,7 @@ import {
 import { transformChatUsersGetResponseToChatsUsersData } from "utils/api/from-api-data-transformers";
 import { transformChatIDToDeleteAPI } from "utils/api/to-api-data-transformers";
 import { objectWithoutKey } from "utils/objects-handle";
-import { SocketsCreator } from "services/sockets";
+import { ChatsAPI } from "./requests";
 
 export class ChatsServiceClass {
   async getChats(afterRequestCallback?: TAfterRequestCallback) {

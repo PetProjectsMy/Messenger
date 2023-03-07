@@ -26,7 +26,7 @@ export function userSetter(
       break;
     case EnumAppPages.Navigation:
       if (isNullish(oldValue) !== isNullish(newValue)) {
-        (pageObject as PagesTypings.NavigationPage).createLinks();
+        (pageObject as PagesTypings.NavigationPage).init();
       }
       break;
 
