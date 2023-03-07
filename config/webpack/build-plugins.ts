@@ -7,7 +7,7 @@ import { EnumBuildModes, IPluginsBuildOptions } from "./types/config";
 function buildHTMLPlugin(isDevMode: boolean) {
   return new HTMLWebpackPlugin({
     template: "index.html",
-    favicon: "./assets/favicon.ico",
+    favicon: "assets/favicon.ico",
     minify: { collapseWhitespace: isDevMode },
   });
 }

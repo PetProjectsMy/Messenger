@@ -1,11 +1,10 @@
 FROM node:18
 
-EXPOSE 3000
+RUN yarn add -D express
 
-WORKDIR /root/app;
+WORKDIR /root/app/
 
-COPY yarn.lock ./
+COPY . ./
 
-RUN yarn
+CMD ["node", "server.js"]
 
-CMD ["tail", "-f", "/dev/null"]

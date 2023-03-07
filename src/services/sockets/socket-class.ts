@@ -39,7 +39,7 @@ export class ChatWebSocket {
           type: EnumMessageType.Ping,
         })
       );
-    }, 30000);
+    }, 5000);
 
     socket.addEventListener("close", (event) => {
       if (!event.wasClean) {
@@ -48,8 +48,9 @@ export class ChatWebSocket {
         console.log(
           `Chat(${chatID}) Socket Closed With Error: code ${event.code}, reason ${event.reason}`
         );
-        clearInterval(ping);
       }
+
+      clearInterval(ping);
     });
 
     socket.addEventListener(
