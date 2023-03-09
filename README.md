@@ -16,4 +16,7 @@
 комманда запуска - yarn dev-start
 
 раздача index.html - с помощью express
-netlify-deploy - https://heroic-sable-837180.netlify.app
+
+deploy:
+render.com: https://messenger-s22v.onrender.com
+netlify https://heroic-sable-837180.netlify.app
