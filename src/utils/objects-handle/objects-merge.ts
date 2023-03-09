@@ -1,19 +1,42 @@
-export function deepMerge(lhs: Indexed, rhs: Indexed): Indexed {
-  for (const p in rhs) {
-    if (!Object.prototype.hasOwnProperty.call(rhs, p)) {
-      continue;
-    }
+import { isObject } from "./is-object";
 
-    try {
-      if (rhs[p]!.constructor === Object) {
-        rhs[p] = deepMerge(lhs[p] as Indexed, rhs[p] as Indexed);
-      } else {
-        lhs[p] = rhs[p];
-      }
-    } catch (e) {
-      lhs[p] = rhs[p];
-    }
+export function deepMerge(target: Indexed, ...sources: Indexed[]): Indexed {
+  if (!sources.length) {
+    return target;
+  }
+  const source = sources.shift();
+  if (source === undefined) {
+    return target;
   }
 
-  return lhs;
+  if (isMergebleObject(target) && isMergebleObject(source)) {
+    Object.entries(source).forEach(function ([sourceKey, sourceValue]) {
+      if (isMergebleObject(sourceValue)) {
+        if (!Object.getOwnPropertyDescriptor(target, sourceKey)) {
+          target[sourceKey] = {};
+        }
+
+        const targetValue = target[sourceKey];
+        if (isMergebleObject(targetValue)) {
+          deepMerge(targetValue, sourceValue);
+        }
+      } else {
+        target[sourceKey] = sourceValue;
+      }
+    });
+  }
+
+  return deepMerge(target, ...sources);
+}
+
+const isMergebleObject = (item: unknown): item is Indexed => {
+  return isObject(item) && !Array.isArray(item);
+};
+
+export function deepCopy(object: unknown) {
+  if (isObject(object)) {
+    return deepMerge({}, object);
+  } else {
+    return object;
+  }
 }

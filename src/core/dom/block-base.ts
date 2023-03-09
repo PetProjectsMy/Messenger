@@ -1,13 +1,14 @@
 import { EventBus } from "core/event-bus";
 import { nanoid } from "nanoid";
-import { toggleHtmlClassToList } from "utils/components";
+import { toggleHtmlClassInClassesList } from "utils/components";
 import {
-  comparePropByPath,
   deepEqual,
   getPropByPath,
+  isObject,
   setPropByPath,
 } from "utils/objects-handle";
-import type { TPropSetArgs } from "./typings";
+import { deepCopy } from "utils/objects-handle/objects-merge";
+import * as BlockTypings from "./typings";
 
 export const enum BlockCommonEvents {
   INIT = "init",
@@ -49,25 +50,20 @@ export default class BlockBase<
 
   readonly id: string = `${this.constructor.name}-${nanoid(7)}`;
 
-  protected _updateComponent(
-    oldPropsOrState: Partial<TProps> | Partial<TState>,
-    newPropsOrState: Partial<TProps> | Partial<TState>
-  ): void {
-    if (this._hasComponentUpdated(oldPropsOrState, newPropsOrState)) {
+  protected _updateComponent({
+    oldPropsOrState,
+    newPropsOrState,
+  }: BlockTypings.ComponentUpdateArgs<TProps, TState>) {
+    if (this._hasComponentUpdated({ oldPropsOrState, newPropsOrState })) {
       this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
     }
   }
 
-  protected _forceUpdateComponent() {
-    this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
-  }
-
-  protected _hasComponentUpdated(
-    oldPropsOrState: Partial<TProps> | Partial<TState>,
-    newPropsOrState: Partial<TProps> | Partial<TState>
-  ): boolean {
-    const result = !deepEqual(oldPropsOrState, newPropsOrState);
-    return result;
+  protected _hasComponentUpdated({
+    oldPropsOrState,
+    newPropsOrState,
+  }: BlockTypings.ComponentUpdateArgs<TProps, TState>) {
+    return !deepEqual(oldPropsOrState, newPropsOrState);
   }
 
   protected _addEventListenersToElement() {
@@ -125,18 +121,16 @@ export default class BlockBase<
 
   public show(): void {
     const element = this.getElement();
-
     element!.style.display = "block";
   }
 
   protected _removeEventsFromElement() {
-    const targetElement = this._unwrappedElement!;
+    const events = this.props.events;
+    const targetElement = this._unwrappedElement;
 
-    const events = this.props.events!;
-
-    Object.entries(events).forEach(([event, listeners]) => {
+    Object.entries(events!).forEach(([event, listeners]) => {
       listeners.forEach((listener) => {
-        targetElement.removeEventListener(event, listener);
+        targetElement!.removeEventListener(event, listener);
       });
     });
   }
@@ -145,26 +139,37 @@ export default class BlockBase<
     return "<div></div>";
   }
 
+  public getPropByPath({
+    pathString = "",
+    isLogNeeded = false,
+  }: BlockTypings.PropGetArgs = {}) {
+    let value = getPropByPath({ object: this.props, pathString, isLogNeeded });
+    if (isObject(value)) {
+      value = deepCopy(value);
+    }
+
+    return value;
+  }
+
   public setPropByPath({
     pathString,
     value,
     isLogNeeded = false,
-  }: TPropSetArgs) {
-    const isUpdated = !comparePropByPath({
+  }: BlockTypings.PropSetArgs) {
+    const args = {
       object: this.props,
       pathString,
-      value,
       isLogNeeded,
-    });
+    };
 
-    if (isUpdated) {
-      setPropByPath({
-        object: this.props,
-        pathString,
-        value,
-        isLogNeeded,
+    const currentValue = getPropByPath(args);
+    setPropByPath({ ...args, value });
+
+    if (pathString.split(".").length > 1) {
+      this._updateComponent({
+        oldPropsOrState: currentValue,
+        newPropsOrState: value,
       });
-      this._forceUpdateComponent();
     }
   }
 
@@ -172,22 +177,21 @@ export default class BlockBase<
     pathString,
     value,
     isLogNeeded = false,
-  }: TPropSetArgs) {
-    const isUpdated = !comparePropByPath({
+  }: BlockTypings.PropSetArgs) {
+    const args = {
       object: this.state,
       pathString,
-      value,
       isLogNeeded,
-    });
+    };
 
-    if (isUpdated) {
-      setPropByPath({
-        object: this.state,
-        pathString,
-        value,
-        isLogNeeded,
+    const currentValue = getPropByPath(args);
+    setPropByPath({ ...args, value });
+
+    if (pathString.split(".").length > 1) {
+      this._updateComponent({
+        oldPropsOrState: currentValue,
+        newPropsOrState: value,
       });
-      this._forceUpdateComponent();
     }
   }
 
@@ -202,12 +206,12 @@ export default class BlockBase<
   }
 
   public toggleHtmlClass(className: string, state: Nullable<"on" | "off">) {
-    const classList = toggleHtmlClassToList(
+    const classList = toggleHtmlClassInClassesList(
       this.props.htmlClasses!,
       className,
       state
     );
 
-    this.props.htmlClasses = classList;
+    this.setPropByPath({ pathString: "htmlClasses", value: classList });
   }
 }

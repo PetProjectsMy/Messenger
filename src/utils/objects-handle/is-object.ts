@@ -1,4 +1,4 @@
-export function isObject(object: unknown) {
+export function isObject(object: unknown): object is Indexed {
   return object != null && object.constructor.name === "Object";
 }
 

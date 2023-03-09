@@ -31,7 +31,7 @@ export function buildPlugins(
   return [
     buildHTMLPlugin(isDevMode),
     buildCSSExtractPlugin(isDevMode),
-    circularDependencyPlugin,
+    circularDependencyPlugin as any,
     buildingProgressPlugin,
   ];
 }

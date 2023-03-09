@@ -25,7 +25,7 @@ export class Block<
 
   public store?: StoreTypings.Store;
 
-  private wasRendered = false;
+  private _wasRendered = false;
 
   protected wrappedId?: string;
 
@@ -53,7 +53,7 @@ export class Block<
       componentName ?? `Not Named Block of type ${this.constructor.name}`;
 
     this.props = deepMerge(this.props ?? {}, props) as TProps;
-    this.props.events = this.props.events ?? {};
+    this.props.events ??= {};
     this.props.htmlAttributes ??= {};
     this.props.htmlClasses ??= [];
     this.props.htmlStyle ??= {};
@@ -153,7 +153,7 @@ export class Block<
 
   private _init() {
     this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
-    this.wasRendered = true;
+    this._wasRendered = true;
   }
 
   protected _makeProxy(object: Record<string, any>) {
@@ -188,16 +188,25 @@ export class Block<
 
   private _registerEvents() {
     const { eventBus } = this;
-    eventBus.on(BlockCommonEvents.INIT, this._init.bind(this));
-    eventBus.on(BlockCommonEvents.FLOW_CDU, this._updateComponent.bind(this));
-    eventBus.on(BlockCommonEvents.FLOW_RENDER, this._render.bind(this));
+    eventBus.on(BlockCommonEvents.INIT, () => {
+      this._init.call(this);
+    });
+    eventBus.on(
+      BlockCommonEvents.FLOW_CDU,
+      (oldPropsOrState, newPropsOrState) => {
+        this._updateComponent.call(this, { oldPropsOrState, newPropsOrState });
+      }
+    );
+    eventBus.on(BlockCommonEvents.FLOW_RENDER, () => {
+      this._render.call(this);
+    });
   }
 
-  private _render(): void {
+  private _render() {
     const fragment = this._compile();
     const newElement = fragment.firstElementChild as HTMLElement;
 
-    if (this.wasRendered) {
+    if (this._wasRendered) {
       this._removeEventsFromElement();
       this._element!.replaceWith(newElement);
     }

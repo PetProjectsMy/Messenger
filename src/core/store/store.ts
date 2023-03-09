@@ -2,9 +2,9 @@ import { renderDOM } from "core/dom";
 import { EnumAppPages } from "pages/enum-app-pages";
 import { type ChatMessagesHandler } from "services/sockets";
 import {
-  comparePropByPath,
   getPropByPath,
   isNullish,
+  isPropByPathEqualToValue,
   setPropByPath,
 } from "utils/objects-handle";
 import { getPageComponent } from "utils/pages";
@@ -151,7 +151,7 @@ export class Store {
     value: unknown,
     isLogNeeded = false
   ) {
-    const isValueChanged = !comparePropByPath({
+    const isValueChanged = !isPropByPathEqualToValue({
       object: this.state,
       pathString,
       value,

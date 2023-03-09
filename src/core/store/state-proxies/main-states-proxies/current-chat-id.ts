@@ -12,6 +12,7 @@ export function currentChatSetter(
   oldValue: Nullable<number>,
   newValue: Nullable<number>
 ) {
+  console.log(`OLD CHAT: ${oldValue}, NEW VALUE: ${newValue}`);
   const newValueIsNull = isNullish(newValue);
 
   if (newValueIsNull) {
