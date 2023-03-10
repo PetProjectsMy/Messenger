@@ -18,5 +18,5 @@
 раздача index.html - с помощью express
 
 deploy:
-render.com: https://messenger-s22v.onrender.com
+render.com: https://messenger-s22v.onrender.com  
 netlify https://heroic-sable-837180.netlify.app
