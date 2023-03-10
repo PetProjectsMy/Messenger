@@ -48,7 +48,7 @@ type THttpMethod = (
   options?: TRequestOptionsWithoutMethod
 ) => Promise<any>;
 
-class HTTPTransport {
+export class HTTPTransport {
   baseURL = "";
 
   constructor({ baseURL }: { baseURL: string }) {
