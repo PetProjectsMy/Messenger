@@ -1,6 +1,6 @@
 import { API_BASE_URL } from "typings/constants";
 
-const enum METHODS {
+export const enum METHODS {
   GET = "GET",
   POST = "POST",
   PUT = "PUT",
@@ -87,7 +87,7 @@ export class HTTPTransport {
       }
 
       const xhr = new XMLHttpRequest();
-      const url = `${this.baseURL}/${apiURL}`;
+      const url = `${this.baseURL}${apiURL}`;
       xhr.open(method, url);
 
       xhr.responseType = "json";
