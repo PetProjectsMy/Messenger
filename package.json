@@ -63,7 +63,7 @@
     "prod-build": "cross-env BUILD_MODE=production webpack",
     "lint:staged": "lint-staged --config='./config/lint-staged/lint-staged.config.js'",
     "lint:code": "eslint --config='./config/eslint/.eslintrc.js' --fix .",
-    "lint:styles": "stylelint --ignore-path='./config/stylelint/.stylelintignore' --fix .",
+    "lint:styles": "stylelint --ignore-path='./config/stylelint/.stylelintignore' --config='./config/stylelint/stylelint.config.js' --fix .",
     "test": "jest --config ./config/jest/jest.config.ts",
     "postinstall": "husky install"
   },
