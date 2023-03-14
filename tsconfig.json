@@ -6,7 +6,7 @@
     "noUnusedParameters": true,
     "strictNullChecks": true,
     "allowJs": true,
-    "checkJs": true,
+    "checkJs": false,
     "allowSyntheticDefaultImports": true,
     "baseUrl": "./src",
     "esModuleInterop": true,

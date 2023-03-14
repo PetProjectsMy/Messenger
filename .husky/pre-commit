@@ -2,4 +2,5 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 yarn run compile-check
+yarn run test
 yarn run lint:staged
