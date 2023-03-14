@@ -17,13 +17,22 @@ body {
   @background-color
 ) {
   .main-section {
-    &:extend(.vertical-block);
+
+    @chat-display-section-flex: 100% - @header-section-flex -
+      @message-input-section-flex;
+    @chat-display-section-height: (@chat-display-section-flex / 100%) * 100vh;
+
+    @message-input-section-height: 100vh * (@message-input-section-flex / 100%);
+
     flex: @flex;
     background-color: @background-color;
 
+    &:extend(.vertical-block);
+
     & > * {
-      &:extend(.horizontal-block);
       width: 100%;
+
+      &:extend(.horizontal-block);
     }
 
     .main-section-header {
@@ -32,15 +41,16 @@ body {
       & > *[class$="section"] {
         flex: 1;
         height: 100%;
+
         &:extend(.vertical-block);
       }
 
       .chat-info-section {
         .chat-title {
           width: 100%;
+          padding-left: 100% - @chat-display-delimiter-line-width;
           font-size: 1.5em;
           text-align: left;
-          padding-left: 100% - @chat-display-delimiter-line-width;
         }
       }
 
@@ -48,11 +58,12 @@ body {
         align-items: flex-end;
 
         button {
-          height: 100%;
           width: 100vh * (@main-section-header-flex / 100%);
+          height: 100%;
           padding-right: 100% - @chat-display-delimiter-line-width;
-          background-size: cover;
+
           background-color: transparent;
+          background-size: cover;
         }
       }
 
@@ -63,43 +74,46 @@ body {
     @side: ~"bottom"
   );
     }
-
-    @chat-display-section-flex: 100% - @header-section-flex -
-      @message-input-section-flex;
-    @chat-display-section-height: (@chat-display-section-flex / 100%) * 100vh;
     .chat-display-section {
-      height: @chat-display-section-height;
 
       @messages-display-section-height: 0.95 * @chat-display-section-height;
+
+      height: @chat-display-section-height;
       .messages-display-section {
+
+        @messages-list-height: 0.95 * @messages-display-section-height;
+
         width: 95%;
         height: @messages-display-section-height;
         border: 0.1em dashed rgba(16, 14, 14, 0.71);
+
         &:extend(.vertical-block);
 
         .message-placeholder {
           flex: auto;
           font-size: 4em;
         }
-
-        @messages-list-height: 0.95 * @messages-display-section-height;
         .messages-list {
-          overflow-y: auto;
-          &:extend(.vertical-block);
-
-          flex-direction: column-reverse;
-          justify-content: flex-start;
-          height: @messages-list-height;
-          width: 100%;
 
           @h: calc(@messages-list-height / @messages-per-display-area);
           @left-right-padding: 3.5%;
+
+          overflow-y: auto;
+          flex-direction: column-reverse;
+          justify-content: flex-start;
+
+          width: 100%;
+          height: @messages-list-height;
+
+          &:extend(.vertical-block);
           .chat-message {
-            &:extend(.vertical-block);
             align-items: flex-end;
-            padding: 0 @left-right-padding;
-            min-height: @h;
+
             width: 100% - 2 * @left-right-padding;
+            min-height: @h;
+            padding: 0 @left-right-padding;
+
+            &:extend(.vertical-block);
 
             .message-text {
               font-size: 2em;
@@ -108,8 +122,6 @@ body {
         }
       }
     }
-
-    @message-input-section-height: 100vh * (@message-input-section-flex / 100%);
     .message-input-section {
       flex: @message-input-section-flex;
       .mixin-one-side-horizontal-border(
@@ -120,8 +132,9 @@ body {
   );
 
       & > * {
-        &:extend(.vertical-block);
         height: 100%;
+
+        &:extend(.vertical-block);
       }
 
       .attachment-block {
@@ -129,8 +142,8 @@ body {
         margin-left: 2%;
 
         button {
-          height: min(0.5 * @message-input-section-height, 100px);
           width: $height;
+          height: min(0.5 * @message-input-section-height, 100px);
           background-size: cover;
         }
       }
@@ -139,11 +152,12 @@ body {
         flex: 70%;
 
         input {
-          margin: 0 2%;
-          height: 50%;
           width: 100%;
-          text-align: center;
+          height: 50%;
+          margin: 0 2%;
+
           font-size: 1.2em;
+          text-align: center;
         }
       }
 
@@ -152,8 +166,8 @@ body {
         margin-right: 2%;
 
         button {
-          height: min(0.5 * @message-input-section-height, 100px);
           width: $height;
+          height: min(0.5 * @message-input-section-height, 100px);
           background-size: cover;
         }
       }

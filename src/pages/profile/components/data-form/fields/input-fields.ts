@@ -50,7 +50,7 @@ Object.entries(MapInputFieldToProps).forEach(
     props.htmlWrapper = {
       componentAlias: "wrappedDataInput",
       htmlWrapperTemplate: `
-      <field class="data-field">
+      <div class="data-field">
         <div class="data-type-section">
           <span class="data-type"> ${MapInputFieldToDataType[fieldName]} </span>
         </div>
@@ -60,7 +60,7 @@ Object.entries(MapInputFieldToProps).forEach(
             <span class="input-error"> \\{{ inputError }} </span>
           \\{{/if}}
         </div>
-      </field>
+      </div>
     `,
     };
   }

@@ -8,39 +8,39 @@
   @fields-total-margin: 7%, 
   @submit-button-section-flex: 1
 ) {
-  &:extend(.centered-container);
-  &:extend(.vertical-block);
-  .mixin-width-by-device(0.9, 0.5, 500px);
   background: #a8a8a8;
   border: 2px solid #708090;
   border-radius: 5%;
 
+  &:extend(.centered-container);
+  &:extend(.vertical-block);
+  .mixin-width-by-device(0.9, 0.5, 500px);
+
   form {
-    &:extend(.vertical-block);
-    width: 80%;
+    @margin: calc(@fields-total-margin / (@fields-num + 2));
+
     flex: @flex-form;
+    width: 80%;
+
+    &:extend(.vertical-block);
 
     & > * {
-      &:extend(.vertical-block);
       width: 100%;
+
+      &:extend(.vertical-block);
     }
 
     legend {
       flex: 100% - @flex-fieldset;
     }
-
-    @margin: calc(@fields-total-margin / (@fields-num + 2));
     fieldset {
       flex: @flex-fieldset;
       justify-content: space-evenly;
 
       & > * {
         width: 100%;
-        &:extend(.vertical-block);
-      }
 
-      span.api-error {
-        flex: 0.5;
+        &:extend(.vertical-block);
       }
 
       .input-with-validation-block {
@@ -57,8 +57,8 @@
         }
 
         span {
-          height: auto;
           display: block;
+          height: auto;
         }
       }
 
@@ -67,13 +67,14 @@
       }
 
       span.api-error {
+        flex: 0.5;
         color: red;
       }
 
       span.api-success,
       span.api-error {
-        font-size: 1.2em;
         margin: 0;
+        font-size: 1.2em;
       }
 
       .submit-button-section {
@@ -81,29 +82,31 @@
         margin: @margin 0;
 
         .submit-button {
-          height: 100%;
           width: min(50%, 175px);
+          height: 100%;
         }
       }
     }
   }
 
   nav {
-    &:extend(.horizontal-block);
-    width: 80%;
     flex: 100% - @flex-form;
+    width: 80%;
+
+    &:extend(.horizontal-block);
 
     & > * {
-      &:extend(.vertical-block);
       flex: 1;
       height: 80%;
+
+      &:extend(.vertical-block);
 
       .sign-up-link {
         white-space: nowrap;
       }
       .home-button {
-        height: 70%;
         width: 40%;
+        height: 70%;
       }
     }
   }

@@ -1,5 +1,6 @@
 .parcel-cache/
 .idea/
+.vscode/
 node_modules/
 netlify.toml
 playground/
@@ -10,7 +11,8 @@ build
 
 *.js
 !.eslintrc.js
-!config/**/*.js
+!stylelint.config.js
+!config/**
 
 *.log
 *.txt

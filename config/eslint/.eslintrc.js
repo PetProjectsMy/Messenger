@@ -1,6 +1,4 @@
-const htmlConfig = require("./config/eslint/html-config");
-const commonjsConfig = require("./config/eslint/commonjs-config");
-const tsConfig = require("./config/eslint/ts-config");
+const { htmlConfig, tsConfig, jsConfig } = require("./overrides");
 
 const config = {
   ignorePatterns: ["build/", "node_modules/"],
@@ -13,7 +11,7 @@ const config = {
   parserOptions: {
     ecmaVersion: "latest",
   },
-  overrides: [htmlConfig, commonjsConfig, tsConfig],
+  overrides: [htmlConfig, jsConfig, tsConfig],
 };
 
 module.exports = config;
