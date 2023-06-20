@@ -1,12 +1,22 @@
 .parcel-cache/
 .idea/
+.vscode/
 node_modules/
 netlify.toml
 playground/
-dist
+build
+
 *.css
 *.css.map
+
 *.js
+!.eslintrc.js
+!stylelint.config.js
+!config/**
+
+*.log
 *.txt
+
 netlify.toml
-package copy.json
+package.copy.json
+cspell.json

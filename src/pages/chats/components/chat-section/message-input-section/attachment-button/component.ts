@@ -1,6 +1,6 @@
 import { WithStoreButton } from "hocs/components";
 import { isNullish } from "utils/objects-handle";
-import backgorundImage from "./icon.png";
+import backgroundImage from "./icon.png";
 
 export class AttachmentButton extends WithStoreButton {
   constructor() {
@@ -8,7 +8,7 @@ export class AttachmentButton extends WithStoreButton {
       props: {
         htmlClasses: ["attachment-button"],
         htmlStyle: {
-          "background-image": backgorundImage,
+          "background-image": backgroundImage,
         },
       },
     });

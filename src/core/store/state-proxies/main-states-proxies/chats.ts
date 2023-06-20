@@ -1,15 +1,15 @@
-import { EnumAppPages } from "pages";
+import { type ChatsList } from "pages/chats/components/navigation/chats-list";
+import { EnumAppPages } from "pages/enum-app-pages";
 
-export function chatsSetter() {
-  const { page } = this.state;
-
-  if (page !== EnumAppPages.Chats) {
+export function chatsSetter(this: StoreTypings.Store) {
+  if (this.getCurrentPageType() !== EnumAppPages.Chats) {
     return;
   }
 
-  const { chatsList } = this.page.refs;
+  const refs = this.getCurrentPageRefs();
+  const chatsList = refs.chatsList as ChatsList;
   chatsList.createChatsList();
   Object.values(chatsList.children.chats).forEach((chat: any) => {
-    this.page.refs[`chat-${chat.chatID}`] = chat;
+    refs[`chat-${chat.chatID}`] = chat;
   });
 }

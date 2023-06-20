@@ -1,6 +1,6 @@
+export { Block } from "./block";
 export {
   BlockCommonEvents,
-  TBlockCommonEventsHandlersArgs,
+  type TBlockCommonEventsHandlersArgs,
 } from "./block-base";
-export { Block, BlockClass } from "./block";
 export { renderDOM } from "./renderDOM";

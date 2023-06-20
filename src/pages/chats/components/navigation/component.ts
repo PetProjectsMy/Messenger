@@ -5,7 +5,7 @@ import template from "./template";
 
 export class ChatsPageNavigationSection extends WithStoreBlock {
   constructor() {
-    const children = {} as TComponentChildren;
+    const children = {} as ComponentTypings.Children;
 
     children.headerSection = new HeaderSection();
     children.chatsList = new ChatsList();

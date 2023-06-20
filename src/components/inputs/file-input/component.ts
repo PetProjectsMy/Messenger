@@ -1,7 +1,7 @@
+import { Button, TButtonProps } from "components/buttons";
+import { Input, TInputProps } from "components/inputs";
 import { Block } from "core/dom";
 import { deepMerge } from "utils/objects-handle";
-import { Input, TInputProps } from "components/inputs/basic-input";
-import { Button, TButtonProps } from "components/buttons/basic-button";
 import template from "./template";
 
 export const enum EnumFileUploadingStatus {
@@ -13,13 +13,13 @@ export const enum EnumFileUploadingStatus {
 type TFileInputProps = TInputProps & {
   htmlAttributes: { name: string; type?: "file"; accept?: string };
   events?: {
-    change: TEventListener[];
+    change: ComponentTypings.EventListener[];
   };
 };
 
-type TchooseButtonProps = TButtonProps & {
+type TChooseButtonProps = TButtonProps & {
   events?: {
-    click?: TEventListener[];
+    click?: ComponentTypings.EventListener[];
   };
 };
 
@@ -31,11 +31,11 @@ export class FileInput extends Block {
     helpers,
   }: {
     fileInputProps: TFileInputProps;
-    chooseButtonProps?: TchooseButtonProps;
-    props?: TComponentCommonProps;
-    helpers?: TComponentHelpers;
+    chooseButtonProps?: TChooseButtonProps;
+    props?: ComponentTypings.CommonProps;
+    helpers?: ComponentTypings.Helpers;
   }) {
-    const children = {} as TComponentChildren;
+    const children = {} as ComponentTypings.Children;
 
     const fileInput = FileInput._createFileInput(fileInputProps);
     children.fileInput = fileInput;
@@ -60,12 +60,9 @@ export class FileInput extends Block {
 
   private static _createFileInput(props: TFileInputProps) {
     const FileInputDefaultProps = {
-      htmlAttributes: { type: "file", accept: "image/*" },
+      htmlAttributes: { type: "file" },
       htmlStyle: {
         display: "none",
-      },
-      events: {
-        change: [() => {}],
       },
     };
 
@@ -76,15 +73,15 @@ export class FileInput extends Block {
   }
 
   private static _createChooseButton(
-    props: TchooseButtonProps,
+    props: TChooseButtonProps,
     fileInputRef: Input
   ) {
-    const chooseButtonDefaultProps: TchooseButtonProps = {
+    const chooseButtonDefaultProps: TChooseButtonProps = {
       events: {
         click: [
-          function () {
+          function (this: Input) {
             const { fileInput } = this.refs;
-            fileInput._unwrappedElement.click();
+            fileInput.getUnwrappedElement()?.click();
           },
         ],
       },

@@ -1,14 +1,14 @@
+import { HomeButton } from "components/buttons/home-button";
 import { Block } from "core/dom";
-import { HomeButton } from "components/buttons";
-import { WithRouterLink } from "hocs/components";
 import { EnumAppRoutes } from "core/router";
+import { WithRouterLink } from "hocs/components";
 import { SignUpPageForm } from "./form-component";
 import template from "./template";
 
 export class SignUpPage extends Block {
   constructor() {
-    const children: TComponentChildren = {};
-    const refs: TComponentRefs = {};
+    const children: ComponentTypings.Children = {};
+    const refs: ComponentTypings.Refs = {};
 
     children.signInLink = new WithRouterLink({
       props: {

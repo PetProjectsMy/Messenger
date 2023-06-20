@@ -1,6 +1,6 @@
+import { Button } from "components/buttons";
 import { Block } from "core/dom";
-import { Button } from "components";
-import { ProfileService } from "services";
+import { ProfileService } from "services/api/profile";
 import {
   APIResponseHasError,
   transformProfileAPIResponseToUserData as transformData,

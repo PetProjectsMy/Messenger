@@ -3,28 +3,34 @@
 .add-chat-modal-mixin() {
   .modal {
     position: absolute;
+
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.3);
-    opacity: 0;
+
     visibility: hidden;
+    opacity: 0;
+    background-color: rgba(0, 0, 0, 0.3);
 
     .modal-content {
-      &:extend(.vertical-block);
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background-color: white;
-      opacity: 1;
+
       width: 80vmin;
       height: 40vmin;
+
+      opacity: 1;
+      background-color: white;
       border-radius: 0.5rem;
 
+      &:extend(.vertical-block);
+
       section {
-        &:extend(.vertical-block);
         flex: 1;
         width: 100%;
+
+        &:extend(.vertical-block);
       }
 
       input {
@@ -35,6 +41,7 @@
         position: fixed;
         top: 0;
         right: 0;
+
         width: 5vmin;
         height: 5vmin;
       }
@@ -42,8 +49,8 @@
   }
 
   .show-modal {
-    opacity: 1;
     visibility: visible;
+    opacity: 1;
     transition: opacity 0.4s ease;
   }
 }

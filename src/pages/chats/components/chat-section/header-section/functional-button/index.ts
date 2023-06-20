@@ -1,0 +1,1 @@
+export { FunctionalButton } from "./component";

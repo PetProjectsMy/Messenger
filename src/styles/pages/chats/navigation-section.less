@@ -16,9 +16,10 @@
     (1 / @chats-number-per-page);
 
   .navigation-section {
-    &:extend(.vertical-block);
     flex: @flex;
     background-color: @chats-list-background-color;
+
+    &:extend(.vertical-block);
 
     & > * {
       width: 100%;
@@ -26,12 +27,12 @@
 
     .navigation-section-header {
       flex: @header-section-flex;
+      border-bottom: 0.2em solid darken(@chats-list-background-color, 20%);
+
       &:extend(.horizontal-block);
       & > * {
         &:extend(.vertical-block);
       }
-
-      border-bottom: 0.2em solid darken(@chats-list-background-color, 20%);
 
       .search-section {
         flex: 3;
@@ -52,10 +53,6 @@
     }
 
     .chats-list {
-      flex: @chats-list-section-flex;
-      overflow: auto;
-      width: 100%;
-
       @avatar-section-part: 25%;
       @chat-list-avatar-max-size: min(
         @chat-row-height,
@@ -63,36 +60,47 @@
       );
       @h: @chat-list-avatar-max-size;
 
+      overflow: auto;
+      flex: @chats-list-section-flex;
+      width: 100%;
+
       .chat-field.current-chat {
         background-color: darken(@chats-list-background-color, 3%);
       }
 
+      // --------------------------
+      .mixin-field-section(@width) {
+        width: @width;
+        height: auto;
+        padding: calc(0.1 * @h) 3%;
+
+        &:extend(.vertical-block);
+      }
+      // --------------------------
       .chat-field {
         width: 100%;
-        &:extend(.horizontal-block);
         height: @chat-row-height;
 
-        .mixin-field-section(@width) {
-          width: @width;
-          padding: calc(0.1 * @h) 3%;
-          height: auto;
-          &:extend(.vertical-block);
-        }
+        &:extend(.horizontal-block);
+
+        .mixin-one-side-horizontal-border(@color: @chats-list-background-color, @side: ~"bottom");
 
         .avatar-section {
           .mixin-field-section(@h);
+
           padding-right: 1%;
 
           img {
-            border-radius: 50%;
-            height: calc(0.8 * @h);
-            width: calc(0.8 * @h);
             align-self: flex-start;
+            width: calc(0.8 * @h);
+            height: calc(0.8 * @h);
+            border-radius: 50%;
           }
         }
 
         .chat-title-section {
           .mixin-field-section(calc(100% - @h));
+
           padding-left: 1%;
 
           .chat-title {
@@ -100,10 +108,6 @@
             font-size: 2em;
           }
         }
-      }
-
-      .chat-field {
-        .mixin-one-side-horizontal-border(@color: @chats-list-background-color, @side: ~"bottom");
       }
     }
   }

@@ -1,24 +1,11 @@
-import { EnumAppPages } from "pages";
-import { type Store } from "core/store";
+import { type PathRouter } from "core/router/path-router";
 import { type ChatMessagesHandler } from "services/sockets";
-import { PathRouter } from "core/router/path-router";
 
 declare global {
   interface Window {
-    store: Store;
+    store: StoreTypings.Store;
     router: PathRouter;
   }
-
-  export type TAppUserData = {
-    id: number;
-    firstName: string;
-    secondName: string;
-    displayName: string;
-    login: string;
-    email: string;
-    phone: string;
-    avatar: Nullable<string>; // path to avatar
-  };
 
   type TChatData = {
     title: string;
@@ -46,16 +33,6 @@ declare global {
   };
 
   export type TAppChatMessages = Record<string, TAppChatMessage[]>;
-
-  export type TAppState = {
-    page: Nullable<EnumAppPages>;
-    user: Nullable<TAppUserData>;
-    chats: Nullable<TAppChatsData>;
-    chatsUsers: Nullable<Record<string, TAppChatUsersData>>;
-    chatsSockets: TAppChatsSockets;
-    chatsMessages: Nullable<TAppChatMessages>;
-    currentChatID: Nullable<number>;
-  };
 }
 
 export {};

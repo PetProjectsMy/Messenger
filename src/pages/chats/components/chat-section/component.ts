@@ -6,7 +6,7 @@ import template from "./template";
 
 export class ChatsPageMainSection extends WithStoreBlock {
   constructor() {
-    const children: TComponentChildren = {};
+    const children: ComponentTypings.Children = {};
 
     children.headerSection = new ChatSectionHeader();
     children.messagesDisplaySection = new MessagesDisplayArea();

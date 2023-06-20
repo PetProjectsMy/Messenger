@@ -50,7 +50,7 @@ Object.entries(MapInputFieldToProps).forEach(
     props.htmlWrapper = {
       componentAlias: "wrappedDataInput",
       htmlWrapperTemplate: `
-      <field class="data-field">
+      <div class="data-field">
         <div class="data-type-section">
           <span class="data-type"> ${MapInputFieldToDataType[fieldName]} </span>
         </div>
@@ -60,7 +60,7 @@ Object.entries(MapInputFieldToProps).forEach(
             <span class="input-error"> \\{{ inputError }} </span>
           \\{{/if}}
         </div>
-      </field>
+      </div>
     `,
     };
   }
@@ -68,7 +68,7 @@ Object.entries(MapInputFieldToProps).forEach(
 
 export const MapInputFieldToUserDataRecord: Record<
   EnumInputFields,
-  Keys<TAppUserData>
+  Keys<StoreTypings.UserData>
 > = {
   [EnumInputFields.FirstName]: "firstName",
   [EnumInputFields.SecondName]: "secondName",
@@ -82,11 +82,11 @@ export const MapInputFieldToHelpers = Object.entries(
   MapInputFieldToUserDataRecord
 ).reduce((acc, [fieldName, recordName]) => {
   acc[fieldName] = {
-    beforePropsProxyHook() {
-      this.setPropByPath(
-        "htmlAttributes.value",
-        this.store.getUserDataByPath(recordName)
-      );
+    beforePropsProxyHook(this: ComponentTypings.Input) {
+      this.setPropByPath({
+        pathString: "htmlAttributes.value",
+        value: this.store!.getUserDataByPath(recordName),
+      });
     },
 
     afterRenderHook() {

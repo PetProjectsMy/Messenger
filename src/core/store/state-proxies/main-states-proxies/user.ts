@@ -1,12 +1,13 @@
-import { EnumAppPages } from "pages";
+import { EnumAppPages } from "pages/enum-app-pages";
 import { isNullish, isObject } from "utils/objects-handle";
 
 export function userSetter(
-  oldValue: Nullable<TAppUserData>,
-  newValue: Nullable<TAppUserData>
+  this: StoreTypings.Store,
+  oldValue: Nullable<StoreTypings.UserData>,
+  newValue: Nullable<StoreTypings.UserData>
 ) {
-  const pageType = this.state.page;
-  const { page } = this;
+  const pageType = this.getCurrentPageType();
+  const pageObject = this.getCurrentPageObject();
 
   switch (pageType as EnumAppPages) {
     case EnumAppPages.Profile:
@@ -17,17 +18,18 @@ export function userSetter(
         throw new Error(`Incorrect User State ${oldValue} On Profile Page`);
       }
 
-      if (oldValue.avatar !== newValue!.avatar) {
-        page.updateUserAvatar();
+      if (oldValue.avatar !== newValue.avatar) {
+        (pageObject as PagesTypings.ProfilePage).updateUserAvatar();
       }
-      page.updateUserInfo();
+      (pageObject as PagesTypings.ProfilePage).updateUserInfo();
 
       break;
     case EnumAppPages.Navigation:
       if (isNullish(oldValue) !== isNullish(newValue)) {
-        page.createLinks();
+        (pageObject as PagesTypings.NavigationPage).init();
       }
       break;
+
     default:
   }
 }

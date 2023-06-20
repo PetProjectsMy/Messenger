@@ -16,7 +16,7 @@ export default function getInputFormTemplate(
   Object.values(enumFormFieldsNames).forEach((fieldName) => {
     content = `
       ${content}
-      {{{ ${fieldName}_child }}}
+      {{{ ${fieldName} }}}
     `;
   });
   content = `
@@ -27,7 +27,7 @@ export default function getInputFormTemplate(
       {{#if apiResponseError }} 
         <span class="api-error"> {{ apiResponseError }} </span>
       {{/if}}
-      {{#if isSubmitButtonNeeded}}
+      {{#if hasSubmitButton}}
         <div class="submit-button-section">
           {{{ submitButton }}}
         </div>

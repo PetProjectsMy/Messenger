@@ -1,27 +1,31 @@
+import { type PathRouter } from "core/router";
 import Handlebars from "handlebars";
 import { nanoid } from "nanoid";
 import { deepMerge } from "utils/objects-handle";
-import { type Store } from "core/store";
-import { type PathRouter } from "core/router";
+import { getDescendantByPath } from "utils/pages/get-descendant-by-path";
 import BlockBase, { BlockCommonEvents } from "./block-base";
 
+function isChildArray(child: unknown): child is ComponentTypings.ChildArray {
+  return Array.isArray(child) && child.every((el) => el instanceof Block);
+}
+
 export class Block<
-  TProps extends TComponentCommonProps = TComponentCommonProps,
-  TState extends TComponentState = TComponentState
+  TProps extends ComponentTypings.CommonProps = ComponentTypings.CommonProps,
+  TState extends ComponentTypings.State = ComponentTypings.State
 > extends BlockBase<TProps, TState> {
-  protected helpers: TComponentHelpers;
+  protected helpers: ComponentTypings.Helpers;
 
   private htmlWrapped: boolean;
 
   protected props: TProps;
 
-  public refs: TComponentRefs;
+  public refs: ComponentTypings.Refs;
 
   public router?: PathRouter;
 
-  public store?: Store;
+  public store?: StoreTypings.Store;
 
-  private wasRendered: Boolean = false;
+  private _wasRendered = false;
 
   protected wrappedId?: string;
 
@@ -35,10 +39,10 @@ export class Block<
   }: {
     componentName?: string;
     props?: TProps;
-    children?: TComponentChildren;
-    refs?: TComponentRefs;
-    state?: TComponentState;
-    helpers?: TComponentHelpers;
+    children?: ComponentTypings.Children;
+    refs?: ComponentTypings.Refs;
+    state?: ComponentTypings.State;
+    helpers?: ComponentTypings.Helpers;
   } = {}) {
     super();
 
@@ -49,7 +53,7 @@ export class Block<
       componentName ?? `Not Named Block of type ${this.constructor.name}`;
 
     this.props = deepMerge(this.props ?? {}, props) as TProps;
-    this.props.events = this.props.events ?? {};
+    this.props.events ??= {};
     this.props.htmlAttributes ??= {};
     this.props.htmlClasses ??= [];
     this.props.htmlStyle ??= {};
@@ -79,19 +83,19 @@ export class Block<
 
   protected _afterPropsAssignHook() {
     if (this.helpers.afterPropsAssignHook) {
-      (this.helpers.afterPropsAssignHook as Function).call(this);
+      (this.helpers.afterPropsAssignHook as TFunction).call(this);
     }
   }
 
   protected _afterRenderHook() {
     if (this.helpers.afterRenderHook) {
-      (this.helpers.afterRenderHook as Function).call(this);
+      (this.helpers.afterRenderHook as TFunction).call(this);
     }
   }
 
   protected _beforePropsAssignHook() {
     if (this.helpers.beforePropsAssignHook) {
-      (this.helpers.beforePropsAssignHook as Function).call(this);
+      (this.helpers.beforePropsAssignHook as TFunction).call(this);
     }
   }
 
@@ -99,13 +103,17 @@ export class Block<
     this._bindEventListenersToBlock();
 
     if (this.helpers.beforePropsProxyHook) {
-      (this.helpers.beforePropsProxyHook as Function).call(this);
+      (this.helpers.beforePropsProxyHook as TFunction).call(this);
     }
   }
 
-  protected _beforeRegisterEventsHook() {}
+  protected _beforeRegisterEventsHook() {
+    return;
+  }
 
-  protected _beforeRenderHook() {}
+  protected _beforeRenderHook() {
+    return;
+  }
 
   private _compile(): DocumentFragment {
     const fragment = document.createElement("template") as HTMLTemplateElement;
@@ -114,7 +122,8 @@ export class Block<
 
     let templateString = this.render();
     if (this.htmlWrapped) {
-      const htmlWrapper = this.props.htmlWrapper as TComponentWrapper;
+      const htmlWrapper = this.props
+        .htmlWrapper as ComponentTypings.HTMLWrapper;
       templateString = Handlebars.compile(htmlWrapper.htmlWrapperTemplate)({
         [`${htmlWrapper.componentAlias}`]: templateString,
       });
@@ -136,20 +145,26 @@ export class Block<
     return fragment.content;
   }
 
+  public getChildByPath<TChild = ComponentTypings.Child>(
+    pathString = ""
+  ): TChild {
+    return getDescendantByPath<TChild>(this, pathString);
+  }
+
   private _init() {
     this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
-    this.wasRendered = true;
+    this._wasRendered = true;
   }
 
   protected _makeProxy(object: Record<string, any>) {
-    const self = this;
+    const { eventBus } = this;
 
     return new Proxy(object, {
       set(target, prop: string, value) {
         const oldValue = target[prop];
         target[prop] = value;
 
-        self.eventBus.emit(BlockCommonEvents.FLOW_CDU, oldValue, value);
+        eventBus.emit(BlockCommonEvents.FLOW_CDU, oldValue, value);
 
         return true;
       },
@@ -159,7 +174,7 @@ export class Block<
   private _makeStubs(): Record<string, string | string[]> {
     const stubs: Record<string, string> = {};
     Object.entries(this.children).forEach(([name, child]) => {
-      if (Array.isArray(child)) {
+      if (isChildArray(child)) {
         stubs[name] = child
           .map((ch) => `<div data-id="${ch.id}"></div>`)
           .join("");
@@ -173,19 +188,25 @@ export class Block<
 
   private _registerEvents() {
     const { eventBus } = this;
-    eventBus.on(BlockCommonEvents.INIT, this._init.bind(this));
+    eventBus.on(BlockCommonEvents.INIT, () => {
+      this._init.call(this);
+    });
     eventBus.on(
       BlockCommonEvents.FLOW_CDU,
-      this._componentDidUpdate.bind(this)
+      (oldPropsOrState, newPropsOrState) => {
+        this._updateComponent.call(this, { oldPropsOrState, newPropsOrState });
+      }
     );
-    eventBus.on(BlockCommonEvents.FLOW_RENDER, this._render.bind(this));
+    eventBus.on(BlockCommonEvents.FLOW_RENDER, () => {
+      this._render.call(this);
+    });
   }
 
-  private _render(): void {
+  private _render() {
     const fragment = this._compile();
     const newElement = fragment.firstElementChild as HTMLElement;
 
-    if (this.wasRendered) {
+    if (this._wasRendered) {
       this._removeEventsFromElement();
       this._element!.replaceWith(newElement);
     }
@@ -244,7 +265,7 @@ export class Block<
 
   private _setHtmlAttributes() {
     Object.entries(this.props.htmlAttributes!).forEach(([attrName, value]) => {
-      this._unwrappedElement!.setAttribute(attrName, value);
+      this._unwrappedElement?.setAttribute(attrName, value);
     });
   }
 
@@ -263,12 +284,12 @@ export class Block<
     this._setHtmlClasses();
     this._setHtmlAttributes();
     this._setElementStyle();
-    this._unwrappedElement!.removeAttribute("wrapped-id");
+    this._unwrappedElement?.removeAttribute("wrapped-id");
   }
 
   private _setHtmlClasses() {
-    if (this.props.htmlClasses!.length) {
-      this._unwrappedElement!.classList.add(...this.props.htmlClasses!);
+    if (this.props.htmlClasses?.length) {
+      this._unwrappedElement?.classList.add(...this.props.htmlClasses!);
     }
   }
 

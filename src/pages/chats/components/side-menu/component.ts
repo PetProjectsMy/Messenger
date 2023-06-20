@@ -4,7 +4,7 @@ import template from "./template";
 
 export class ChatsPageSideMenu extends Block {
   constructor() {
-    const children = {} as TComponentChildren;
+    const children = {} as ComponentTypings.Children;
 
     children.collapseButton = new Buttons.CollapseButton();
     children.createChatButton = new Buttons.CreateChatButton();

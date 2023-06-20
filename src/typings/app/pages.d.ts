@@ -1,19 +1,35 @@
-import * as PagesClasses from "pages";
+import type {
+  ChatsPage as TChatsPage,
+  LoginPage as TLoginPage,
+  NavigationPage as TNavigationPage,
+  ProfilePage as TProfilePage,
+  SignUpPage as TSignUpPage,
+} from "pages";
+import type { TErrorPage, TErrorPageClass } from "pages/errors";
 
 declare global {
-  export type TAppPage =
-    | PagesClasses.ChatsPage
-    | PagesClasses.LoginPage
-    | PagesClasses.ProfilePage
-    | PagesClasses.SignUpPage
-    | PagesClasses.TErrorPage;
+  export namespace PagesTypings {
+    export type AppPage =
+      | TChatsPage
+      | TErrorPage
+      | TLoginPage
+      | TNavigationPage
+      | TProfilePage
+      | TSignUpPage;
 
-  export type TAppPageClass =
-    | typeof PagesClasses.ChatsPage
-    | typeof PagesClasses.LoginPage
-    | typeof PagesClasses.ProfilePage
-    | typeof PagesClasses.SignUpPage
-    | PagesClasses.TErrorPageClass;
+    export type PageClass =
+      | typeof TChatsPage
+      | typeof TLoginPage
+      | typeof TNavigationPage
+      | typeof TProfilePage
+      | typeof TSignUpPage
+      | TErrorPageClass;
+
+    export type ChatsPage = TChatsPage;
+    export type ErrorPage = TErrorPage;
+    export type LoginPage = TLoginPage;
+    export type NavigationPage = TNavigationPage;
+    export type ProfilePage = TProfilePage;
+    export type SignUpPage = TSignUpPage;
+  }
 }
-
-export {};

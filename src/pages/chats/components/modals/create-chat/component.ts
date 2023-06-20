@@ -1,6 +1,7 @@
+import { Button } from "components/buttons";
+import { Input } from "components/inputs";
 import { Block } from "core/dom";
-import { Button, Input } from "components";
-import { ChatsService } from "services/chats";
+import { ChatsService } from "services/api/chats";
 import { APIResponseHasError } from "utils/api";
 import template from "./template";
 
@@ -10,7 +11,7 @@ export class CreateChatModalWindow extends Block {
       apiResponseSuccess: "",
       apiResponseError: "",
     };
-    const children = {} as TComponentChildren;
+    const children = {} as ComponentTypings.Children;
 
     children.chatTitleInput = CreateChatModalWindow._createChatTitleInput();
 

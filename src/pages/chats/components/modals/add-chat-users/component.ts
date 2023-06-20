@@ -1,7 +1,8 @@
+import { Button } from "components/buttons";
+import { Input } from "components/inputs";
 import { Block } from "core/dom";
-import { Button, Input } from "components";
+import { ChatsService } from "services/api/chats";
 import { APIResponseHasError } from "utils/api";
-import { ChatsService } from "services";
 import { transformAddUsersFormDataToAPI } from "utils/api/to-api-data-transformers";
 import template from "./template";
 
@@ -20,9 +21,9 @@ export class AddChatUsersModalWindow extends Block {
       apiResponseError: "",
     };
 
-    const children = {} as TComponentChildren;
-    children.usersIdenifiersInput =
-      AddChatUsersModalWindow._createUsersIdenifiersInput();
+    const children = {} as ComponentTypings.Children;
+    children.usersIdentifiersInput =
+      AddChatUsersModalWindow._createUsersIdentifiersInput();
 
     const beforePropsAssignHook = function () {
       this.chatID = chatID;
@@ -44,7 +45,7 @@ export class AddChatUsersModalWindow extends Block {
 
   private _createSubmitButton() {
     const refs = {
-      usersInput: this.children.usersIdenifiersInput as Block,
+      usersInput: this.children.usersIdentifiersInput as Block,
       modalWindow: this,
     };
 
@@ -53,7 +54,7 @@ export class AddChatUsersModalWindow extends Block {
         this.state.apiResponseError = response.reason;
       } else {
         this.state.apiResponseSuccess = "Users added successfully";
-        this.children.usersIdenifiersInput.setValue("");
+        this.children.usersIdentifiersInput.setValue("");
       }
     }.bind(this);
 
@@ -97,7 +98,7 @@ export class AddChatUsersModalWindow extends Block {
     return template;
   }
 
-  private static _createUsersIdenifiersInput() {
+  private static _createUsersIdentifiersInput() {
     return new Input({
       props: {
         htmlAttributes: {

@@ -1,5 +1,5 @@
 import { WithStoreButton } from "hocs/components";
-import { ChatsService } from "services";
+import { ChatsService } from "services/api/chats";
 import { transformChatIDToDeleteAPI } from "utils/api/to-api-data-transformers";
 import { isNullish } from "utils/objects-handle";
 

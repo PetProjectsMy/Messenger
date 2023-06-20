@@ -1,13 +1,14 @@
+import { EventBus } from "core/event-bus";
 import { nanoid } from "nanoid";
+import { toggleHtmlClassInClassesList } from "utils/components";
 import {
   deepEqual,
   getPropByPath,
+  isObject,
   setPropByPath,
-  comparePropByPath,
 } from "utils/objects-handle";
-import { EventBus } from "core/event-bus";
-import { toggleHtmlClassToList } from "utils/components";
-import { getDescendantByPath } from "utils/pages";
+import { deepCopy } from "utils/objects-handle/objects-merge";
+import * as BlockTypings from "./typings";
 
 export const enum BlockCommonEvents {
   INIT = "init",
@@ -16,8 +17,8 @@ export const enum BlockCommonEvents {
 }
 
 export type TBlockCommonEventsHandlersArgs<
-  TProps extends TComponentCommonProps,
-  TState extends TComponentState
+  TProps extends ComponentTypings.CommonProps,
+  TState extends ComponentTypings.State
 > = {
   [BlockCommonEvents.INIT]: [];
   [BlockCommonEvents.FLOW_CDU]:
@@ -27,15 +28,9 @@ export type TBlockCommonEventsHandlersArgs<
 };
 
 export default class BlockBase<
-  TProps extends TComponentCommonProps,
-  TState extends TComponentState
+  TProps extends ComponentTypings.CommonProps,
+  TState extends ComponentTypings.State
 > {
-  static EVENTS = {
-    INIT: "init",
-    FLOW_CDU: "flow:component-did-update",
-    FLOW_RENDER: "flow:render",
-  };
-
   protected _element: Nullable<HTMLElement> = null;
 
   protected _unwrappedElement: Nullable<HTMLElement> = null;
@@ -47,7 +42,7 @@ export default class BlockBase<
 
   public componentName: string;
 
-  protected children: TComponentChildren;
+  public children: ComponentTypings.Children;
 
   protected props: TProps;
 
@@ -55,25 +50,20 @@ export default class BlockBase<
 
   readonly id: string = `${this.constructor.name}-${nanoid(7)}`;
 
-  protected _componentDidUpdate(
-    oldPropsOrState: Partial<TProps> | Partial<TState>,
-    newPropsOrState: Partial<TProps> | Partial<TState>,
-    forceUpdate: boolean = false
-  ): void {
-    if (
-      forceUpdate ||
-      this.componentDidUpdate(oldPropsOrState, newPropsOrState)
-    ) {
+  protected _updateComponent({
+    oldPropsOrState,
+    newPropsOrState,
+  }: BlockTypings.ComponentUpdateArgs<TProps, TState>) {
+    if (this._hasComponentUpdated({ oldPropsOrState, newPropsOrState })) {
       this.eventBus.emit(BlockCommonEvents.FLOW_RENDER);
     }
   }
 
-  protected componentDidUpdate(
-    oldPropsOrState: Partial<TProps> | Partial<TState>,
-    newPropsOrState: Partial<TProps> | Partial<TState>
-  ): boolean {
-    const result = !deepEqual(oldPropsOrState, newPropsOrState);
-    return result;
+  protected _hasComponentUpdated({
+    oldPropsOrState,
+    newPropsOrState,
+  }: BlockTypings.ComponentUpdateArgs<TProps, TState>) {
+    return !deepEqual(oldPropsOrState, newPropsOrState);
   }
 
   protected _addEventListenersToElement() {
@@ -97,7 +87,10 @@ export default class BlockBase<
     });
   }
 
-  public dispatchEventListener(event: string, listener: TEventListener) {
+  public dispatchEventListener(
+    event: string,
+    listener: ComponentTypings.EventListener
+  ) {
     const events = this.props.events!;
 
     events[event] ??= [];
@@ -109,12 +102,12 @@ export default class BlockBase<
     return this._element;
   }
 
-  public getChildByPath<TChild = TComponentChild>(pathString: string = "") {
-    return getDescendantByPath<TChild>(this.children, pathString);
+  public getUnwrappedElement(): Nullable<HTMLElement> {
+    return this._unwrappedElement;
   }
 
-  public getStateByPath(pathString: string = "") {
-    return getPropByPath(this.state, pathString);
+  public getStateByPath(pathString = "") {
+    return getPropByPath({ object: this.state, pathString });
   }
 
   public hide(): void {
@@ -128,18 +121,16 @@ export default class BlockBase<
 
   public show(): void {
     const element = this.getElement();
-
     element!.style.display = "block";
   }
 
   protected _removeEventsFromElement() {
-    const targetElement = this._unwrappedElement!;
+    const events = this.props.events;
+    const targetElement = this._unwrappedElement;
 
-    const events = this.props.events!;
-
-    Object.entries(events).forEach(([event, listeners]) => {
+    Object.entries(events!).forEach(([event, listeners]) => {
       listeners.forEach((listener) => {
-        targetElement.removeEventListener(event, listener);
+        targetElement!.removeEventListener(event, listener);
       });
     });
   }
@@ -148,44 +139,79 @@ export default class BlockBase<
     return "<div></div>";
   }
 
-  public setPropByPath(
-    propPath: string,
-    newValue: unknown,
-    forceUpdate: boolean = false,
-    doLog: boolean = false
-  ): void {
-    const didUpdate =
-      forceUpdate || !comparePropByPath(this.props, propPath, newValue, doLog);
+  public getPropByPath({
+    pathString = "",
+    isLogNeeded = false,
+  }: BlockTypings.PropGetArgs = {}) {
+    let value = getPropByPath({ object: this.props, pathString, isLogNeeded });
+    if (isObject(value)) {
+      value = deepCopy(value);
+    }
 
-    if (didUpdate) {
-      setPropByPath(this.props, propPath, newValue, doLog);
-      this._componentDidUpdate("" as any, "" as any, true);
+    return value;
+  }
+
+  public setPropByPath({
+    pathString,
+    value,
+    isLogNeeded = false,
+  }: BlockTypings.PropSetArgs) {
+    const args = {
+      object: this.props,
+      pathString,
+      isLogNeeded,
+    };
+
+    const currentValue = getPropByPath(args);
+    setPropByPath({ ...args, value });
+
+    if (pathString.split(".").length > 1) {
+      this._updateComponent({
+        oldPropsOrState: currentValue,
+        newPropsOrState: value,
+      });
     }
   }
 
-  public setChildByPath(
-    childPath: string,
-    newValue: TComponentChild | TComponentChildArray,
-    forceUpdate: boolean = false,
-    doLog: boolean = false
-  ) {
-    const didUpdate =
-      forceUpdate ||
-      !comparePropByPath(this.children, childPath, newValue, doLog);
+  public setStateByPath({
+    pathString,
+    value,
+    isLogNeeded = false,
+  }: BlockTypings.PropSetArgs) {
+    const args = {
+      object: this.state,
+      pathString,
+      isLogNeeded,
+    };
 
-    if (didUpdate) {
-      setPropByPath(this.children, childPath, newValue, doLog);
-      this._componentDidUpdate("" as any, "" as any, true);
+    const currentValue = getPropByPath(args);
+    setPropByPath({ ...args, value });
+
+    if (pathString.split(".").length > 1) {
+      this._updateComponent({
+        oldPropsOrState: currentValue,
+        newPropsOrState: value,
+      });
     }
+  }
+
+  public setChild({
+    childName,
+    value,
+  }: {
+    childName: string;
+    value: ComponentTypings.Child | ComponentTypings.ChildArray;
+  }) {
+    this.children[childName] = value;
   }
 
   public toggleHtmlClass(className: string, state: Nullable<"on" | "off">) {
-    const classList = toggleHtmlClassToList(
+    const classList = toggleHtmlClassInClassesList(
       this.props.htmlClasses!,
       className,
       state
     );
 
-    this.props.htmlClasses = classList;
+    this.setPropByPath({ pathString: "htmlClasses", value: classList });
   }
 }

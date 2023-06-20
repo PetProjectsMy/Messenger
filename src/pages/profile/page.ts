@@ -1,40 +1,34 @@
+import { HomeButton } from "components/buttons/home-button";
+import { type ImageComponent } from "components/image";
+import { Input } from "components/inputs";
 import { Block } from "core/dom";
-import avatarImagePlaceholder from "static/avatar-placeholder-profile.png";
-import { ImageComponent, Input } from "components";
-import { HomeButton } from "components/buttons";
 import { WithStore } from "hocs";
-import template from "./template";
-import { DataChangeButton, ProfilePageInputForm } from "./components";
+import {
+  DataChangeButton,
+  ProfileHeader,
+  ProfilePageInputForm,
+} from "./components";
+import { AvatarUploadForm } from "./components/avatar-upload-form";
 import { EnumInputFields } from "./components/data-form";
 import { MapInputFieldToUserDataRecord } from "./components/data-form/fields";
-import { AvatarUploadForm } from "./components/avatar-upload-form";
+import template from "./template";
 
-type TProfilePageProps = WithComponentCommonProps<{ userID: number }>;
+type TProfilePageProps = ComponentTypings.WithCommonProps<{ userID: number }>;
 const ProfilePageBlock = WithStore(Block<TProfilePageProps>);
 
 export class ProfilePage extends ProfilePageBlock {
   constructor() {
-    const children: TComponentChildren = {};
+    const children: ComponentTypings.Children = {};
 
-    const storeAvatar = window.store.getUserDataByPath("avatar");
-    const imageSource = storeAvatar || avatarImagePlaceholder;
-    const avatarImage = new ImageComponent({
-      props: {
-        htmlAttributes: {
-          src: imageSource,
-          alt: "Profile Avatar",
-        },
-      },
-    });
-    children.avatarImage = avatarImage;
-    children.avatarUploadForm = new AvatarUploadForm(avatarImage);
+    const header = new ProfileHeader();
+    const avatarImage = header.getChildByPath<ImageComponent>("avatarImage");
 
+    children.header = header;
     children.profileDataForm = new ProfilePageInputForm();
+    children.avatarUploadForm = new AvatarUploadForm();
     children.homeButton = new HomeButton();
 
-    const refs = {} as TComponentRefs;
-
-    super({ children, refs });
+    super({ children, refs: { avatarImage } });
   }
 
   protected render(): string {
@@ -47,28 +41,27 @@ export class ProfilePage extends ProfilePageBlock {
     this.children.changeDataButton = new DataChangeButton({
       form: this.children.profileDataForm as Block,
     });
-    this.props.userID = this.store.getUserDataByPath("id") as number;
   }
 
   public updateUserInfo() {
-    const userData = this.store.getUserDataByPath() as TAppUserData;
+    const userData = this.store.getUserDataByPath() as StoreTypings.UserData;
 
     Object.entries((this.children.profileDataForm as Block).refs).forEach(
       ([inputName, inputBlock]: [EnumInputFields, Input]) => {
         const recordName = MapInputFieldToUserDataRecord[inputName];
-        inputBlock.setPropByPath(
-          "htmlAttributes.value",
-          `${userData[recordName]}`
-        );
+        inputBlock.setPropByPath({
+          pathString: "htmlAttributes.value",
+          value: `${userData[recordName]}`,
+        });
       }
     );
   }
 
   public updateUserAvatar() {
     const newAvatar = this.store.getUserDataByPath("avatar") as string;
-    (this.children.avatarImage as ImageComponent).setPropByPath(
-      "htmlAttributes.src",
-      newAvatar
-    );
+    (this.refs.avatarImage as ImageComponent).setPropByPath({
+      pathString: "htmlAttributes.src",
+      value: newAvatar,
+    });
   }
 }

@@ -1,23 +1,26 @@
 @import "../helpers/common";
 
 .navigation__panel {
+  width: 100%;
+  height: 30%;
+
   &:extend(.centered-container);
   &:extend(.vertical-block);
-  height: 30%;
-  width: 100%;
 
-  & > * {
-    flex: 1;
-  }
+  .navigation-link {
+    flex: 1.5;
 
-  .naviagtion-link a {
-    margin: 1vh 0;
-    font-size: 1.4em;
+    &:extend(.vertical-block);
+    a {
+      margin: 1vh 0;
+      font-size: 1.4em;
+    }
   }
 
   .logout-button {
-    font-size: 1.2em;
+    flex: 1;
     width: fit-content;
     padding: 0 0.7%;
+    font-size: 1.2em;
   }
 }

@@ -21,6 +21,7 @@
 
   @media @desktop {
     @s_: ~"min(@{max-width}, calc(1px * @{st} + @{k} * (100vw - 1px * @{wt})))";
+
     width: @s_;
   }
 }
@@ -30,9 +31,11 @@
   @media @phone {
     height: 100vh * @pp;
   }
+
   @media @tablet {
     height: 100vh * @pp;
   }
+
   @media @desktop {
     height: min(@pd * 100vh, @max-height);
   }
@@ -43,6 +46,6 @@
 
   background-image: linear-gradient(@color_, @color_);
   background-repeat: no-repeat;
-  background-size: @percent-width @thickness;
   background-position: left 50% @side;
+  background-size: @percent-width @thickness;
 }

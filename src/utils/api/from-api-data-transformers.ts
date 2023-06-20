@@ -1,13 +1,12 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { baseURL } from "api";
+import { API_BASE_URL } from "typings/constants";
 
 export function transformAvatarURL(url: Nullable<string>) {
-  return url ? `${baseURL}/resources${url}` : url;
+  return url ? `${API_BASE_URL}/resources${url}` : url;
 }
 
 export function transformProfileAPIResponseToUserData(
   response: TProfileAPIResponse
-): TAppUserData {
+): StoreTypings.UserData {
   return {
     id: response.id,
     firstName: response.first_name,
@@ -55,8 +54,8 @@ export function transformChatGetTokenResponseToToken(
   return response.token;
 }
 
-export function transformWebsocketMessageDTOtoAppMessage(
-  message: TWebsocketMessageDTO
+export function transformMessageDTOtoAppMessage(
+  message: WebSocketTypings.MessageDTO
 ): TAppChatMessage {
   return {
     userID: message.user_id.toString(),

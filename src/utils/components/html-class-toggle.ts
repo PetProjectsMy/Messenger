@@ -1,6 +1,6 @@
 import { isNullish } from "utils/objects-handle";
 
-export function toggleHtmlClassToList(
+export function toggleHtmlClassInClassesList(
   classesList: string[],
   className: string,
   state: Nullable<"on" | "off">

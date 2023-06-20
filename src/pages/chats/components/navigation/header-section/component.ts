@@ -1,10 +1,10 @@
 import { Block } from "core/dom";
-import { HomeButton } from "components/buttons";
+import { HomeButton } from "components/buttons/home-button";
 import template from "./template";
 
 export class HeaderSection extends Block {
   constructor() {
-    const children = {} as TComponentChildren;
+    const children = {} as ComponentTypings.Children;
 
     children.homeButton = new HomeButton();
 

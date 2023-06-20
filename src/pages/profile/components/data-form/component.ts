@@ -1,19 +1,19 @@
-import { InputForm } from "components";
+import { InputForm } from "components/inputs/input-form";
 import { WithStoreValidatedInput } from "hocs/components";
-import { afterValidationCallback } from "./after-validation-callback";
+import { afterSubmitCallback } from "./after-submit-callback";
 import {
   EnumInputFields,
-  MapInputFieldToProps,
   MapInputFieldToHelpers,
+  MapInputFieldToProps,
 } from "./fields";
 
-export class ProfilePageInputForm extends InputForm {
+export class ProfilePageInputForm extends InputForm<typeof EnumInputFields> {
   constructor() {
     super({
       props: {
         htmlClasses: ["profile-data-form"],
-        isSubmitButtonNeeded: false,
-        afterValidationCallback,
+        hasSubmitButton: false,
+        afterSubmitCallback,
       },
       InputClass: WithStoreValidatedInput as any,
       enumInputFieldsNames: EnumInputFields,

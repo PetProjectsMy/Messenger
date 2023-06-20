@@ -1,6 +1,6 @@
 import { TButtonProps } from "components/buttons";
 import { WithRouterButton } from "hocs/components";
-import { AuthorizationService } from "services";
+import { AuthorizationService } from "services/api/authorization";
 
 export class LogoutButton extends WithRouterButton {
   constructor(props?: TButtonProps) {

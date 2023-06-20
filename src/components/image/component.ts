@@ -1,7 +1,7 @@
 import { Block } from "core/dom";
 import template from "./template";
 
-export type TImageProps = WithComponentCommonProps<{
+export type TImageProps = ComponentTypings.WithCommonProps<{
   htmlAttributes: {
     src: string;
     alt: string;

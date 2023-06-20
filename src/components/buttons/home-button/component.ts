@@ -1,8 +1,8 @@
+import { TButtonProps } from "components/buttons";
 import { EnumAppRoutes } from "core/router";
-import { Button, TButtonProps } from "components/buttons";
-import { WithRouter } from "hocs";
+import { WithRouterButton } from "hocs/components";
 
-export class HomeButton extends WithRouter(Button) {
+export class HomeButton extends WithRouterButton {
   constructor(props?: TButtonProps) {
     super({
       props: {
@@ -11,7 +11,7 @@ export class HomeButton extends WithRouter(Button) {
         events: {
           click: [
             () => {
-              this.router.go(EnumAppRoutes.NavigationPage);
+              this.router?.go(EnumAppRoutes.NavigationPage);
             },
           ],
         },

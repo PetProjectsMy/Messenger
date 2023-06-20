@@ -1,5 +1,5 @@
-import { ChatsService } from "services/chats";
-import { ProfileService } from "services/profile";
+import { ChatsService } from "services/api/chats";
+import { ProfileService } from "services/api/profile";
 import { SocketsCreator } from "services/sockets";
 
 async function getAllChatsAllMessages() {

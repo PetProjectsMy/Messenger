@@ -1,0 +1,1 @@
+export { SignUpService } from "./service";

@@ -1,13 +1,11 @@
-import { TInputValidator } from "components/inputs/input-with-validation";
-
 export type TInputSingleValidator = (value: string) => string;
 
 export function makeValidator({
   validatorsList,
 }: {
   validatorsList: TInputSingleValidator[];
-}): TInputValidator {
-  return function validate() {
+}): ComponentTypings.InputValidator {
+  return function validate(this: ComponentTypings.Input) {
     let error = "";
     const value = this.getValue();
 
@@ -20,7 +18,7 @@ export function makeValidator({
     }
 
     this.state.inputError = error;
-    this.setPropByPath("htmlAttributes.value", value);
+    this.setPropByPath({ pathString: "htmlAttributes.value", value });
 
     return !error;
   };

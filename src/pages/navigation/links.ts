@@ -1,4 +1,4 @@
-import { EnumAppPages } from "pages";
+import { EnumAppPages } from "pages/enum-app-pages";
 import { EnumAppRoutes } from "core/router";
 import { TLinkProps } from "components/link";
 
@@ -31,7 +31,7 @@ export const MapNavigationLinkToProps: Record<string, TLinkProps> = {
   },
   [EnumNavigationPageLinks.Profile]: {
     label: "Profile",
-    htmlAttributes: { id: `pforile_link` },
+    htmlAttributes: { id: `profile_link` },
   },
 };
 

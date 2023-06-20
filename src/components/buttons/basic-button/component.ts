@@ -1,7 +1,7 @@
 import { Block } from "core/dom";
 import template from "./template";
 
-export type TButtonProps = WithComponentCommonProps<{
+export type TButtonProps = ComponentTypings.WithCommonProps<{
   label?: string;
   htmlAttributes?: {
     type?: string;

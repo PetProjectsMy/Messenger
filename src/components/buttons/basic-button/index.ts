@@ -1,1 +1,1 @@
-export { TButtonProps, Button } from "./component";
+export { type TButtonProps, Button } from "./component";

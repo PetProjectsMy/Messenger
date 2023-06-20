@@ -1,26 +1,30 @@
-import { type Block } from "core/dom";
-import { Button, type Input } from "components";
+import { Button } from "components/buttons";
 import { formSubmitButtonCallback } from "components/inputs/input-form";
 
+const enum FormMode {
+  DataSaved = "data_saved",
+  DataChanging = "data_changing",
+}
 export class DataChangeButton extends Button {
-  constructor(refs: { form: Block }) {
-    const enum FormMode {
-      DataSaved = "data_saved",
-      DataChanging = "data_changing",
-    }
+  constructor(refs: { form: ComponentTypings.Block }) {
+    async function onClickCallback(this: DataChangeButton) {
+      const form = this.refs.form as ComponentTypings.InputForm;
 
-    async function onClickCallback() {
-      const { form } = this.refs;
-
-      form.state.apiResponseSuccess = "";
+      form.setStateByPath({
+        pathString: "apiResponseSuccess",
+        value: "",
+        isLogNeeded: true,
+      });
 
       if (this.state.mode === FormMode.DataSaved) {
         this.state.mode = FormMode.DataChanging;
         this.props.label = "save data";
 
-        Object.values(form.refs).forEach((dataField: Input) => {
-          dataField.toggleDisabledState();
-        });
+        Object.values(form.refs).forEach(
+          (dataField: ComponentTypings.Input) => {
+            dataField.toggleDisabledState();
+          }
+        );
       } else {
         await formSubmitButtonCallback.call(this);
 
@@ -28,9 +32,11 @@ export class DataChangeButton extends Button {
           this.state.mode = FormMode.DataSaved;
           this.props.label = "change data";
 
-          Object.values(form.refs).forEach((dataField: Input) => {
-            dataField.toggleDisabledState();
-          });
+          Object.values(form.refs).forEach(
+            (dataField: ComponentTypings.Input) => {
+              dataField.toggleDisabledState();
+            }
+          );
         }
       }
     }

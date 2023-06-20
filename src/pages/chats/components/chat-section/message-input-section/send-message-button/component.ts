@@ -1,15 +1,14 @@
-import { type Input } from "components";
 import { WithStoreButton } from "hocs/components";
 import { isNullish } from "utils/objects-handle";
-import backgorundImage from "./icon.png";
+import backgroundImage from "./icon.png";
 
 export class SendMessageButton extends WithStoreButton {
-  constructor(messageInputRef: Input) {
+  constructor(messageInputRef: ComponentTypings.Input) {
     super({
       props: {
         htmlClasses: ["send-message-button"],
         htmlStyle: {
-          "background-image": backgorundImage,
+          "background-image": backgroundImage,
         },
       },
       refs: {
@@ -30,26 +29,29 @@ export class SendMessageButton extends WithStoreButton {
     const currentChatID = store.getCurrentChatID();
     const isChatSelected = !isNullish(currentChatID);
 
-    const messageInput = this.refs.messageInput as Input;
+    const messageInput = this.refs.messageInput as ComponentTypings.Input;
     const webSocket = store.getSocketByChatID(currentChatID, true);
     console.log(
       `CHAT(${currentChatID}) Websocket: ${JSON.stringify(webSocket)}`
     );
 
     if (isChatSelected) {
-      this.setPropByPath("events.click", [
-        function () {
-          const message = messageInput.getValue();
-          if (message === "") {
-            return;
-          }
+      this.setPropByPath({
+        pathString: "events.click",
+        value: [
+          function () {
+            const message = messageInput.getValue();
+            if (message === "") {
+              return;
+            }
 
-          webSocket.send(message);
-          messageInput.setValue("");
-        },
-      ]);
+            webSocket.send(message);
+            messageInput.setValue("");
+          },
+        ],
+      });
     } else {
-      this.setPropByPath("events.click", []);
+      this.setPropByPath({ pathString: "events.click", value: [] });
     }
 
     this.toggleDisabledState(!isChatSelected);

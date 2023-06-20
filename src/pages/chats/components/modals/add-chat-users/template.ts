@@ -2,7 +2,7 @@ export default `
     <div class="modal-content">
       <section class="users-data-input-section">
         <div class="idenrifierss-input-section">
-          {{{ usersIdenifiersInput }}}
+          {{{ usersIdentifiersInput }}}
         </div>
       </section>
       

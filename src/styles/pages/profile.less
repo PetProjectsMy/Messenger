@@ -20,14 +20,16 @@
 @main-section-background-color: azure;
 
 main.profile-page {
+  height: @profile-page-height;
+
   &:extend(.centered-container);
   &:extend(.vertical-block);
   .mixin-width-by-device(0.9, 0.6, 600px);
-  height: @profile-page-height;
 
   & > * {
-    &:extend(.vertical-block);
     width: 100%;
+
+    &:extend(.vertical-block);
   }
 
   .profile-form-header {
@@ -36,22 +38,27 @@ main.profile-page {
     background-color: @footer-section-background-color;
 
     .image-section {
-      &:extend(.vertical-block);
       flex: @image-section-flex;
 
+      &:extend(.vertical-block);
+
       img {
-        border-radius: 50%;
         @h: ~"min(90%, calc(0.9 * @{image-max-height}))";
-        max-height: @h;
-        max-width: @h;
+
+        width: @h;
+        height: @h;
         padding: calc(0.05 * @h);
+
         font-size: 1.5em;
+
+        border-radius: 50%;
       }
     }
 
     .name-section {
-      &:extend(.vertical-block);
       flex: @name-section-flex;
+
+      &:extend(.vertical-block);
 
       .user-id {
         height: 80%;
@@ -62,23 +69,30 @@ main.profile-page {
   }
 
   form.profile-data-form fieldset {
-    border: none;
-    background-color: @main-section-background-color;
     flex: @main-section-height;
-    &:extend(.vertical-block);
+
     width: 100%;
 
-    field.data-field {
+    background-color: @main-section-background-color;
+    border: none;
+
+    &:extend(.vertical-block);
+
+    .data-field {
       flex: 1;
-      &:extend(.horizontal-block);
       width: 100%;
 
+      &:extend(.horizontal-block);
+
       & > * {
-        height: 100%;
-        width: 100%;
         flex: 1;
-        &:extend(.vertical-block);
+
+        width: 100%;
+        height: 100%;
+
         font-size: 1.3em;
+
+        &:extend(.vertical-block);
       }
 
       .data-type-section {
@@ -114,35 +128,40 @@ main.profile-page {
   }
 
   .profile-nav-section {
-    &:extend(.horizontal-block);
-    background-color: beige;
     flex: @nav-section-flex;
+    background-color: beige;
+
+    &:extend(.horizontal-block);
 
     .data-change-section,
     .home-button-section,
     .avatar-change-section {
-      &:extend(.vertical-block);
       flex: 1;
       height: 100%;
 
+      &:extend(.vertical-block);
+
       & > * {
-        &:extend(.vertical-block);
-        width: 100%;
         flex: 1;
+        width: 100%;
+
+        &:extend(.vertical-block);
       }
     }
 
     section.avatar-change-section {
       form.avatar-change-form {
-        &:extend(.vertical-block);
-        height: 100%;
         width: 100%;
+        height: 100%;
+
+        &:extend(.vertical-block);
 
         .choose-button-section,
         .submit-button-section {
-          &:extend(.vertical-block);
-          width: 100%;
           flex: 1;
+          width: 100%;
+
+          &:extend(.vertical-block);
         }
 
         input.upload-avatar {
