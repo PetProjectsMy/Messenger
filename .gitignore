@@ -1,4 +1,6 @@
-.parcel-cache
-node_modules
-modules.txt
-package copy.json
+*
+!build/
+!build/**
+!.gitignore
+!netlify.toml
+
