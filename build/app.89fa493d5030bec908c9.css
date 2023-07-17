@@ -1,19 +1,17 @@
-/*!***************************************************************************************************************!*\
-  !*** css ../node_modules/css-loader/dist/cjs.js!../node_modules/less-loader/dist/cjs.js!./styles/styles.less ***!
-  \***************************************************************************************************************/
 * {
   margin: 0;
   padding: 0;
   font-size: 2vmin;
 }
 .submit-button {
-  color: black;
-  background-color: #3369f3;
   width: fit-content;
   padding: 0 7%;
+  color: black;
+  background-color: #3369f3;
 }
 .vertical-block,
 .navigation__panel,
+.navigation__panel .navigation-link,
 .login-page,
 .login-page form,
 .login-page form > *,
@@ -41,7 +39,7 @@ main.profile-page > *,
 main.profile-page .profile-form-header .image-section,
 main.profile-page .profile-form-header .name-section,
 main.profile-page form.profile-data-form fieldset,
-main.profile-page form.profile-data-form fieldset field.data-field > *,
+main.profile-page form.profile-data-form fieldset .data-field > *,
 main.profile-page .profile-nav-section .data-change-section,
 main.profile-page .profile-nav-section .home-button-section,
 main.profile-page .profile-nav-section .avatar-change-section,
@@ -54,8 +52,8 @@ main.profile-page .profile-nav-section section.avatar-change-section form.avatar
 main.error-page {
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
   align-items: center;
+  justify-content: space-evenly;
 }
 .horizontal-block,
 .login-page nav,
@@ -64,12 +62,12 @@ main.error-page {
 .chats-page .navigation-section .navigation-section-header,
 .chats-page .navigation-section .chats-list .chat-field,
 .chats-page .main-section > *,
-main.profile-page form.profile-data-form fieldset field.data-field,
+main.profile-page form.profile-data-form fieldset .data-field,
 main.profile-page .profile-nav-section {
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
   align-items: center;
+  justify-content: space-evenly;
 }
 .centered-container,
 .navigation__panel,
@@ -78,25 +76,26 @@ main.profile-page .profile-nav-section {
 main.profile-page,
 main.error-page {
   position: fixed;
-  left: 50%;
   top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
 }
 .navigation__panel {
-  height: 30%;
   width: 100%;
+  height: 30%;
 }
-.navigation__panel > * {
-  flex: 1;
+.navigation__panel .navigation-link {
+  flex: 1.5;
 }
-.navigation__panel .naviagtion-link a {
+.navigation__panel .navigation-link a {
   margin: 1vh 0;
   font-size: 1.4em;
 }
 .navigation__panel .logout-button {
-  font-size: 1.2em;
+  flex: 1;
   width: fit-content;
   padding: 0 0.7%;
+  font-size: 1.2em;
 }
 .login-page {
   background: #a8a8a8;
@@ -119,8 +118,8 @@ main.error-page {
   }
 }
 .login-page form {
-  width: 80%;
   flex: 85%;
+  width: 80%;
 }
 .login-page form > * {
   width: 100%;
@@ -135,9 +134,6 @@ main.error-page {
 .login-page form fieldset > * {
   width: 100%;
 }
-.login-page form fieldset span.api-error {
-  flex: 0.5;
-}
 .login-page form fieldset .input-with-validation-block {
   flex: 1;
   margin-top: calc(7% / (2 + 2));
@@ -150,31 +146,32 @@ main.error-page {
   height: 100%;
 }
 .login-page form fieldset .input-with-validation-block span {
-  height: auto;
   display: block;
+  height: auto;
 }
 .login-page form fieldset span.api-success {
   color: green;
 }
 .login-page form fieldset span.api-error {
+  flex: 0.5;
   color: red;
 }
 .login-page form fieldset span.api-success,
 .login-page form fieldset span.api-error {
-  font-size: 1.2em;
   margin: 0;
+  font-size: 1.2em;
 }
 .login-page form fieldset .submit-button-section {
   flex: 0.7;
   margin: calc(7% / (2 + 2)) 0;
 }
 .login-page form fieldset .submit-button-section .submit-button {
-  height: 100%;
   width: min(50%, 175px);
+  height: 100%;
 }
 .login-page nav {
-  width: 80%;
   flex: 15%;
+  width: 80%;
 }
 .login-page nav > * {
   flex: 1;
@@ -184,8 +181,8 @@ main.error-page {
   white-space: nowrap;
 }
 .login-page nav > * .home-button {
-  height: 70%;
   width: 40%;
+  height: 70%;
 }
 @media (max-width: 449px) {
   .login-page {
@@ -232,8 +229,8 @@ main.error-page {
   }
 }
 .sign-up-page form {
-  width: 80%;
   flex: 88%;
+  width: 80%;
 }
 .sign-up-page form > * {
   width: 100%;
@@ -248,9 +245,6 @@ main.error-page {
 .sign-up-page form fieldset > * {
   width: 100%;
 }
-.sign-up-page form fieldset span.api-error {
-  flex: 0.5;
-}
 .sign-up-page form fieldset .input-with-validation-block {
   flex: 1;
   margin-top: calc(10% / (7 + 2));
@@ -263,31 +257,32 @@ main.error-page {
   height: 100%;
 }
 .sign-up-page form fieldset .input-with-validation-block span {
-  height: auto;
   display: block;
+  height: auto;
 }
 .sign-up-page form fieldset span.api-success {
   color: green;
 }
 .sign-up-page form fieldset span.api-error {
+  flex: 0.5;
   color: red;
 }
 .sign-up-page form fieldset span.api-success,
 .sign-up-page form fieldset span.api-error {
-  font-size: 1.2em;
   margin: 0;
+  font-size: 1.2em;
 }
 .sign-up-page form fieldset .submit-button-section {
   flex: 1;
   margin: calc(10% / (7 + 2)) 0;
 }
 .sign-up-page form fieldset .submit-button-section .submit-button {
-  height: 100%;
   width: min(50%, 175px);
+  height: 100%;
 }
 .sign-up-page nav {
-  width: 80%;
   flex: 12%;
+  width: 80%;
 }
 .sign-up-page nav > * {
   flex: 1;
@@ -297,8 +292,8 @@ main.error-page {
   white-space: nowrap;
 }
 .sign-up-page nav > * .home-button {
-  height: 70%;
   width: 40%;
+  height: 70%;
 }
 @media (max-width: 449px) {
   .sign-up-page {
@@ -360,8 +355,8 @@ body {
   flex: 1;
 }
 .chats-page .navigation-section .chats-list {
-  flex: 88%;
   overflow: auto;
+  flex: 88%;
   width: 100%;
 }
 .chats-page .navigation-section .chats-list .chat-field.current-chat {
@@ -370,34 +365,32 @@ body {
 .chats-page .navigation-section .chats-list .chat-field {
   width: 100%;
   height: 12.57142857vh;
+  background-image: linear-gradient(#acceff, #acceff);
+  background-repeat: no-repeat;
+  background-position: left 50% bottom;
+  background-size: 90% 0.1em;
 }
 .chats-page .navigation-section .chats-list .chat-field .avatar-section {
   width: min(12.57142857vh, 7vw);
-  padding: calc(0.1 * min(12.57142857vh, 7vw)) 3%;
   height: auto;
+  padding: calc(0.1 * min(12.57142857vh, 7vw)) 3%;
   padding-right: 1%;
 }
 .chats-page .navigation-section .chats-list .chat-field .avatar-section img {
-  border-radius: 50%;
-  height: calc(0.8 * min(12.57142857vh, 7vw));
-  width: calc(0.8 * min(12.57142857vh, 7vw));
   align-self: flex-start;
+  width: calc(0.8 * min(12.57142857vh, 7vw));
+  height: calc(0.8 * min(12.57142857vh, 7vw));
+  border-radius: 50%;
 }
 .chats-page .navigation-section .chats-list .chat-field .chat-title-section {
   width: calc(100% - min(12.57142857vh, 7vw));
-  padding: calc(0.1 * min(12.57142857vh, 7vw)) 3%;
   height: auto;
+  padding: calc(0.1 * min(12.57142857vh, 7vw)) 3%;
   padding-left: 1%;
 }
 .chats-page .navigation-section .chats-list .chat-field .chat-title-section .chat-title {
   height: 100%;
   font-size: 2em;
-}
-.chats-page .navigation-section .chats-list .chat-field {
-  background-image: linear-gradient(#acceff, #acceff);
-  background-repeat: no-repeat;
-  background-size: 90% 0.1em;
-  background-position: left 50% bottom;
 }
 .chats-page .main-section {
   flex: 55%;
@@ -410,8 +403,8 @@ body {
   flex: 6%;
   background-image: linear-gradient(#e0e0e0, #e0e0e0);
   background-repeat: no-repeat;
-  background-size: 96% 0.2em;
   background-position: left 50% bottom;
+  background-size: 96% 0.2em;
 }
 .chats-page .main-section .main-section-header > *[class$="section"] {
   flex: 1;
@@ -419,19 +412,19 @@ body {
 }
 .chats-page .main-section .main-section-header .chat-info-section .chat-title {
   width: 100%;
+  padding-left: 4%;
   font-size: 1.5em;
   text-align: left;
-  padding-left: 4%;
 }
 .chats-page .main-section .main-section-header .functional-button-section {
   align-items: flex-end;
 }
 .chats-page .main-section .main-section-header .functional-button-section button {
-  height: 100%;
   width: 6vh;
+  height: 100%;
   padding-right: 4%;
-  background-size: cover;
   background-color: transparent;
+  background-size: cover;
 }
 .chats-page .main-section .chat-display-section {
   height: 82vh;
@@ -449,14 +442,14 @@ body {
   overflow-y: auto;
   flex-direction: column-reverse;
   justify-content: flex-start;
-  height: 74.005vh;
   width: 100%;
+  height: 74.005vh;
 }
 .chats-page .main-section .chat-display-section .messages-display-section .messages-list .chat-message {
   align-items: flex-end;
-  padding: 0 3.5%;
-  min-height: calc(74.005vh / 7);
   width: 93%;
+  min-height: calc(74.005vh / 7);
+  padding: 0 3.5%;
 }
 .chats-page .main-section .chat-display-section .messages-display-section .messages-list .chat-message .message-text {
   font-size: 2em;
@@ -465,8 +458,8 @@ body {
   flex: 12%;
   background-image: linear-gradient(#e0e0e0, #e0e0e0);
   background-repeat: no-repeat;
-  background-size: 96% 0.2em;
   background-position: left 50% top;
+  background-size: 96% 0.2em;
 }
 .chats-page .main-section .message-input-section > * {
   height: 100%;
@@ -476,39 +469,39 @@ body {
   margin-left: 2%;
 }
 .chats-page .main-section .message-input-section .attachment-block button {
-  height: min(6vh, 100px);
   width: min(6vh, 100px);
+  height: min(6vh, 100px);
   background-size: cover;
 }
 .chats-page .main-section .message-input-section .message-input-block {
   flex: 70%;
 }
 .chats-page .main-section .message-input-section .message-input-block input {
-  margin: 0 2%;
-  height: 50%;
   width: 100%;
-  text-align: center;
+  height: 50%;
+  margin: 0 2%;
   font-size: 1.2em;
+  text-align: center;
 }
 .chats-page .main-section .message-input-section .submit-block {
   flex: 15%;
   margin-right: 2%;
 }
 .chats-page .main-section .message-input-section .submit-block button {
-  height: min(6vh, 100px);
   width: min(6vh, 100px);
+  height: min(6vh, 100px);
   background-size: cover;
 }
 .chats-page section.side-menu {
-  display: none;
   position: absolute;
-  width: 12%;
   right: 0;
+  display: none;
+  width: 12%;
   background-color: #8ac8ff;
 }
 .chats-page section.side-menu button {
-  height: 6vh;
   width: 100%;
+  height: 6vh;
 }
 .chats-page section.side-menu .collapse-button {
   background-size: 100% 100%;
@@ -517,19 +510,19 @@ body {
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
-  opacity: 0;
   visibility: hidden;
+  opacity: 0;
+  background-color: rgba(0, 0, 0, 0.3);
 }
 .chats-page .modal .modal-content {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: white;
-  opacity: 1;
   width: 80vmin;
   height: 40vmin;
+  opacity: 1;
+  background-color: white;
   border-radius: 0.5rem;
 }
 .chats-page .modal .modal-content section {
@@ -547,8 +540,8 @@ body {
   height: 5vmin;
 }
 .chats-page .show-modal {
-  opacity: 1;
   visibility: visible;
+  opacity: 1;
   transition: opacity 0.4s ease;
 }
 main.profile-page {
@@ -580,11 +573,11 @@ main.profile-page .profile-form-header .image-section {
   flex: 75%;
 }
 main.profile-page .profile-form-header .image-section img {
-  border-radius: 50%;
-  max-height: min(90%, calc(0.9 * 16.875vh));
-  max-width: min(90%, calc(0.9 * 16.875vh));
+  width: min(90%, calc(0.9 * 16.875vh));
+  height: min(90%, calc(0.9 * 16.875vh));
   padding: calc(0.05 * min(90%, calc(0.9 * 16.875vh)));
   font-size: 1.5em;
+  border-radius: 50%;
 }
 main.profile-page .profile-form-header .name-section {
   flex: 25%;
@@ -595,25 +588,25 @@ main.profile-page .profile-form-header .name-section .user-id {
   font-weight: 600;
 }
 main.profile-page form.profile-data-form fieldset {
-  border: none;
-  background-color: azure;
   flex: 49.5vh;
   width: 100%;
+  background-color: azure;
+  border: none;
 }
-main.profile-page form.profile-data-form fieldset field.data-field {
+main.profile-page form.profile-data-form fieldset .data-field {
   flex: 1;
   width: 100%;
 }
-main.profile-page form.profile-data-form fieldset field.data-field > * {
+main.profile-page form.profile-data-form fieldset .data-field > * {
+  flex: 1;
+  width: 100%;
   height: 100%;
-  width: 100%;
-  flex: 1;
   font-size: 1.3em;
 }
-main.profile-page form.profile-data-form fieldset field.data-field .data-type-section .data-type {
+main.profile-page form.profile-data-form fieldset .data-field .data-type-section .data-type {
   font-weight: 550;
 }
-main.profile-page form.profile-data-form fieldset field.data-field .data-input-section .data-input {
+main.profile-page form.profile-data-form fieldset .data-field .data-input-section .data-input {
   font-style: italic;
   text-align: center;
 }
@@ -632,8 +625,8 @@ main.profile-page form.profile-data-form fieldset span.api-success {
   text-decoration: underline;
 }
 main.profile-page .profile-nav-section {
-  background-color: beige;
   flex: 20%;
+  background-color: beige;
 }
 main.profile-page .profile-nav-section .data-change-section,
 main.profile-page .profile-nav-section .home-button-section,
@@ -644,17 +637,17 @@ main.profile-page .profile-nav-section .avatar-change-section {
 main.profile-page .profile-nav-section .data-change-section > *,
 main.profile-page .profile-nav-section .home-button-section > *,
 main.profile-page .profile-nav-section .avatar-change-section > * {
-  width: 100%;
   flex: 1;
+  width: 100%;
 }
 main.profile-page .profile-nav-section section.avatar-change-section form.avatar-change-form {
-  height: 100%;
   width: 100%;
+  height: 100%;
 }
 main.profile-page .profile-nav-section section.avatar-change-section form.avatar-change-form .choose-button-section,
 main.profile-page .profile-nav-section section.avatar-change-section form.avatar-change-form .submit-button-section {
-  width: 100%;
   flex: 1;
+  width: 100%;
 }
 main.profile-page .profile-nav-section section.avatar-change-section form.avatar-change-form input.upload-avatar {
   display: none;
@@ -676,5 +669,3 @@ main.error-page .return-link {
   font-size: 1.2em;
 }
 
-
-/*# sourceMappingURL=app.css.map*/
