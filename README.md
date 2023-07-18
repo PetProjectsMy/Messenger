@@ -1,6 +1,6 @@
 ### DEMO
-- render.com: https://messenger-s22v.onrender.com  
-- netlify: https://heroic-sable-837180.netlify.app
+- render.com: https://pet-projects-messenger.onrender.com
+- netlify: https://pet-projects-messenger.netlify.app
 ___
 В проекте с использованием шаблонизатора handlebars и css-препроцессора less
 реализованы 8 статических страничек:
