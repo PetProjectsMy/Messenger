@@ -1,6 +1,6 @@
 ### DEMO
-- render.com: https://pet-projects-messenger.onrender.com
-- netlify: https://pet-projects-messenger.netlify.app
+- render.com: <a href=https://pet-projects-messenger.onrender.com target="_blank">https://pet-projects-messenger.onrender.com</a>
+- netlify: <a href=https://pet-projects-messenger.onrender.com target="_blank">https://pet-projects-messenger.netlify.app</a>
 ___
 В проекте с использованием шаблонизатора handlebars и css-препроцессора less
 реализованы 8 статических страничек:
